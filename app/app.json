@@ -1,0 +1,56 @@
+{
+  "expo": {
+    "name": "app",
+    "slug": "app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSCameraUsageDescription": "생물을 촬영해 도감에 기록하기 위해 카메라를 사용합니다.",
+        "NSLocationWhenInUseUsageDescription": "발견 위치를 지도에 기록하기 위해 위치를 사용합니다. 위치 없이도 촬영은 가능합니다.",
+        "NSPhotoLibraryUsageDescription": "갤러리의 사진을 불러와 도감에 기록하기 위해 사진 접근이 필요합니다."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false,
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "생물을 촬영해 도감에 기록하기 위해 카메라를 사용합니다."
+        }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "발견 위치를 지도에 기록하기 위해 위치를 사용합니다. 위치 없이도 촬영은 가능합니다."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "갤러리의 사진을 불러와 도감에 기록하기 위해 사진 접근이 필요합니다."
+        }
+      ],
+      "expo-secure-store"
+    ]
+  }
+}
