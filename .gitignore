@@ -1,0 +1,12 @@
+# dependencies
+node_modules/
+
+# env
+.env
+.env.local
+
+# OS
+.DS_Store
+
+# typescript
+*.tsbuildinfo
