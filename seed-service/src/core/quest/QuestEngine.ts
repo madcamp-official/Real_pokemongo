@@ -6,7 +6,7 @@
  *
  * 완료 조건은 questCriteria 를 관찰 하나에 대한 술어로 평가하는 방식.
  */
-import type { Observation, Taxon, ChildId } from "../domain/types.js";
+import type { Observation, Taxon, UserId } from "../domain/types.js";
 import type { Quest, QuestProgress, QuestCriteria } from "./questTypes.js";
 import type { QuestRepository, TaxonRepository } from "../repositories/ports.js";
 
@@ -41,7 +41,7 @@ export class QuestEngine {
     for (const quest of active) {
       if (!this.matches(quest.criteria, taxon, obs)) continue;
 
-      const progress = await this.getOrInitProgress(obs.childId, quest.id);
+      const progress = await this.getOrInitProgress(obs.userId, quest.id);
       if (progress.completed) continue;
 
       // 서로 다른 종만 카운트(중복 관찰 방지).
@@ -94,24 +94,24 @@ export class QuestEngine {
   }
 
   private async getOrInitProgress(
-    childId: ChildId,
+    userId: UserId,
     questId: string,
   ): Promise<QuestProgress> {
-    const existing = await this.quests.getProgress(childId, questId);
+    const existing = await this.quests.getProgress(userId, questId);
     if (existing) return existing;
-    return { childId, questId, matchedTaxonIds: [], completed: false };
+    return { userId, questId, matchedTaxonIds: [], completed: false };
   }
 
-  /** 아이 홈 화면에 노출할 진행 중 퀘스트(항상 최소 1개 보장은 시딩·로테이션 책임). */
-  async activeForChild(childId: ChildId, now: Date = new Date()) {
+  /** 홈 화면에 노출할 진행 중 퀘스트(항상 최소 1개 보장은 시딩·로테이션 책임). */
+  async activeForUser(userId: UserId, now: Date = new Date()) {
     const active = (await this.quests.listActive()).filter((q) =>
       this.isActiveAt(q, now),
     );
     return Promise.all(
       active.map(async (quest) => {
         const progress =
-          (await this.quests.getProgress(childId, quest.id)) ??
-          ({ childId, questId: quest.id, matchedTaxonIds: [], completed: false } as QuestProgress);
+          (await this.quests.getProgress(userId, quest.id)) ??
+          ({ userId, questId: quest.id, matchedTaxonIds: [], completed: false } as QuestProgress);
         return {
           quest,
           done: progress.matchedTaxonIds.length,

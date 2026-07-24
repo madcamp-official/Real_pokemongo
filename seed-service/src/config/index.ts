@@ -49,6 +49,11 @@ export interface AppConfig {
       apiKey?: string;
       endpoint: string;
     };
+    /** B단계: GPU 서버(HybridClassifier) 상시 추론 서버. SSH 로컬 포트포워딩 경유 접근. */
+    bioclip: {
+      endpoint: string;
+      timeoutMs: number;
+    };
     freeDailyLimit: number; // 0 = 무제한
   };
 
@@ -98,6 +103,18 @@ export function loadConfig(): AppConfig {
       plantNet: {
         apiKey: env("PLANTNET_API_KEY"),
         endpoint: env("PLANTNET_ENDPOINT") ?? "https://my-api.plantnet.org/v2",
+      },
+      bioclip: {
+        // plantId/plantNet과 동일한 관례: 명시적으로 설정하지 않으면 빈 문자열(꺼짐).
+        // BIOCLIP_ENDPOINT는 apiKey가 없는 대신 그 자체가 온/오프 스위치이므로, 여기서
+        // 기본값을 채워버리면(예: 127.0.0.1:8931) 실제 GPU 서버가 없는 개발/테스트
+        // 환경에서도 isConfigured()=true가 되어 항상 이 프로바이더가 먼저 선택되고,
+        // 매 요청이 네트워크 실패로 죽는다 -- 실제로 이 값을 채워 넣었다가 기존
+        // ObservationFlow/DataRightsService/Authorization 테스트가 무더기로 깨지는 걸
+        // 확인하고 되돌린 결정이다. 로컬 개발 시 .env.example의 안내대로 SSH 터널을 연
+        // 뒤 개발자가 직접 .env에 값을 채워야 활성화된다.
+        endpoint: env("BIOCLIP_ENDPOINT") ?? "",
+        timeoutMs: envNumber("BIOCLIP_TIMEOUT_MS", 15000),
       },
       freeDailyLimit: envNumber("FREE_DAILY_IDENTIFY_LIMIT", 20),
     },

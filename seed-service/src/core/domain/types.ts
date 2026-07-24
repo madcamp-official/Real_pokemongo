@@ -15,8 +15,7 @@
 // ---------------------------------------------------------------------------
 export type Brand<T, B extends string> = T & { readonly __brand: B };
 
-export type GuardianId = Brand<string, "GuardianId">;
-export type ChildId = Brand<string, "ChildId">;
+export type UserId = Brand<string, "UserId">;
 export type TaxonId = Brand<string, "TaxonId">;
 export type ObservationId = Brand<string, "ObservationId">;
 export type QuestId = Brand<string, "QuestId">;
@@ -109,7 +108,7 @@ export interface ObservedRegion {
 
 export interface Observation {
   id: ObservationId;
-  childId: ChildId;
+  userId: UserId;
   taxonId: TaxonId | null; // 동정 실패/상위분류만 된 경우 null 가능
   taxonRank: TaxonRank | null; // 어느 계급까지 확정됐는지 (species가 아닐 수 있음)
   timestamp: string; // ISO8601
@@ -126,7 +125,7 @@ export interface Observation {
 // 도감 진행 (Collection)
 // ---------------------------------------------------------------------------
 export interface CollectionEntry {
-  childId: ChildId;
+  userId: UserId;
   taxonId: TaxonId;
   unlocked: boolean;
   firstObservedAt?: string; // 첫 발견 시각
@@ -135,26 +134,17 @@ export interface CollectionEntry {
 }
 
 // ---------------------------------------------------------------------------
-// 계정 (공유 코어 상단, 어린이 버티컬에서 사용)
+// 계정 (단일 사용자 모델 — v1.2: 보호자·자녀 2단계 구조를 단일 계정으로 통합)
 // ---------------------------------------------------------------------------
-
-export type AgeBand = "toddler" | "child"; // toddler: 글 미독(5~6), child: 읽기 가능(7~10)
 
 export type SubscriptionPlan = "free" | "family";
 
-export interface Guardian {
-  id: GuardianId;
+export interface User {
+  id: UserId;
   // 인증 주체. 이메일/토큰 등은 인증 계층 소관이라 여기선 참조만.
   plan: SubscriptionPlan;
   locationStorageEnabled: boolean; // 기본 false (명세서 F12)
-  createdAt: string;
-}
-
-export interface ChildProfile {
-  id: ChildId;
-  guardianId: GuardianId;
   nickname: string; // 실명 아님
-  ageBand: AgeBand; // 정밀 생년월일 미저장
   avatar: string;
   level: number;
   xp: number;

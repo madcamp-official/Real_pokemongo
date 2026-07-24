@@ -12,7 +12,6 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildApp, type App } from "../composition.js";
 import { loadConfig, type AppConfig } from "../config/index.js";
-import type { ChildId } from "../core/domain/types.js";
 import type { AuthContext } from "../core/auth/Authorization.js";
 import { makeCleanJpeg, makeJpegWithGpsExif } from "../core/media/fixtures.js";
 
@@ -28,15 +27,9 @@ function testConfig(freeDailyLimit = 0): AppConfig {
 
 async function setup(freeDailyLimit = 0) {
   const app = await buildApp(testConfig(freeDailyLimit));
-  const guardian = await app.accounts.createGuardian("free");
-  const ctx = { guardianId: guardian.id }; // 인증된 보호자 컨텍스트
-  const child = await app.accounts.createChild(ctx, {
-    nickname: "테스트아이",
-    ageBand: "child",
-    avatar: "fox",
-    legalGuardianConsent: true,
-  });
-  return { app, guardian, ctx, child };
+  const user = await app.accounts.createUser({ nickname: "테스트유저", avatar: "fox" });
+  const ctx: AuthContext = { userId: user.id }; // 인증된 계정 컨텍스트
+  return { app, ctx, user };
 }
 
 function img() {
@@ -47,7 +40,6 @@ function img() {
 async function observeHigh(
   app: App,
   ctx: AuthContext,
-  childId: ChildId,
   sci: string,
   kor: string,
   group: "plant" | "insect",
@@ -55,7 +47,6 @@ async function observeHigh(
 ) {
   app.mock.enqueue([{ scientificName: sci, vernacularName: kor, rank: "species", confidence: 0.92 }]);
   return app.flow.observe(ctx, {
-    childId,
     images: img(),
     media: [],
     groupHint: group,
@@ -64,8 +55,8 @@ async function observeHigh(
 }
 
 test("high 확신은 도감·퀘스트·보상에 반영된다", async () => {
-  const { app, ctx, child } = await setup();
-  const res = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant");
+  const { app, ctx } = await setup();
+  const res = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
 
   assert.ok(res.recorded, "high 확신은 기록되어야 함");
   assert.equal(res.recorded!.newlyUnlockedTaxonId, "taxon-dandelion");
@@ -73,40 +64,40 @@ test("high 확신은 도감·퀘스트·보상에 반영된다", async () => {
   assert.ok(res.recorded!.xpGained > 0);
 
   // 봄 퀘스트(노란 꽃) 진행이 1 올라야 한다(민들레=노란 봄 식물).
-  const progress = await app.repos.quests.getProgress(child.id, "quest-spring-yellow-flowers");
+  const progress = await app.repos.quests.getProgress(ctx.userId, "quest-spring-yellow-flowers");
   assert.ok(progress);
   assert.equal(progress!.matchedTaxonIds.length, 1);
 });
 
 test("medium 확신은 도감/퀘스트에 반영되지 않는다(오동정 굳힘 방지)", async () => {
-  const { app, ctx, child } = await setup();
+  const { app, ctx } = await setup();
   app.mock.enqueue([
     { scientificName: "Taraxacum officinale", vernacularName: "민들레", rank: "species", confidence: 0.72 },
     { scientificName: "Forsythia koreana", vernacularName: "개나리", rank: "species", confidence: 0.66 },
   ]);
-  const res = await app.flow.observe(ctx, { childId: child.id, images: img(), media: [], groupHint: "plant" });
+  const res = await app.flow.observe(ctx, { images: img(), media: [], groupHint: "plant" });
 
   assert.equal(res.identification.tier, "medium");
   assert.equal(res.recorded, undefined, "medium은 기록되면 안 됨");
 
-  const entries = await app.repos.collection.listByChild(child.id);
+  const entries = await app.repos.collection.listByUser(ctx.userId);
   assert.equal(entries.length, 0, "도감에 해금이 없어야 함");
 });
 
 test("unknown 확신은 재촬영 안내만 하고 아무것도 기록하지 않는다", async () => {
-  const { app, ctx, child } = await setup();
+  const { app, ctx } = await setup();
   app.mock.enqueue([{ scientificName: "Nothing here", rank: "species", confidence: 0.2 }]);
-  const res = await app.flow.observe(ctx, { childId: child.id, images: img(), media: [], groupHint: "plant" });
+  const res = await app.flow.observe(ctx, { images: img(), media: [], groupHint: "plant" });
 
   assert.equal(res.identification.tier, "unknown");
   assert.equal(res.recorded, undefined);
-  const obs = await app.repos.observations.listByChild(child.id);
+  const obs = await app.repos.observations.listByUser(ctx.userId);
   assert.equal(obs.length, 0);
 });
 
 test("위험 종도 도감에는 수집되되, 안전 안내가 먼저 노출된다", async () => {
-  const { app, ctx, child } = await setup();
-  const res = await observeHigh(app, ctx, child.id, "Apis mellifera", "꿀벌", "insect");
+  const { app, ctx } = await setup();
+  const res = await observeHigh(app, ctx, "Apis mellifera", "꿀벌", "insect");
 
   assert.ok(res.recorded, "위험 종도 도감엔 수집됨");
   assert.ok(res.safety, "안전 안내가 있어야 함");
@@ -115,39 +106,39 @@ test("위험 종도 도감에는 수집되되, 안전 안내가 먼저 노출된
 });
 
 test("재관찰은 중복 해금·중복 배지를 만들지 않는다(멱등성)", async () => {
-  const { app, ctx, child } = await setup();
-  const first = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant");
-  const second = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant");
+  const { app, ctx } = await setup();
+  const first = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
+  const second = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
 
   assert.equal(first.recorded!.newlyUnlockedTaxonId, "taxon-dandelion");
   assert.equal(second.recorded!.newlyUnlockedTaxonId, undefined, "이미 해금된 종은 다시 해금되지 않음");
 
   // '첫 발견' 배지는 한 번만.
-  const badges = await app.repos.badges.listByChild(child.id);
+  const badges = await app.repos.badges.listByUser(ctx.userId);
   const firstFind = badges.filter((b) => b.badgeId === "badge-first-find");
   assert.equal(firstFind.length, 1);
 
   // XP: 첫 해금 +10, 재관찰 +2 → 누적 12.
-  const fresh = await app.accounts.getChild(child.id);
+  const fresh = await app.accounts.getUser(ctx.userId);
   assert.equal(fresh!.xp, 12);
 });
 
 test("일일 한도 초과 시 외부 동정 API를 호출하지 않고 차단한다(비용 안전)", async () => {
-  const { app, ctx, child } = await setup(1); // 무료 일일 한도 1
+  const { app, ctx } = await setup(1); // 무료 일일 한도 1
 
-  const ok = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant");
+  const ok = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
   assert.ok(ok.recorded, "첫 관찰은 성공");
   assert.equal(app.mock.identifyCalls, 1);
 
   // 두 번째: 한도 초과 → 동정 자체를 시도하지 않아야 함(호출 카운트 불변).
-  const blocked = await app.flow.observe(ctx, { childId: child.id, images: img(), media: [], groupHint: "plant" });
+  const blocked = await app.flow.observe(ctx, { images: img(), media: [], groupHint: "plant" });
   assert.equal(blocked.blocked?.reason, "daily_limit");
   assert.equal(app.mock.identifyCalls, 1, "차단 시 외부 API가 호출되면 안 됨(비용 발생)");
 });
 
 test("정밀 좌표를 줘도 위치 저장 OFF면 저장 데이터에 좌표가 없다", async () => {
-  const { app, ctx, child } = await setup();
-  const res = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant", {
+  const { app, ctx } = await setup();
+  const res = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant", {
     rawCoord: { lat: 37.512345, lng: 127.056789 },
   });
   const obs = await app.repos.observations.get(res.recorded!.observationId as never);
@@ -156,12 +147,11 @@ test("정밀 좌표를 줘도 위치 저장 OFF면 저장 데이터에 좌표가
 });
 
 test("GPS EXIF 사진을 올려도 외부 동정 API에는 EXIF 없는 바이트만 전달된다", async () => {
-  const { app, ctx, child } = await setup();
+  const { app, ctx } = await setup();
   app.mock.enqueue([
     { scientificName: "Taraxacum officinale", vernacularName: "민들레", rank: "species", confidence: 0.93 },
   ]);
   await app.flow.observe(ctx, {
-    childId: child.id,
     images: [makeJpegWithGpsExif()], // GPS가 박힌 원시 사진
     media: [],
     groupHint: "plant",
@@ -183,10 +173,10 @@ test("GPS EXIF 사진을 올려도 외부 동정 API에는 EXIF 없는 바이트
 });
 
 test("위치 저장 ON이어도 시·군·구 코드만 저장되고 정밀 좌표는 없다", async () => {
-  const { app, ctx, child } = await setup();
+  const { app, ctx } = await setup();
   await app.accounts.setLocationStorage(ctx, true);
 
-  const res = await observeHigh(app, ctx, child.id, "Taraxacum officinale", "민들레", "plant", {
+  const res = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant", {
     rawCoord: { lat: 37.512345, lng: 127.056789 },
   });
   const obs = await app.repos.observations.get(res.recorded!.observationId as never);

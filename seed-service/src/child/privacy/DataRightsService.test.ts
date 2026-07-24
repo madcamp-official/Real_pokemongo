@@ -3,9 +3,11 @@
  *
  * 회귀하면 "삭제했다는데 데이터가 남는" 법 위반 사고가 난다. 절대 약화 금지.
  * 핵심 불변식:
- *  - 삭제 후 그 아이의 데이터가 **모든 저장소에서 0건**(삭제 완전성).
- *  - 형제·남의 가족 데이터는 절대 지워지지 않음(과잉 삭제 방지).
- *  - 삭제/내보내기는 본인 가족만(IDOR 방지) — 남의 아이는 AuthorizationError.
+ *  - 삭제 후 내 계정 데이터가 **모든 저장소에서 0건**(삭제 완전성).
+ *  - 다른 계정 데이터는 절대 지워지지 않음(과잉 삭제 방지).
+ *  - 삭제/내보내기는 항상 ctx.userId 자신만 대상(대상 id를 별도로 받지 않으므로 IDOR
+ *    자체가 API 표면에서 성립하지 않는다 — v1.2 단일 계정 모델로 통합되며 바뀐 부분).
+ *    다만 위조/존재하지 않는 계정으로는 아무것도 할 수 없어야 한다.
  *  - 파기 리포트가 실제 삭제 건수를 정확히 보고.
  *  - 미디어 blob 파기 대상(MediaRef)이 리포트에 수집됨.
  */
@@ -15,8 +17,7 @@ import { buildApp, type App } from "../../composition.js";
 import { loadConfig } from "../../config/index.js";
 import { AuthorizationError, type AuthContext } from "../../core/auth/Authorization.js";
 import { makeCleanJpeg } from "../../core/media/fixtures.js";
-import { asMediaRef } from "../../core/domain/ids.js";
-import type { ChildId, GuardianId } from "../../core/domain/types.js";
+import { asMediaRef, newUserId } from "../../core/domain/ids.js";
 
 function testConfig() {
   const cfg = loadConfig();
@@ -27,64 +28,51 @@ function testConfig() {
   return cfg;
 }
 
-/** 한 아이가 관찰을 여러 번 해서 모든 저장소에 데이터를 쌓는다. */
-async function observe(app: App, ctx: AuthContext, childId: ChildId, sci: string, kor: string) {
+/** 한 계정이 관찰을 여러 번 해서 모든 저장소에 데이터를 쌓는다. */
+async function observe(app: App, ctx: AuthContext, sci: string, kor: string) {
   app.mock.enqueue([{ scientificName: sci, vernacularName: kor, rank: "species", confidence: 0.92 }]);
   return app.flow.observe(ctx, {
-    childId,
     images: [makeCleanJpeg()],
     media: [asMediaRef("media://" + sci)],
     groupHint: "plant",
   });
 }
 
-async function seedChildWithData(app: App, ctx: AuthContext, childId: ChildId) {
-  await observe(app, ctx, childId, "Taraxacum officinale", "민들레");
-  await observe(app, ctx, childId, "Forsythia koreana", "개나리");
+async function seedUserWithData(app: App, ctx: AuthContext) {
+  await observe(app, ctx, "Taraxacum officinale", "민들레");
+  await observe(app, ctx, "Forsythia koreana", "개나리");
 }
 
-/** 그 아이의 데이터가 모든 저장소에 몇 건씩 있는지. */
-async function footprint(app: App, childId: ChildId) {
+/** 그 계정의 데이터가 모든 저장소에 몇 건씩 있는지. */
+async function footprint(app: App, userId: AuthContext["userId"]) {
   return {
-    child: await app.repos.children.get(childId),
-    observations: (await app.repos.observations.listByChild(childId)).length,
-    collection: (await app.repos.collection.listByChild(childId)).length,
-    questProgress: (await app.repos.quests.listProgressByChild(childId)).length,
-    badges: (await app.repos.badges.listByChild(childId)).length,
+    user: await app.repos.users.get(userId),
+    observations: (await app.repos.observations.listByUser(userId)).length,
+    collection: (await app.repos.collection.listByUser(userId)).length,
+    questProgress: (await app.repos.quests.listProgressByUser(userId)).length,
+    badges: (await app.repos.badges.listByUser(userId)).length,
   };
 }
 
-async function twoChildFamily() {
+async function oneUser(nickname = "첫째") {
   const app = await buildApp(testConfig());
-  const g = await app.accounts.createGuardian("free");
-  const ctx: AuthContext = { guardianId: g.id };
-  const childA = await app.accounts.createChild(ctx, {
-    nickname: "첫째",
-    ageBand: "child",
-    avatar: "fox",
-    legalGuardianConsent: true,
-  });
-  const childB = await app.accounts.createChild(ctx, {
-    nickname: "둘째",
-    ageBand: "child",
-    avatar: "bear",
-    legalGuardianConsent: true,
-  });
-  return { app, g, ctx, childA, childB };
+  const user = await app.accounts.createUser({ nickname, avatar: "fox" });
+  const ctx: AuthContext = { userId: user.id };
+  return { app, user, ctx };
 }
 
-test("삭제 완전성: 아이 데이터가 모든 저장소에서 0건이 된다", async () => {
-  const { app, ctx, childA } = await twoChildFamily();
-  await seedChildWithData(app, ctx, childA.id);
+test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장소에서 0건이 된다", async () => {
+  const { app, ctx } = await oneUser();
+  await seedUserWithData(app, ctx);
 
   // 사전 조건: 데이터가 실제로 쌓였는지.
-  const before = await footprint(app, childA.id);
+  const before = await footprint(app, ctx.userId);
   assert.ok(before.observations >= 2 && before.collection >= 2 && before.badges >= 1);
 
-  const report = await app.dataRights.eraseChildData(ctx, childA.id);
+  const report = await app.dataRights.eraseUserData(ctx);
 
-  const after = await footprint(app, childA.id);
-  assert.equal(after.child, null, "프로필이 남으면 안 됨");
+  const after = await footprint(app, ctx.userId);
+  assert.equal(after.user, null, "프로필이 남으면 안 됨");
   assert.equal(after.observations, 0);
   assert.equal(after.collection, 0);
   assert.equal(after.questProgress, 0);
@@ -98,57 +86,42 @@ test("삭제 완전성: 아이 데이터가 모든 저장소에서 0건이 된�
   assert.equal(report.mediaRefsToPurge.length, before.observations);
 });
 
-test("과잉 삭제 방지: 형제 데이터는 절대 지워지지 않는다", async () => {
-  const { app, ctx, childA, childB } = await twoChildFamily();
-  await seedChildWithData(app, ctx, childA.id);
-  await seedChildWithData(app, ctx, childB.id);
+test("과잉 삭제 방지: 다른 계정 데이터는 절대 지워지지 않는다", async () => {
+  const { app, ctx: ctxA } = await oneUser("첫째");
+  const userB = await app.accounts.createUser({ nickname: "둘째", avatar: "bear" });
+  const ctxB: AuthContext = { userId: userB.id };
 
-  await app.dataRights.eraseChildData(ctx, childA.id);
+  await seedUserWithData(app, ctxA);
+  await seedUserWithData(app, ctxB);
 
-  // 형제(B)의 데이터는 온전해야 한다.
-  const b = await footprint(app, childB.id);
-  assert.ok(b.child, "형제 프로필은 유지");
-  assert.ok(b.observations >= 2, "형제 관찰 유지");
-  assert.ok(b.collection >= 2, "형제 도감 유지");
+  await app.dataRights.eraseUserData(ctxA);
+
+  // 다른 계정(B)의 데이터는 온전해야 한다.
+  const b = await footprint(app, ctxB.userId);
+  assert.ok(b.user, "다른 계정 프로필은 유지");
+  assert.ok(b.observations >= 2, "다른 계정 관찰 유지");
+  assert.ok(b.collection >= 2, "다른 계정 도감 유지");
 });
 
-test("IDOR: 남의 아이는 삭제도 내보내기도 할 수 없다", async () => {
-  const { app, childA } = await twoChildFamily();
-  const attacker = await app.accounts.createGuardian("free");
-  const attackerCtx: AuthContext = { guardianId: attacker.id };
+test("위조된 계정으로는 삭제도 내보내기도 할 수 없다", async () => {
+  const { app } = await oneUser();
+  const forgedCtx: AuthContext = { userId: newUserId() }; // 존재하지 않는 계정
 
   await assert.rejects(
-    () => app.dataRights.eraseChildData(attackerCtx, childA.id),
+    () => app.dataRights.eraseUserData(forgedCtx),
     AuthorizationError,
   );
   await assert.rejects(
-    () => app.dataRights.exportChildData(attackerCtx, childA.id),
+    () => app.dataRights.exportUserData(forgedCtx),
     AuthorizationError,
   );
-  // A의 프로필은 그대로.
-  assert.ok(await app.repos.children.get(childA.id));
 });
 
-test("회원 탈퇴: 보호자와 소속 자녀 전원 데이터가 파기된다", async () => {
-  const { app, g, ctx, childA, childB } = await twoChildFamily();
-  await seedChildWithData(app, ctx, childA.id);
-  await seedChildWithData(app, ctx, childB.id);
+test("이동권: 내보내기는 내 데이터 사본을 반환하되 정밀 좌표는 없다", async () => {
+  const { app, ctx } = await oneUser("첫째");
+  await seedUserWithData(app, ctx);
 
-  const report = await app.dataRights.eraseGuardianAccount(ctx);
-
-  assert.equal(report.children.length, 2, "자녀 2명 모두 파기 리포트");
-  assert.equal(report.guardianDeleted, true);
-  assert.equal(await app.repos.guardians.get(g.id), null, "보호자 계정 파기");
-  assert.equal((await footprint(app, childA.id)).child, null);
-  assert.equal((await footprint(app, childB.id)).child, null);
-  assert.equal((await footprint(app, childA.id)).observations, 0);
-});
-
-test("이동권: 내보내기는 아동 데이터 사본을 반환하되 정밀 좌표는 없다", async () => {
-  const { app, ctx, childA } = await twoChildFamily();
-  await seedChildWithData(app, ctx, childA.id);
-
-  const dump = await app.dataRights.exportChildData(ctx, childA.id);
+  const dump = await app.dataRights.exportUserData(ctx);
   assert.equal(dump.profile.nickname, "첫째");
   assert.ok(dump.observations.length >= 2);
   assert.ok(dump.collection.length >= 2);
@@ -158,13 +131,13 @@ test("이동권: 내보내기는 아동 데이터 사본을 반환하되 정밀 
 });
 
 test("파기 후 재호출은 인가 단계에서 거부된다(프로필 부재)", async () => {
-  const { app, ctx, childA } = await twoChildFamily();
-  await seedChildWithData(app, ctx, childA.id);
-  await app.dataRights.eraseChildData(ctx, childA.id);
+  const { app, ctx } = await oneUser();
+  await seedUserWithData(app, ctx);
+  await app.dataRights.eraseUserData(ctx);
 
-  // 이미 지워진 아이 → 소유권 검증이 미존재로 거부(안전하게 실패).
+  // 이미 지워진 계정 → 소유권 검증이 미존재로 거부(안전하게 실패).
   await assert.rejects(
-    () => app.dataRights.eraseChildData(ctx, childA.id),
+    () => app.dataRights.eraseUserData(ctx),
     AuthorizationError,
   );
 });

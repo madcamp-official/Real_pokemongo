@@ -5,10 +5,8 @@
  * TODO(제공 필요): DATABASE_URL 채운 뒤 Postgres 등 어댑터 구현.
  */
 import type {
-  Guardian,
-  GuardianId,
-  ChildProfile,
-  ChildId,
+  User,
+  UserId,
   Taxon,
   TaxonId,
   Observation,
@@ -21,8 +19,7 @@ import type {
 import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
 import type {
-  GuardianRepository,
-  ChildRepository,
+  UserRepository,
   TaxonRepository,
   ObservationRepository,
   CollectionRepository,
@@ -30,31 +27,15 @@ import type {
   BadgeRepository,
 } from "../ports.js";
 
-export class InMemoryGuardianRepo implements GuardianRepository {
-  private m = new Map<string, Guardian>();
-  async save(g: Guardian) {
-    this.m.set(g.id, g);
+export class InMemoryUserRepo implements UserRepository {
+  private m = new Map<string, User>();
+  async save(u: User) {
+    this.m.set(u.id, u);
   }
-  async get(id: GuardianId) {
+  async get(id: UserId) {
     return this.m.get(id) ?? null;
   }
-  async delete(id: GuardianId) {
-    return this.m.delete(id);
-  }
-}
-
-export class InMemoryChildRepo implements ChildRepository {
-  private m = new Map<string, ChildProfile>();
-  async save(c: ChildProfile) {
-    this.m.set(c.id, c);
-  }
-  async get(id: ChildId) {
-    return this.m.get(id) ?? null;
-  }
-  async listByGuardian(guardianId: GuardianId) {
-    return [...this.m.values()].filter((c) => c.guardianId === guardianId);
-  }
-  async delete(id: ChildId) {
+  async delete(id: UserId) {
     return this.m.delete(id);
   }
 }
@@ -96,18 +77,18 @@ export class InMemoryObservationRepo implements ObservationRepository {
   async get(id: ObservationId) {
     return this.m.get(id) ?? null;
   }
-  async listByChild(childId: ChildId) {
+  async listByUser(userId: UserId) {
     return [...this.m.values()]
-      .filter((o) => o.childId === childId)
+      .filter((o) => o.userId === userId)
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
   }
-  async listByChildSince(childId: ChildId, sinceIso: string) {
-    return (await this.listByChild(childId)).filter((o) => o.timestamp >= sinceIso);
+  async listByUserSince(userId: UserId, sinceIso: string) {
+    return (await this.listByUser(userId)).filter((o) => o.timestamp >= sinceIso);
   }
-  async deleteByChild(childId: ChildId) {
+  async deleteByUser(userId: UserId) {
     let n = 0;
     for (const [k, v] of this.m) {
-      if (v.childId === childId) {
+      if (v.userId === userId) {
         this.m.delete(k);
         n++;
       }
@@ -118,22 +99,22 @@ export class InMemoryObservationRepo implements ObservationRepository {
 
 export class InMemoryCollectionRepo implements CollectionRepository {
   private m = new Map<string, CollectionEntry>();
-  private key(childId: ChildId, taxonId: TaxonId) {
-    return `${childId}::${taxonId}`;
+  private key(userId: UserId, taxonId: TaxonId) {
+    return `${userId}::${taxonId}`;
   }
-  async get(childId: ChildId, taxonId: TaxonId) {
-    return this.m.get(this.key(childId, taxonId)) ?? null;
+  async get(userId: UserId, taxonId: TaxonId) {
+    return this.m.get(this.key(userId, taxonId)) ?? null;
   }
   async save(entry: CollectionEntry) {
-    this.m.set(this.key(entry.childId, entry.taxonId), entry);
+    this.m.set(this.key(entry.userId, entry.taxonId), entry);
   }
-  async listByChild(childId: ChildId) {
-    return [...this.m.values()].filter((e) => e.childId === childId);
+  async listByUser(userId: UserId) {
+    return [...this.m.values()].filter((e) => e.userId === userId);
   }
-  async deleteByChild(childId: ChildId) {
+  async deleteByUser(userId: UserId) {
     let n = 0;
     for (const [k, v] of this.m) {
-      if (v.childId === childId) {
+      if (v.userId === userId) {
         this.m.delete(k);
         n++;
       }
@@ -145,8 +126,8 @@ export class InMemoryCollectionRepo implements CollectionRepository {
 export class InMemoryQuestRepo implements QuestRepository {
   private quests = new Map<string, Quest>();
   private progress = new Map<string, QuestProgress>();
-  private pkey(childId: ChildId, questId: string) {
-    return `${childId}::${questId}`;
+  private pkey(userId: UserId, questId: string) {
+    return `${userId}::${questId}`;
   }
   async listActive() {
     return [...this.quests.values()];
@@ -154,22 +135,22 @@ export class InMemoryQuestRepo implements QuestRepository {
   async get(id: string) {
     return this.quests.get(id) ?? null;
   }
-  async getProgress(childId: ChildId, questId: string) {
-    return this.progress.get(this.pkey(childId, questId)) ?? null;
+  async getProgress(userId: UserId, questId: string) {
+    return this.progress.get(this.pkey(userId, questId)) ?? null;
   }
   async saveProgress(p: QuestProgress) {
-    this.progress.set(this.pkey(p.childId, p.questId), p);
+    this.progress.set(this.pkey(p.userId, p.questId), p);
   }
-  async listProgressByChild(childId: ChildId) {
-    return [...this.progress.values()].filter((p) => p.childId === childId);
+  async listProgressByUser(userId: UserId) {
+    return [...this.progress.values()].filter((p) => p.userId === userId);
   }
   async upsertMany(quests: Quest[]) {
     for (const q of quests) this.quests.set(q.id, q);
   }
-  async deleteProgressByChild(childId: ChildId) {
+  async deleteProgressByUser(userId: UserId) {
     let n = 0;
     for (const [k, v] of this.progress) {
-      if (v.childId === childId) {
+      if (v.userId === userId) {
         this.progress.delete(k);
         n++;
       }
@@ -180,18 +161,18 @@ export class InMemoryQuestRepo implements QuestRepository {
 
 export class InMemoryBadgeRepo implements BadgeRepository {
   private m: EarnedBadge[] = [];
-  async listByChild(childId: ChildId) {
-    return this.m.filter((b) => b.childId === childId);
+  async listByUser(userId: UserId) {
+    return this.m.filter((b) => b.userId === userId);
   }
   async award(badge: EarnedBadge) {
     this.m.push(badge);
   }
-  async has(childId: ChildId, badgeId: string) {
-    return this.m.some((b) => b.childId === childId && b.badgeId === badgeId);
+  async has(userId: UserId, badgeId: string) {
+    return this.m.some((b) => b.userId === userId && b.badgeId === badgeId);
   }
-  async deleteByChild(childId: ChildId) {
+  async deleteByUser(userId: UserId) {
     const before = this.m.length;
-    this.m = this.m.filter((b) => b.childId !== childId);
+    this.m = this.m.filter((b) => b.userId !== userId);
     return before - this.m.length;
   }
 }

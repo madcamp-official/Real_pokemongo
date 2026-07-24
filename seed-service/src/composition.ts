@@ -9,8 +9,7 @@
  */
 import { loadConfig, type AppConfig } from "./config/index.js";
 import {
-  InMemoryGuardianRepo,
-  InMemoryChildRepo,
+  InMemoryUserRepo,
   InMemoryTaxonRepo,
   InMemoryObservationRepo,
   InMemoryCollectionRepo,
@@ -22,6 +21,7 @@ import type { IdentificationProvider } from "./core/identification/Identificatio
 import { MockProvider } from "./core/identification/providers/MockProvider.js";
 import { PlantIdProvider } from "./core/identification/providers/PlantIdProvider.js";
 import { PlantNetProvider } from "./core/identification/providers/PlantNetProvider.js";
+import { BioClipProvider } from "./core/identification/providers/BioClipProvider.js";
 import { ObservationService } from "./core/observation/ObservationService.js";
 import { StubGridGeocoder } from "./core/observation/regionGeneralizer.js";
 import { Authorizer } from "./core/auth/Authorization.js";
@@ -30,7 +30,6 @@ import { QuestEngine } from "./core/quest/QuestEngine.js";
 import { RewardEngine } from "./core/rewards/RewardEngine.js";
 import { AccountService } from "./child/account/AccountService.js";
 import { ContentCardService } from "./child/content/ContentCardService.js";
-import { GuardianDashboard } from "./child/dashboard/GuardianDashboard.js";
 import { DataRightsService } from "./child/privacy/DataRightsService.js";
 import { ObservationFlow } from "./child/ObservationFlow.js";
 import {
@@ -43,8 +42,7 @@ import {
 export interface App {
   config: AppConfig;
   repos: {
-    guardians: InMemoryGuardianRepo;
-    children: InMemoryChildRepo;
+    users: InMemoryUserRepo;
     taxa: InMemoryTaxonRepo;
     observations: InMemoryObservationRepo;
     collection: InMemoryCollectionRepo;
@@ -56,7 +54,6 @@ export interface App {
   authorizer: Authorizer;
   accounts: AccountService;
   content: ContentCardService;
-  dashboard: GuardianDashboard;
   dataRights: DataRightsService;
   flow: ObservationFlow;
 }
@@ -64,8 +61,7 @@ export interface App {
 export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   // --- 저장소 ---
   const repos = {
-    guardians: new InMemoryGuardianRepo(),
-    children: new InMemoryChildRepo(),
+    users: new InMemoryUserRepo(),
     taxa: new InMemoryTaxonRepo(),
     observations: new InMemoryObservationRepo(),
     collection: new InMemoryCollectionRepo(),
@@ -81,10 +77,14 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
 
   // --- 동정 프로바이더 우선순위 ---
   // 설정된(키 있는) 실제 프로바이더 먼저, 그다음 Mock(개발 폴백).
+  // bioclip이 맨 앞: plant.id/plantnet은 아직 identify() 미구현(벤더 스펙 대기)이라
+  // isConfigured()=false로 항상 스킵되므로 순서가 실질적인 영향은 없지만, bioclip이
+  // 지금 유일하게 실제로 동작하는 프로바이더임을 명시적으로 드러낸다.
+  const bioclip = new BioClipProvider(config.identification.bioclip);
   const plantId = new PlantIdProvider(config.identification.plantId);
   const plantNet = new PlantNetProvider(config.identification.plantNet);
   const mock = new MockProvider();
-  const providers: IdentificationProvider[] = [plantId, plantNet, mock];
+  const providers: IdentificationProvider[] = [bioclip, plantId, plantNet, mock];
 
   const gateway = new IdentificationGateway(providers, repos.taxa);
 
@@ -95,27 +95,18 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   const rewards = new RewardEngine(
     SEED_BADGES,
     repos.badges,
-    repos.children,
+    repos.users,
     repos.collection,
     repos.observations,
     repos.quests,
     repos.taxa,
   );
-  const authorizer = new Authorizer(repos.children);
-  const accounts = new AccountService(repos.guardians, repos.children, authorizer);
-  const dashboard = new GuardianDashboard(
-    repos.guardians,
-    repos.children,
-    repos.observations,
-    repos.collection,
-    repos.taxa,
-    repos.badges,
-  );
+  const authorizer = new Authorizer(repos.users);
+  const accounts = new AccountService(repos.users, authorizer);
 
   const dataRights = new DataRightsService({
     authorizer,
-    guardians: repos.guardians,
-    children: repos.children,
+    users: repos.users,
     observations: repos.observations,
     collection: repos.collection,
     quests: repos.quests,
@@ -142,7 +133,6 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     authorizer,
     accounts,
     content,
-    dashboard,
     dataRights,
     flow,
   };

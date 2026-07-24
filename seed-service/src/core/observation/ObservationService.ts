@@ -7,7 +7,7 @@
  * 일일 동정 한도(무료 사용자) 체크도 여기서 제공(명세서 §15, config.freeDailyLimit).
  */
 import type {
-  ChildId,
+  UserId,
   Observation,
   ObservationId,
   ObservedRegion,
@@ -19,7 +19,7 @@ import { newObservationId } from "../domain/ids.js";
 import type { ObservationRepository } from "../repositories/ports.js";
 
 export interface CreateObservationInput {
-  childId: ChildId;
+  userId: UserId;
   taxonId: TaxonId | null;
   taxonRank: TaxonRank | null;
   media: MediaRef[];
@@ -36,7 +36,7 @@ export class ObservationService {
   async record(input: CreateObservationInput): Promise<Observation> {
     const obs: Observation = {
       id: newObservationId(),
-      childId: input.childId,
+      userId: input.userId,
       taxonId: input.taxonId,
       taxonRank: input.taxonRank,
       timestamp: (input.now ?? new Date()).toISOString(),
@@ -50,8 +50,8 @@ export class ObservationService {
     return obs;
   }
 
-  listByChild(childId: ChildId): Promise<Observation[]> {
-    return this.repo.listByChild(childId);
+  listByUser(userId: UserId): Promise<Observation[]> {
+    return this.repo.listByUser(userId);
   }
 
   /**
@@ -59,13 +59,13 @@ export class ObservationService {
    * limit=0 이면 무제한.
    */
   async isWithinDailyLimit(
-    childId: ChildId,
+    userId: UserId,
     limit: number,
     now: Date = new Date(),
   ): Promise<boolean> {
     if (limit <= 0) return true;
     const since = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-    const recent = await this.repo.listByChildSince(childId, since);
+    const recent = await this.repo.listByUserSince(userId, since);
     return recent.length < limit;
   }
 

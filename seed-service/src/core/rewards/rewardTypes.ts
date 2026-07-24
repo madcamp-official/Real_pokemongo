@@ -4,7 +4,7 @@
  * 게이미피케이션 원칙(§5): "모든 보상은 실제 관찰 활동에서 파생". 확률형(가챠) 없음.
  * 배지 조건은 결정론적 규칙(rule)으로만 정의한다.
  */
-import type { ChildId, TaxonGroup, Season } from "../domain/types.js";
+import type { UserId, TaxonGroup, Season } from "../domain/types.js";
 
 /**
  * 배지 획득 규칙. 순수 카운트 기반(결정론적).
@@ -30,12 +30,12 @@ export interface BadgeDefinition {
 }
 
 export interface EarnedBadge {
-  childId: ChildId;
+  userId: UserId;
   badgeId: string;
   earnedAt: string;
 }
 
-/** 레벨 곡선: 누적 XP → 레벨. 완만하게(아동 대상, 과한 경쟁 지양). */
+/** 레벨 곡선: 누적 XP → 레벨. 완만하게(과한 경쟁 지양). */
 export interface LevelCurve {
   /** level N 에 도달하기 위한 누적 XP 문턱값 배열(index=level-1). */
   thresholds: number[];

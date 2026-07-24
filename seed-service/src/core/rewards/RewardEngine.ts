@@ -4,7 +4,7 @@
  * 관찰/퀘스트 완료 이벤트를 받아 XP를 올리고, 결정론적 규칙으로 배지 획득을 판정한다.
  * 확률형 보상 없음. 모든 보상은 실제 활동에서 파생.
  */
-import type { ChildId, ChildProfile, TaxonGroup } from "../domain/types.js";
+import type { UserId, User, TaxonGroup } from "../domain/types.js";
 import {
   levelForXp,
   type BadgeDefinition,
@@ -14,7 +14,7 @@ import {
 } from "./rewardTypes.js";
 import type {
   BadgeRepository,
-  ChildRepository,
+  UserRepository,
   CollectionRepository,
   ObservationRepository,
   QuestRepository,
@@ -31,7 +31,7 @@ export class RewardEngine {
   constructor(
     private readonly badgeDefs: BadgeDefinition[],
     private readonly badges: BadgeRepository,
-    private readonly children: ChildRepository,
+    private readonly users: UserRepository,
     private readonly collection: CollectionRepository,
     private readonly observations: ObservationRepository,
     private readonly quests: QuestRepository,
@@ -44,25 +44,25 @@ export class RewardEngine {
    * @param baseXp 이 활동 자체의 기본 XP(예: 신규 종 해금 10, 재관찰 2)
    */
   async onObservation(
-    child: ChildProfile,
+    user: User,
     opts: { newlyUnlocked: boolean; now?: Date },
   ): Promise<RewardOutcome> {
     const baseXp = opts.newlyUnlocked ? 10 : 2;
-    return this.grant(child, baseXp, opts.now);
+    return this.grant(user, baseXp, opts.now);
   }
 
   /** 퀘스트 완료 보상. */
   async onQuestComplete(
-    child: ChildProfile,
+    user: User,
     questXp: number,
     questBadgeId: string | undefined,
     now: Date = new Date(),
   ): Promise<RewardOutcome> {
-    const outcome = await this.grant(child, questXp, now);
-    if (questBadgeId && !(await this.badges.has(child.id, questBadgeId))) {
+    const outcome = await this.grant(user, questXp, now);
+    if (questBadgeId && !(await this.badges.has(user.id, questBadgeId))) {
       const def = this.badgeDefs.find((b) => b.id === questBadgeId);
       if (def) {
-        await this.awardBadge(child.id, def, now);
+        await this.awardBadge(user.id, def, now);
         outcome.newBadges.push(def);
       }
     }
@@ -71,15 +71,15 @@ export class RewardEngine {
 
   /** XP 지급 + 레벨 재계산 + 규칙 기반 배지 평가를 한번에. */
   private async grant(
-    child: ChildProfile,
+    user: User,
     xp: number,
     now: Date = new Date(),
   ): Promise<RewardOutcome> {
-    const prevLevel = levelForXp(child.xp, this.curve);
-    const updated: ChildProfile = { ...child, xp: child.xp + xp };
+    const prevLevel = levelForXp(user.xp, this.curve);
+    const updated: User = { ...user, xp: user.xp + xp };
     const newLevel = levelForXp(updated.xp, this.curve);
     updated.level = newLevel;
-    await this.children.save(updated);
+    await this.users.save(updated);
 
     const newBadges = await this.evaluateBadges(updated, now);
 
@@ -92,14 +92,14 @@ export class RewardEngine {
 
   /** 모든 배지 규칙을 현재 상태에 대해 평가하고, 새로 충족된 것을 지급. */
   private async evaluateBadges(
-    child: ChildProfile,
+    user: User,
     now: Date,
   ): Promise<BadgeDefinition[]> {
     const earned: BadgeDefinition[] = [];
     for (const def of this.badgeDefs) {
-      if (await this.badges.has(child.id, def.id)) continue;
-      if (await this.satisfies(child.id, def)) {
-        await this.awardBadge(child.id, def, now);
+      if (await this.badges.has(user.id, def.id)) continue;
+      if (await this.satisfies(user.id, def)) {
+        await this.awardBadge(user.id, def, now);
         earned.push(def);
       }
     }
@@ -107,44 +107,44 @@ export class RewardEngine {
   }
 
   private async satisfies(
-    childId: ChildId,
+    userId: UserId,
     def: BadgeDefinition,
   ): Promise<boolean> {
     const rule = def.rule;
     switch (rule.kind) {
       case "firstObservation": {
-        const obs = await this.observations.listByChild(childId);
+        const obs = await this.observations.listByUser(userId);
         return obs.length >= 1;
       }
       case "totalObservations": {
-        const obs = await this.observations.listByChild(childId);
+        const obs = await this.observations.listByUser(userId);
         return obs.length >= rule.count;
       }
       case "distinctTaxaInGroup": {
-        const count = await this.distinctTaxaInGroup(childId, rule.group);
+        const count = await this.distinctTaxaInGroup(userId, rule.group);
         return count >= rule.count;
       }
       case "seasonComplete": {
         const inSeason = await this.taxa.list({ season: rule.season });
         if (inSeason.length === 0) return false;
-        const entries = await this.collection.listByChild(childId);
+        const entries = await this.collection.listByUser(userId);
         const unlocked = new Set(
           entries.filter((e) => e.unlocked).map((e) => e.taxonId as string),
         );
         return inSeason.every((t) => unlocked.has(t.id as string));
       }
       case "questCount": {
-        const progress = await this.quests.listProgressByChild(childId);
+        const progress = await this.quests.listProgressByUser(userId);
         return progress.filter((p) => p.completed).length >= rule.count;
       }
     }
   }
 
   private async distinctTaxaInGroup(
-    childId: ChildId,
+    userId: UserId,
     group: TaxonGroup,
   ): Promise<number> {
-    const entries = await this.collection.listByChild(childId);
+    const entries = await this.collection.listByUser(userId);
     const unlocked = entries.filter((e) => e.unlocked);
     let count = 0;
     for (const e of unlocked) {
@@ -155,12 +155,12 @@ export class RewardEngine {
   }
 
   private async awardBadge(
-    childId: ChildId,
+    userId: UserId,
     def: BadgeDefinition,
     now: Date,
   ): Promise<void> {
     const badge: EarnedBadge = {
-      childId,
+      userId,
       badgeId: def.id,
       earnedAt: now.toISOString(),
     };

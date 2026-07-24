@@ -3,15 +3,18 @@
  *
  * 실행: npm run demo  (외부 API 키 없이 MockProvider 로 전체 파이프라인이 돈다)
  *
+ * v1.2: 보호자·자녀 2단계 계정 모델을 단일 사용자 계정으로 통합.
+ *
  * 시연 내용:
- *   1) 보호자 계정 + 자녀 프로필 생성(동의, 위치 기본 OFF)
+ *   1) 계정 생성(위치 기본 OFF)
  *   2) 민들레 관찰(고확신) → 도감 해금 + 봄 퀘스트 1/3 + 첫 발견 배지
  *   3) 개나리 관찰 → 봄 퀘스트 2/3
  *   4) 꿀벌 관찰 → 안전 안내가 종 정보보다 먼저 노출됨(F4)
- *   5) 보호자 대시보드 요약
+ *   5) 내 계정 요약
  */
 import { buildApp } from "./composition.js";
 import type { TaxonGroup } from "./core/domain/types.js";
+import type { AuthContext } from "./core/auth/Authorization.js";
 import { makeCleanJpeg } from "./core/media/fixtures.js";
 
 const img = () => [makeCleanJpeg()]; // 원시 이미지(플로우가 정화). 유효 JPEG 픽스처.
@@ -26,18 +29,12 @@ async function main() {
     }\n`,
   );
 
-  // 1) 계정/프로필
-  const guardian = await app.accounts.createGuardian("free");
+  // 1) 계정
+  const user = await app.accounts.createUser({ plan: "free", nickname: "하준", avatar: "fox" });
   // 인증 컨텍스트: 실제 서비스에선 인증 계층(토큰 검증)이 발급한다. 데모에선 직접 생성.
-  const ctx = { guardianId: guardian.id };
-  const child = await app.accounts.createChild(ctx, {
-    nickname: "하준",
-    ageBand: "child",
-    avatar: "fox",
-    legalGuardianConsent: true, // 동의 없으면 생성 불가
-  });
-  console.log(`👦 자녀 프로필 생성: ${child.nickname} (Lv.${child.level})`);
-  console.log(`🔒 위치 저장 기본값: ${guardian.locationStorageEnabled ? "ON" : "OFF"}\n`);
+  const ctx: AuthContext = { userId: user.id };
+  console.log(`👤 계정 생성: ${user.nickname} (Lv.${user.level})`);
+  console.log(`🔒 위치 저장 기본값: ${user.locationStorageEnabled ? "ON" : "OFF"}\n`);
 
   // 관찰 헬퍼: Mock 시나리오를 주입한 뒤 flow.observe 호출
   async function observe(
@@ -49,7 +46,6 @@ async function main() {
       { scientificName: scenario.sci, vernacularName: scenario.kor, rank: "species", confidence: scenario.conf },
     ]);
     const res = await app.flow.observe(ctx, {
-      childId: child.id,
       images: img(),
       media: [],
       groupHint,
@@ -87,7 +83,6 @@ async function main() {
     { scientificName: "Unknown", rank: "species", confidence: 0.2 },
   ]);
   const lowConf = await app.flow.observe(ctx, {
-    childId: child.id,
     images: img(),
     media: [],
     groupHint: "plant",
@@ -95,18 +90,17 @@ async function main() {
   console.log(`📸 [정체불명 풀] → ${lowConf.identification.childMessage}`);
   console.log(`   (tier=${lowConf.identification.tier}, 도감/퀘스트 반영 안 됨)\n`);
 
-  // 5) 보호자 대시보드 (인증된 본인 것만 — IDOR 차단)
-  const view = await app.dashboard.build(ctx);
-  console.log("=== 👪 보호자 대시보드(이번 주) ===");
-  for (const s of view.children) {
-    console.log(
-      `- ${s.nickname} (Lv.${s.level}): 관찰 ${s.observationsThisWeek}건, ` +
-        `서로 다른 종 ${s.distinctSpeciesThisWeek}, 배지 ${s.badgesTotal}개`,
-    );
-    console.log(`  분류군: ${JSON.stringify(s.groupBreakdown)}`);
-    console.log(`  교육과정 연계: ${JSON.stringify(s.curriculumProgress)}`);
-  }
-  console.log(`\n🔒 위치 저장 상태: ${view.locationStorageEnabled ? "ON" : "OFF"} (기본 OFF)`);
+  // 5) 내 계정 요약 (인증된 본인 것만 — IDOR 차단)
+  const fresh = await app.accounts.getSelf(ctx);
+  const obsCount = (await app.repos.observations.listByUser(ctx.userId)).length;
+  const collectionProgress = await app.repos.collection.listByUser(ctx.userId);
+  const badges = await app.repos.badges.listByUser(ctx.userId);
+  console.log("=== 👤 내 계정 요약 ===");
+  console.log(
+    `- ${fresh.nickname} (Lv.${fresh.level}, XP ${fresh.xp}): 관찰 ${obsCount}건, ` +
+      `도감 ${collectionProgress.filter((e) => e.unlocked).length}종, 배지 ${badges.length}개`,
+  );
+  console.log(`\n🔒 위치 저장 상태: ${fresh.locationStorageEnabled ? "ON" : "OFF"} (기본 OFF)`);
 }
 
 main().catch((e) => {

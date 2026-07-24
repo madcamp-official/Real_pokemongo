@@ -1,8 +1,7 @@
 /** 식별자 생성 유틸. 브랜디드 타입으로 캐스팅해 반환한다. */
 import { randomUUID } from "node:crypto";
 import type {
-  GuardianId,
-  ChildId,
+  UserId,
   ObservationId,
   TaxonId,
   QuestId,
@@ -10,8 +9,7 @@ import type {
   MediaRef,
 } from "./types.js";
 
-export const newGuardianId = () => randomUUID() as GuardianId;
-export const newChildId = () => randomUUID() as ChildId;
+export const newUserId = () => randomUUID() as UserId;
 export const newObservationId = () => randomUUID() as ObservationId;
 export const newTaxonId = () => randomUUID() as TaxonId;
 export const newQuestId = () => randomUUID() as QuestId;

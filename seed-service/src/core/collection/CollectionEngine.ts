@@ -7,7 +7,7 @@
  * 이 엔진은 범용 코어 후보다(도감 = 관찰 플랫폼 공통 기능).
  */
 import type {
-  ChildId,
+  UserId,
   TaxonId,
   Observation,
   CollectionEntry,
@@ -41,7 +41,7 @@ export class CollectionEngine {
    */
   async applyObservation(obs: Observation): Promise<UnlockResult | null> {
     if (!obs.taxonId) return null;
-    const existing = await this.collection.get(obs.childId, obs.taxonId);
+    const existing = await this.collection.get(obs.userId, obs.taxonId);
 
     if (existing && existing.unlocked) {
       const updated: CollectionEntry = {
@@ -53,7 +53,7 @@ export class CollectionEngine {
     }
 
     const entry: CollectionEntry = {
-      childId: obs.childId,
+      userId: obs.userId,
       taxonId: obs.taxonId,
       unlocked: true,
       firstObservedAt: obs.timestamp,
@@ -66,11 +66,11 @@ export class CollectionEngine {
 
   /** 전체(또는 계절/서식지 축) 진행률. */
   async progress(
-    childId: ChildId,
+    userId: UserId,
     filter?: { season?: Season; habitat?: Habitat },
   ): Promise<CollectionProgress> {
     const total = await this.taxa.count(filter);
-    const entries = await this.collection.listByChild(childId);
+    const entries = await this.collection.listByUser(userId);
 
     let unlockedCount = entries.filter((e) => e.unlocked).length;
     if (filter) {
@@ -95,12 +95,12 @@ export class CollectionEngine {
    * "이 근처에 있대!"의 근거는 좌표가 아니라 seasonTags/habitatTags 다.
    */
   async silhouetteHints(
-    childId: ChildId,
+    userId: UserId,
     ctx: { season?: Season; habitat?: Habitat },
     max = 5,
   ): Promise<TaxonId[]> {
     const candidates = await this.taxa.list(ctx);
-    const entries = await this.collection.listByChild(childId);
+    const entries = await this.collection.listByUser(userId);
     const unlocked = new Set(
       entries.filter((e) => e.unlocked).map((e) => e.taxonId as string),
     );

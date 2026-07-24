@@ -6,7 +6,7 @@
  * 술어(predicate)로 정의된다.
  */
 import type {
-  ChildId,
+  UserId,
   Season,
   Habitat,
   TaxonGroup,
@@ -63,7 +63,7 @@ export interface Quest {
 }
 
 export interface QuestProgress {
-  childId: ChildId;
+  userId: UserId;
   questId: string;
   /** 지금까지 이 퀘스트 조건을 만족시킨 서로 다른 taxonId 집합. */
   matchedTaxonIds: string[];

@@ -8,7 +8,6 @@
  * 단위로 처리한다. 각 엔진은 여기서만 조립되고, 서로를 직접 알지 못한다(느슨한 결합).
  */
 import type {
-  ChildId,
   MediaRef,
   TaxonGroup,
   TaxonRank,
@@ -29,7 +28,6 @@ import type { AuthContext, Authorizer } from "../core/auth/Authorization.js";
 import { sanitizeImages } from "../core/media/MediaSanitizer.js";
 
 export interface ObserveRequest {
-  childId: ChildId;
   /** 클라이언트가 올린 원시 이미지 바이트. 저장·외부 전송 전 이 플로우에서 정화된다. */
   images: Uint8Array[];
   media: MediaRef[]; // 저장소에 업로드된 사진 참조(업로드 파이프라인도 정화본만 저장할 것)
@@ -78,12 +76,11 @@ export class ObservationFlow {
     const now = req.now ?? new Date();
 
     // ── 인가: 다른 어떤 처리(한도 체크, 동정 API 호출)보다 먼저 ──────────────
-    // 남의 childId 로 관찰을 기록하거나, 남의 무료 한도·유료 동정 호출을 소진시키는
-    // IDOR/비용 공격을 진입점에서 차단한다(체크리스트 §1.3). 임의로 완화하지 말 것.
-    const child = await this.deps.authorizer.assertOwnsChild(ctx, req.childId);
-
-    const guardian = await this.deps.accounts.getGuardian(child.guardianId);
-    if (!guardian) throw new Error("보호자 계정을 찾을 수 없습니다.");
+    // ctx 가 실제 존재하는 계정인지 확인하고 User 를 받는다(존재하지 않는/파기된 계정으로
+    // 무료 한도·유료 동정 호출을 소진시키는 비용 공격을 진입점에서 차단, 체크리스트 §1.3).
+    // 단일 계정 모델에서는 이 한 번의 조회가 예전의 "소유권 검증 + 보호자 조회(2단계)"를
+    // 모두 대체한다 — User 자체에 plan/locationStorageEnabled 가 있으므로 별도 조회 불필요.
+    const user = await this.deps.authorizer.requireUser(ctx);
 
     // ── 미디어 정화: 저장·외부 전송 이전에 EXIF GPS 등 메타데이터 제거(§1.4) ──
     // 이후 게이트웨이/프로바이더는 SanitizedImage 만 받으므로, 원시 바이트가 외부
@@ -91,9 +88,9 @@ export class ObservationFlow {
     const sanitized = sanitizeImages(req.images).images;
 
     // (선택) 무료 사용자 일일 동정 한도 (명세서 §15).
-    if (guardian.plan === "free") {
+    if (user.plan === "free") {
       const ok = await this.deps.observations.isWithinDailyLimit(
-        req.childId,
+        ctx.userId,
         this.deps.freeDailyLimit,
         now,
       );
@@ -126,7 +123,7 @@ export class ObservationFlow {
 
     // ── F12 위치 일반화 (정밀 좌표는 이 함수 밖으로 나가지 않는다) ───────────
     const region = await resolveRegionForStorage({
-      locationStorageEnabled: guardian.locationStorageEnabled,
+      locationStorageEnabled: user.locationStorageEnabled,
       rawCoord: req.rawCoord,
       geocoder: this.deps.geocoder,
     });
@@ -134,7 +131,7 @@ export class ObservationFlow {
     // ── F9 관찰 기록 ──────────────────────────────────────────────────────
     const rank: TaxonRank = identification.top.rank;
     const observation = await this.deps.observations.record({
-      childId: req.childId,
+      userId: ctx.userId,
       taxonId: taxon.id,
       taxonRank: rank,
       media: req.media,
@@ -147,14 +144,14 @@ export class ObservationFlow {
 
     // ── F5 도감 해금 ──────────────────────────────────────────────────────
     const unlock = await this.deps.collection.applyObservation(observation);
-    const progress = await this.deps.collection.progress(req.childId);
+    const progress = await this.deps.collection.progress(ctx.userId);
 
     // ── F7 퀘스트 반영 ────────────────────────────────────────────────────
     const questUpdates = await this.deps.quests.applyObservation(observation, now);
     const completed = questUpdates.filter((u) => u.justCompleted);
 
     // ── F8 보상 (관찰 + 완료 퀘스트) ──────────────────────────────────────
-    const obsReward = await this.deps.rewards.onObservation(child, {
+    const obsReward = await this.deps.rewards.onObservation(user, {
       newlyUnlocked: unlock?.newlyUnlocked ?? false,
       now,
     });
@@ -163,8 +160,8 @@ export class ObservationFlow {
     let newLevel = obsReward.newLevel;
 
     for (const u of completed) {
-      // child 의 최신 상태를 다시 읽어 XP 누적이 정확하도록.
-      const fresh = (await this.deps.accounts.getChild(req.childId)) ?? child;
+      // 사용자의 최신 상태를 다시 읽어 XP 누적이 정확하도록.
+      const fresh = (await this.deps.accounts.getUser(ctx.userId)) ?? user;
       const questReward = await this.deps.rewards.onQuestComplete(
         fresh,
         u.quest.reward.xp,
