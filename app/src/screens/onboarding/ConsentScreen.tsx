@@ -1,8 +1,7 @@
-import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRef, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
-import { submitConsent } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
 
@@ -41,8 +40,11 @@ const STEPS: ConsentStep[] = [
 ];
 
 /**
- * F1 순차 동의 화면. privacy → location → photo 순서로 하나씩 보여주고
- * 각 단계의 동의 상태를 로컬에 표시한 뒤, 마지막에 서버에 일괄 제출한다.
+ * F1 순차 동의 화면. privacy → location → photo 순서로 하나씩 보여주고,
+ * 마지막 단계에서는 서버에 제출하지 않고 SignupScreen으로 값을 넘긴다.
+ * 계정이 아직 없는 시점(인증 토큰 없음)이라 여기서 API를 호출할 수 없다 —
+ * 실제 제출은 SignupScreen이 `POST /auth/signup`에 동의 값을 함께 담아 한 번에 한다
+ * (seed-service/src/http/routes/auth.routes.ts 헤더 주석 참고).
  */
 export default function ConsentScreen({ navigation, route }: Props) {
   const { mode } = route.params;
@@ -52,14 +54,21 @@ export default function ConsentScreen({ navigation, route }: Props) {
     location: false,
     photo: false,
   });
-  const [submitting, setSubmitting] = useState(false);
   const setConsent = useAuthStore((s) => s.setConsent);
   const initSettingsFromConsent = useSettingsStore((s) => s.initFromConsent);
+  // 마지막 단계 버튼의 연속 탭 방지. state는 리렌더까지 반영이 늦어질 수 있어
+  // (오늘 실제로 겪은 문제 — 빠른 두 번 탭이 onAgree를 두 번 실행시킴) ref로 동기 차단한다.
+  const hasAgreedLast = useRef(false);
 
   const step = STEPS[stepIndex];
   const isLast = stepIndex === STEPS.length - 1;
 
-  const onAgree = async () => {
+  const onAgree = () => {
+    if (isLast) {
+      if (hasAgreedLast.current) return;
+      hasAgreedLast.current = true;
+    }
+
     const next = { ...agreed, [step.key]: true };
     setAgreed(next);
 
@@ -68,24 +77,15 @@ export default function ConsentScreen({ navigation, route }: Props) {
       return;
     }
 
-    setSubmitting(true);
-    try {
-      await submitConsent({
-        privacy: next.privacy,
-        location: next.location,
-        photo: next.photo,
-        consent_version: CONSENT_VERSION,
-      });
-      setConsent({
-        ...next,
-        consentVersion: CONSENT_VERSION,
-        agreedAt: new Date().toISOString(),
-      });
-      initSettingsFromConsent({ location: next.location, photo: next.photo });
-      navigation.navigate('Signup', { mode });
-    } finally {
-      setSubmitting(false);
-    }
+    const consent = {
+      privacy: next.privacy,
+      location: next.location,
+      photo: next.photo,
+      consent_version: CONSENT_VERSION,
+    };
+    setConsent({ ...next, consentVersion: CONSENT_VERSION, agreedAt: new Date().toISOString() });
+    initSettingsFromConsent({ location: next.location, photo: next.photo });
+    navigation.navigate('Signup', { mode, consent });
   };
 
   return (
@@ -105,18 +105,10 @@ export default function ConsentScreen({ navigation, route }: Props) {
         <Text style={styles.desc}>{step.desc}</Text>
       </View>
 
-      <Pressable
-        style={[styles.agreeButton, submitting && styles.disabled]}
-        onPress={() => void onAgree()}
-        disabled={submitting}
-      >
-        {submitting ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.agreeText}>
-            {isLast ? '동의하고 계속하기' : '동의합니다'}
-          </Text>
-        )}
+      <Pressable style={styles.agreeButton} onPress={onAgree}>
+        <Text style={styles.agreeText}>
+          {isLast ? '동의하고 계속하기' : '동의합니다'}
+        </Text>
       </Pressable>
     </View>
   );

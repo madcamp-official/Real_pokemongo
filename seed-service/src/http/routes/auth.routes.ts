@@ -1,5 +1,12 @@
 /**
  * F1 온보딩 & 인증 라우트. `POST /auth/signup`만 비인증, 나머지는 방금 발급한 토큰 필요.
+ *
+ * 동의(consent)는 회원가입 요청에 함께 담아 한 번에 처리한다(계정이 생기기 전에는
+ * 인증 토큰이 없어 별도 `/auth/consent` 호출이 애초에 불가능했다 — 프론트엔드가
+ * "계정 생성 전에 동의부터 받는다"는 순서로 온보딩을 설계했으므로, 그 순서에 맞춰
+ * 백엔드도 가입 시점에 동의를 함께 수집하도록 맞췄다. 이전엔 가입 후 별도
+ * `POST /auth/consent`를 호출하는 2단계였으나, 그 엔드포인트를 호출하는 유일한
+ * 프론트엔드 코드가 사라져 지금은 쓰이지 않으므로 제거했다).
  */
 import type { FastifyInstance } from "fastify";
 import type { App } from "../../composition.js";
@@ -11,28 +18,28 @@ interface SignupBody {
   password: string;
   nickname: string;
   avatar: string;
-}
-const signupBodySchema = {
-  type: "object",
-  required: ["email", "password", "nickname", "avatar"],
-  properties: {
-    email: { type: "string", minLength: 3 },
-    password: { type: "string", minLength: 1 },
-    nickname: { type: "string", minLength: 1 },
-    avatar: { type: "string", minLength: 1 },
-  },
-} as const;
-
-interface ConsentBody {
   privacy: boolean;
   location: boolean;
   photo: boolean;
   consent_version: string;
 }
-const consentBodySchema = {
+const signupBodySchema = {
   type: "object",
-  required: ["privacy", "location", "photo", "consent_version"],
+  required: [
+    "email",
+    "password",
+    "nickname",
+    "avatar",
+    "privacy",
+    "location",
+    "photo",
+    "consent_version",
+  ],
   properties: {
+    email: { type: "string", minLength: 3 },
+    password: { type: "string", minLength: 1 },
+    nickname: { type: "string", minLength: 1 },
+    avatar: { type: "string", minLength: 1 },
     privacy: { type: "boolean" },
     location: { type: "boolean" },
     photo: { type: "boolean" },
@@ -49,7 +56,8 @@ export function registerAuthRoutes(
     "/auth/signup",
     { schema: { body: signupBodySchema } },
     async (request, reply) => {
-      const { email, password, nickname, avatar } = request.body;
+      const { email, password, nickname, avatar, privacy, location, photo, consent_version } =
+        request.body;
 
       // 이메일 중복 가입 방지(로그인 엔드포인트가 없는 지금 범위에서도, 같은 이메일로
       // 계정이 여러 개 생기는 건 명백한 버그이므로 막는다).
@@ -62,23 +70,14 @@ export function registerAuthRoutes(
       const passwordHash = await hashPassword(password);
       await app.repos.credentials.save({ userId: user.id, email, passwordHash });
 
-      const accessToken = await reply.jwtSign({ sub: user.id });
-      return buildSignupResponse(accessToken, user, email);
-    },
-  );
-
-  server.post<{ Body: ConsentBody }>(
-    "/auth/consent",
-    { preHandler: authenticate, schema: { body: consentBodySchema } },
-    async (request, reply) => {
-      const ctx = requireAuthContext(request);
-      const { privacy, location, photo, consent_version } = request.body;
-
+      // 동의는 계정과 동시에 생성된다(프론트가 계정 생성 전에 동의부터 받으므로, 그
+      // 시점엔 인증 토큰이 없어 별도 호출이 불가능했다 — 위 파일 헤더 주석 참고).
       // location 동의는 기존 AccountService.setLocationStorage()를 그대로 재사용
       // (프라이버시 기본값/본인 계정만 조작 가능 원칙이 이미 거기 있음 — 중복 구현하지 않음).
+      const ctx = { userId: user.id };
       await app.accounts.setLocationStorage(ctx, location);
       await app.repos.consent.save({
-        userId: ctx.userId,
+        userId: user.id,
         privacy,
         location,
         photo,
@@ -86,7 +85,8 @@ export function registerAuthRoutes(
         agreedAt: new Date().toISOString(),
       });
 
-      return reply.code(200).send({});
+      const accessToken = await reply.jwtSign({ sub: user.id });
+      return buildSignupResponse(accessToken, user, email);
     },
   );
 

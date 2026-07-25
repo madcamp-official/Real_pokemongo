@@ -79,7 +79,6 @@ const routes: Array<[string, RegExp, Handler]> = [
       );
     },
   ],
-  ['POST', /\/auth\/consent$/, () => ({})],
   ['POST', /\/session\/guest\/convert$/, () => mockGuestConvert],
   ['GET', /\/account\/restore-bundle$/, () => mockRestoreBundle],
   ['DELETE', /\/account$/, () => ({})],

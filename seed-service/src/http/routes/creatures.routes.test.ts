@@ -30,7 +30,7 @@ async function signupWithUser(server: Awaited<ReturnType<typeof testServer>>["se
   const res = await server.inject({
     method: "POST",
     url: "/auth/signup",
-    payload: { email: `${randomUUID()}@b.com`, password: "pw12345", nickname: "A", avatar: "fox" },
+    payload: { email: `${randomUUID()}@b.com`, password: "pw12345", nickname: "A", avatar: "fox", privacy: true, location: true, photo: true, consent_version: "v1" },
   });
   const body = res.json();
   return { token: body.access_token as string, userId: body.user.user_id as string };

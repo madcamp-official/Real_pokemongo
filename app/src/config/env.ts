@@ -5,7 +5,7 @@
  */
 export const env = {
   /** 실제 백엔드 대신 로컬 mock 응답을 사용할지 여부 */
-  USE_MOCK: true,
+  USE_MOCK: false,
   /** 백엔드 API base URL (USE_MOCK=false 일 때 사용) */
   API_BASE_URL: 'http://localhost:8080',
   /** 네트워크 요청 타임아웃 (ms) — 리스크 1(네트워크 불안정) 대응 */

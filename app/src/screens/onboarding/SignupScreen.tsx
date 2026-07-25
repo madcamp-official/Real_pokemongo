@@ -23,10 +23,12 @@ const AVATARS = ['🦊', '🐰', '🐢', '🐿️', '🦔', '🐝'];
 /**
  * F1 계정 만들기 (단일 사용자 모델).
  * 이메일/비밀번호 + 닉네임/아바타를 한 화면에서 받아 계정을 생성한다.
+ * route.params.consent는 이전 화면(ConsentScreen)에서 이미 수집된 동의 값 —
+ * 계정이 없던 시점엔 인증 토큰이 없어 여기서 가입 요청에 함께 담아 제출한다.
  * mode='convert' 인 경우 가입 직후 게스트 로컬 기록을 서버로 마이그레이션한다.
  */
 export default function SignupScreen({ navigation, route }: Props) {
-  const { mode } = route.params;
+  const { mode, consent } = route.params;
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [passwordConfirm, setPasswordConfirm] = useState('');
@@ -54,6 +56,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         password,
         nickname: nickname.trim(),
         avatar,
+        ...consent,
       });
       setSession(res.access_token, res.user);
 

@@ -2,6 +2,7 @@
  * 내비게이션 파라미터 타입 정의.
  * Phase 진행에 따라 스택별 상세 화면 파라미터를 확장한다.
  */
+import type { ConsentPayload } from '@/types/api';
 export type RootTabParamList = {
   Camera: undefined; // F2 촬영
   Dex: undefined; // F5 도감
@@ -19,7 +20,7 @@ export type RootStackParamList = {
   Tutorial: undefined;
   Choice: undefined;
   Consent: { mode: AuthFlowMode };
-  Signup: { mode: AuthFlowMode };
+  Signup: { mode: AuthFlowMode; consent: ConsentPayload };
   // ── 메인 앱 ──────────────────────────────────────────
   Main: undefined;
   // ── 상세 (F4/F6) ─────────────────────────────────────

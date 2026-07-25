@@ -1,15 +1,15 @@
 import { apiClient } from '@/api/client';
-import type { SignupRequest, SignupResponse, ConsentRequest } from '@/types/api';
+import type { SignupRequest, SignupResponse } from '@/types/api';
 
-/** F1 온보딩 & 인증 API (단일 사용자 계정 모델). */
+/**
+ * F1 온보딩 & 인증 API (단일 사용자 계정 모델).
+ * 동의(consent)는 계정 생성 전엔 인증 토큰이 없어 별도 제출이 불가능하므로,
+ * SignupRequest에 담아 `signup()` 한 번에 함께 제출한다(ConsentScreen → SignupScreen).
+ */
 
 export async function signup(req: SignupRequest): Promise<SignupResponse> {
   const { data } = await apiClient.post<SignupResponse>('/auth/signup', req);
   return data;
-}
-
-export async function submitConsent(req: ConsentRequest): Promise<void> {
-  await apiClient.post('/auth/consent', req);
 }
 
 export interface GuestConvertResponse {

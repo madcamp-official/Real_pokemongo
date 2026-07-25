@@ -35,7 +35,7 @@ async function signup(server: FastifyInstance) {
   const res = await server.inject({
     method: "POST",
     url: "/auth/signup",
-    payload: { email: `${randomUUID()}@b.com`, password: "pw12345", nickname: "A", avatar: "fox" },
+    payload: { email: `${randomUUID()}@b.com`, password: "pw12345", nickname: "A", avatar: "fox", privacy: true, location: true, photo: true, consent_version: "v1" },
   });
   return res.json().access_token as string;
 }

@@ -11,7 +11,14 @@ export type ID = string;
 export type TaxonGroup = '곤충' | '양서류' | '식물' | '기타';
 
 // ─── F1. 온보딩 & 인증 (단일 사용자 계정) ─────────────────
-export interface SignupRequest {
+/** 계정 생성 전에는 인증 토큰이 없어 동의를 따로 제출할 수 없다 — 가입 요청에 함께 담는다. */
+export interface ConsentPayload {
+  privacy: boolean;
+  location: boolean;
+  photo: boolean;
+  consent_version: string;
+}
+export interface SignupRequest extends ConsentPayload {
   email: string;
   password: string;
   nickname: string;
@@ -26,12 +33,6 @@ export interface UserProfile {
 export interface SignupResponse {
   access_token: string;
   user: UserProfile;
-}
-export interface ConsentRequest {
-  privacy: boolean;
-  location: boolean;
-  photo: boolean;
-  consent_version: string;
 }
 
 // ─── F2. 촬영 ───────────────────────────────────────────

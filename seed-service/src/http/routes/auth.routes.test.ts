@@ -31,12 +31,27 @@ async function testServer() {
   return { app, server };
 }
 
+/** 회원가입 요청 기본 페이로드. 동의 필드는 D단계 이후 가입 시 함께 제출된다. */
+function signupPayload(overrides: Partial<Record<string, unknown>> = {}) {
+  return {
+    email: "a@b.com",
+    password: "pw12345",
+    nickname: "탐험가",
+    avatar: "fox",
+    privacy: true,
+    location: true,
+    photo: false,
+    consent_version: "v1",
+    ...overrides,
+  };
+}
+
 test("POST /auth/signup: 성공 시 access_token과 user를 반환한다", async () => {
   const { server } = await testServer();
   const res = await server.inject({
     method: "POST",
     url: "/auth/signup",
-    payload: { email: "a@b.com", password: "pw12345", nickname: "탐험가", avatar: "fox" },
+    payload: signupPayload({ email: "a@b.com", nickname: "탐험가" }),
   });
   assert.equal(res.statusCode, 200);
   const body = res.json();
@@ -47,7 +62,7 @@ test("POST /auth/signup: 성공 시 access_token과 user를 반환한다", async
 
 test("POST /auth/signup: 같은 이메일로 재가입은 409", async () => {
   const { server } = await testServer();
-  const payload = { email: "dup@b.com", password: "pw12345", nickname: "A", avatar: "fox" };
+  const payload = signupPayload({ email: "dup@b.com" });
   const first = await server.inject({ method: "POST", url: "/auth/signup", payload });
   assert.equal(first.statusCode, 200);
   const second = await server.inject({ method: "POST", url: "/auth/signup", payload });
@@ -59,37 +74,36 @@ test("POST /auth/signup: 필드 누락은 400(스키마 검증)", async () => {
   const res = await server.inject({
     method: "POST",
     url: "/auth/signup",
-    payload: { email: "a@b.com" }, // password/nickname/avatar 누락
+    payload: { email: "a@b.com" }, // password/nickname/avatar/동의 필드 전부 누락
   });
   assert.equal(res.statusCode, 400);
 });
 
-test("POST /auth/consent: 인증 없으면 401", async () => {
+test("POST /auth/signup: 동의 필드만 빠져도 400(계정 생성 전 동의 필수)", async () => {
   const { server } = await testServer();
   const res = await server.inject({
     method: "POST",
-    url: "/auth/consent",
-    payload: { privacy: true, location: true, photo: true, consent_version: "v1" },
+    url: "/auth/signup",
+    payload: { email: "no-consent@b.com", password: "pw12345", nickname: "A", avatar: "fox" },
   });
-  assert.equal(res.statusCode, 401);
+  assert.equal(res.statusCode, 400);
 });
 
-test("POST /auth/consent: 인증 있으면 성공하고 location 동의가 계정에 반영된다", async () => {
+test("POST /auth/signup: 동의 정보가 가입과 함께 저장되고 location이 계정에 반영된다", async () => {
   const { app, server } = await testServer();
-  const signup = await server.inject({
-    method: "POST",
-    url: "/auth/signup",
-    payload: { email: "c@b.com", password: "pw12345", nickname: "A", avatar: "fox" },
-  });
-  const { access_token, user } = signup.json();
-
   const res = await server.inject({
     method: "POST",
-    url: "/auth/consent",
-    headers: { authorization: `Bearer ${access_token}` },
-    payload: { privacy: true, location: true, photo: false, consent_version: "v1" },
+    url: "/auth/signup",
+    payload: signupPayload({
+      email: "c@b.com",
+      privacy: true,
+      location: true,
+      photo: false,
+      consent_version: "v1",
+    }),
   });
   assert.equal(res.statusCode, 200);
+  const { user } = res.json();
 
   const fresh = await app.repos.users.get(user.user_id);
   assert.equal(fresh!.locationStorageEnabled, true, "location:true가 계정에 반영돼야 함");
@@ -104,7 +118,7 @@ test("POST /session/guest/convert: 인증 있으면 migrated_sightings=0을 정�
   const signup = await server.inject({
     method: "POST",
     url: "/auth/signup",
-    payload: { email: "g@b.com", password: "pw12345", nickname: "A", avatar: "fox" },
+    payload: signupPayload({ email: "g@b.com" }),
   });
   const { access_token } = signup.json();
 
