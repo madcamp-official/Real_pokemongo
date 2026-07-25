@@ -113,6 +113,64 @@ test("POST /auth/signup: 동의 정보가 가입과 함께 저장되고 location
   assert.equal(consentRecord!.consentVersion, "v1");
 });
 
+test("POST /auth/login: 올바른 이메일/비밀번호면 access_token과 user를 반환한다", async () => {
+  const { server } = await testServer();
+  await server.inject({
+    method: "POST",
+    url: "/auth/signup",
+    payload: signupPayload({ email: "login-ok@b.com", password: "pw12345", nickname: "탐험가" }),
+  });
+
+  const res = await server.inject({
+    method: "POST",
+    url: "/auth/login",
+    payload: { email: "login-ok@b.com", password: "pw12345" },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.ok(body.access_token);
+  assert.equal(body.user.email, "login-ok@b.com");
+  assert.equal(body.user.nickname, "탐험가");
+});
+
+test("POST /auth/login: 비밀번호가 틀리면 401", async () => {
+  const { server } = await testServer();
+  await server.inject({
+    method: "POST",
+    url: "/auth/signup",
+    payload: signupPayload({ email: "login-wrongpw@b.com", password: "correct-pw" }),
+  });
+
+  const res = await server.inject({
+    method: "POST",
+    url: "/auth/login",
+    payload: { email: "login-wrongpw@b.com", password: "wrong-pw" },
+  });
+  assert.equal(res.statusCode, 401);
+  assert.equal(res.json().error, "invalid_credentials");
+});
+
+test("POST /auth/login: 가입되지 않은 이메일이면 401(존재 여부 노출 안 함)", async () => {
+  const { server } = await testServer();
+  const res = await server.inject({
+    method: "POST",
+    url: "/auth/login",
+    payload: { email: "never-signed-up@b.com", password: "whatever1" },
+  });
+  assert.equal(res.statusCode, 401);
+  assert.equal(res.json().error, "invalid_credentials");
+});
+
+test("POST /auth/login: 필드 누락은 400(스키마 검증)", async () => {
+  const { server } = await testServer();
+  const res = await server.inject({
+    method: "POST",
+    url: "/auth/login",
+    payload: { email: "a@b.com" },
+  });
+  assert.equal(res.statusCode, 400);
+});
+
 test("POST /session/guest/convert: 인증 있으면 migrated_sightings=0을 정직하게 반환", async () => {
   const { server } = await testServer();
   const signup = await server.inject({

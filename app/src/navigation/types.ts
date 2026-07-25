@@ -19,6 +19,7 @@ export type RootStackParamList = {
   // ── 온보딩 (F1, 단일 사용자 계정) ────────────────────
   Tutorial: undefined;
   Choice: undefined;
+  Login: undefined;
   Consent: { mode: AuthFlowMode };
   Signup: { mode: AuthFlowMode; consent: ConsentPayload };
   // ── 메인 앱 ──────────────────────────────────────────

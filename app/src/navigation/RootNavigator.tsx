@@ -7,6 +7,7 @@ import { useAuthStore } from '@/store/authStore';
 import { MainTabs } from '@/navigation/MainTabs';
 import TutorialScreen from '@/screens/onboarding/TutorialScreen';
 import ChoiceScreen from '@/screens/onboarding/ChoiceScreen';
+import LoginScreen from '@/screens/onboarding/LoginScreen';
 import ConsentScreen from '@/screens/onboarding/ConsentScreen';
 import SignupScreen from '@/screens/onboarding/SignupScreen';
 import SpeciesCardScreen from '@/screens/dex/SpeciesCardScreen';
@@ -53,6 +54,11 @@ export function RootNavigator() {
       >
         <Stack.Screen name="Tutorial" component={TutorialScreen} />
         <Stack.Screen name="Choice" component={ChoiceScreen} />
+        <Stack.Screen
+          name="Login"
+          component={LoginScreen}
+          options={{ headerShown: true, title: '로그인' }}
+        />
         <Stack.Screen
           name="Consent"
           component={ConsentScreen}

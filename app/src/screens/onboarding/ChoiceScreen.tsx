@@ -6,9 +6,10 @@ import { useAuthStore } from '@/store/authStore';
 type Props = NativeStackScreenProps<RootStackParamList, 'Choice'>;
 
 /**
- * F1 게스트 모드 vs 계정 생성 분기.
+ * F1 로그인 / 계정 만들기 / 게스트 3분기.
+ * 로그인: 이미 계정이 있는 사용자 → 바로 LoginScreen(동의 절차 없음).
+ * 계정 만들기: 순차 동의(카메라·위치 등 이용 동의) → 계정 생성(닉네임/아바타 포함) 흐름.
  * 게스트: 즉시 로컬 세션 시작(촬영 1~2회 임시 저장) → 바로 메인 진입.
- * 계정 생성: 순차 동의 → 계정 생성(닉네임/아바타 포함) 흐름으로 진행.
  */
 export default function ChoiceScreen({ navigation }: Props) {
   const startGuest = useAuthStore((s) => s.startGuest);
@@ -20,6 +21,10 @@ export default function ChoiceScreen({ navigation }: Props) {
     navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
   };
 
+  const onLogin = () => {
+    navigation.navigate('Login');
+  };
+
   const onSignup = () => {
     navigation.navigate('Consent', { mode: 'signup' });
   };
@@ -29,16 +34,21 @@ export default function ChoiceScreen({ navigation }: Props) {
       <View style={styles.header}>
         <Text style={styles.title}>어떻게 시작할까요?</Text>
         <Text style={styles.desc}>
-          계정을 만들면 도감·기록이 안전하게 보관돼요.{'\n'}
-          우선 둘러보고 싶다면 게스트로 시작할 수 있어요.
+          이미 계정이 있다면 로그인하세요.{'\n'}
+          처음이라면 계정을 만들거나, 우선 게스트로 둘러볼 수 있어요.
         </Text>
       </View>
 
       <View style={styles.options}>
-        <Pressable style={styles.primaryCard} onPress={onSignup}>
-          <Text style={styles.primaryEmoji}>🌿</Text>
-          <Text style={styles.primaryTitle}>계정 만들기</Text>
-          <Text style={styles.primaryDesc}>도감과 기록을 안전하게 보관해요</Text>
+        <Pressable style={styles.primaryCard} onPress={onLogin}>
+          <Text style={styles.primaryEmoji}>🔑</Text>
+          <Text style={styles.primaryTitle}>로그인</Text>
+          <Text style={styles.primaryDesc}>이미 계정이 있어요</Text>
+        </Pressable>
+
+        <Pressable style={styles.secondaryCard} onPress={onSignup}>
+          <Text style={styles.secondaryTitle}>계정 만들기</Text>
+          <Text style={styles.secondaryDesc}>도감과 기록을 안전하게 보관해요</Text>
         </Pressable>
 
         <Pressable style={styles.secondaryCard} onPress={onGuest}>

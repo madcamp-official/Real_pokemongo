@@ -34,6 +34,12 @@ export interface SignupResponse {
   access_token: string;
   user: UserProfile;
 }
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+/** 응답 형태가 회원가입과 동일(토큰+프로필)해서 SignupResponse를 그대로 재사용한다. */
+export type LoginResponse = SignupResponse;
 
 // ─── F2. 촬영 ───────────────────────────────────────────
 export interface SightingUploadResponse {

@@ -1,5 +1,6 @@
 /**
- * F1 온보딩 & 인증 라우트. `POST /auth/signup`만 비인증, 나머지는 방금 발급한 토큰 필요.
+ * F1 온보딩 & 인증 라우트. `POST /auth/signup`, `POST /auth/login`만 비인증, 나머지는
+ * 방금 발급한 토큰 필요.
  *
  * 동의(consent)는 회원가입 요청에 함께 담아 한 번에 처리한다(계정이 생기기 전에는
  * 인증 토큰이 없어 별도 `/auth/consent` 호출이 애초에 불가능했다 — 프론트엔드가
@@ -10,7 +11,7 @@
  */
 import type { FastifyInstance } from "fastify";
 import type { App } from "../../composition.js";
-import { requireAuthContext, hashPassword, type AuthenticateHandler } from "../auth.js";
+import { requireAuthContext, hashPassword, verifyPassword, type AuthenticateHandler } from "../auth.js";
 import { buildSignupResponse } from "../mappers.js";
 
 interface SignupBody {
@@ -44,6 +45,19 @@ const signupBodySchema = {
     location: { type: "boolean" },
     photo: { type: "boolean" },
     consent_version: { type: "string", minLength: 1 },
+  },
+} as const;
+
+interface LoginBody {
+  email: string;
+  password: string;
+}
+const loginBodySchema = {
+  type: "object",
+  required: ["email", "password"],
+  properties: {
+    email: { type: "string", minLength: 3 },
+    password: { type: "string", minLength: 1 },
   },
 } as const;
 
@@ -84,6 +98,33 @@ export function registerAuthRoutes(
         consentVersion: consent_version,
         agreedAt: new Date().toISOString(),
       });
+
+      const accessToken = await reply.jwtSign({ sub: user.id });
+      return buildSignupResponse(accessToken, user, email);
+    },
+  );
+
+  server.post<{ Body: LoginBody }>(
+    "/auth/login",
+    { schema: { body: loginBodySchema } },
+    async (request, reply) => {
+      const { email, password } = request.body;
+
+      // 이메일 존재 여부와 비밀번호 오류를 구분해서 응답하지 않는다 — 둘 중 하나만 다르게
+      // 응답하면 공격자가 가입된 이메일 목록을 무차별로 추려낼 수 있다(계정 존재 여부 노출).
+      const invalidCredentials = () =>
+        reply
+          .code(401)
+          .send({ error: "invalid_credentials", message: "이메일 또는 비밀번호가 올바르지 않습니다." });
+
+      const credential = await app.repos.credentials.findByEmail(email);
+      if (!credential) return invalidCredentials();
+
+      const passwordOk = await verifyPassword(password, credential.passwordHash);
+      if (!passwordOk) return invalidCredentials();
+
+      const user = await app.repos.users.get(credential.userId);
+      if (!user) return invalidCredentials();
 
       const accessToken = await reply.jwtSign({ sub: user.id });
       return buildSignupResponse(accessToken, user, email);

@@ -79,6 +79,16 @@ const routes: Array<[string, RegExp, Handler]> = [
       );
     },
   ],
+  [
+    'POST',
+    /\/auth\/login$/,
+    (config) => {
+      // mock에는 실제 자격증명 저장소가 없어 어떤 이메일/비밀번호든 로그인에 성공시킨다
+      // (USE_MOCK=true는 UI 흐름 개발용이지 인증 로직 검증용이 아님 — 실 검증은 실서버 테스트로).
+      const body = parseBody(config);
+      return buildMockSignup((body.email as string) ?? 'guest@example.com', '탐험가', '🦊');
+    },
+  ],
   ['POST', /\/session\/guest\/convert$/, () => mockGuestConvert],
   ['GET', /\/account\/restore-bundle$/, () => mockRestoreBundle],
   ['DELETE', /\/account$/, () => ({})],
