@@ -15,7 +15,11 @@ import {
   InMemoryCollectionRepo,
   InMemoryQuestRepo,
   InMemoryBadgeRepo,
+  InMemoryCredentialRepo,
+  InMemoryConsentRepo,
 } from "./core/repositories/memory/InMemoryRepositories.js";
+import { LocalDiskMediaStore } from "./core/media/LocalDiskMediaStore.js";
+import { PendingSightingStore } from "./core/observation/PendingSightingStore.js";
 import { IdentificationGateway } from "./core/identification/IdentificationGateway.js";
 import type { IdentificationProvider } from "./core/identification/IdentificationProvider.js";
 import { MockProvider } from "./core/identification/providers/MockProvider.js";
@@ -48,14 +52,20 @@ export interface App {
     collection: InMemoryCollectionRepo;
     quests: InMemoryQuestRepo;
     badges: InMemoryBadgeRepo;
+    credentials: InMemoryCredentialRepo;
+    consent: InMemoryConsentRepo;
   };
   mock: MockProvider; // 데모에서 시나리오 주입용
   gateway: IdentificationGateway;
   authorizer: Authorizer;
   accounts: AccountService;
   content: ContentCardService;
+  collection: CollectionEngine;
   dataRights: DataRightsService;
   flow: ObservationFlow;
+  /** C단계: HTTP 계층 전용 조각(사진 로컬 저장, 업로드~동정확정 임시 상태). */
+  mediaStore: LocalDiskMediaStore;
+  pendingSightings: PendingSightingStore;
 }
 
 export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
@@ -67,6 +77,8 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     collection: new InMemoryCollectionRepo(),
     quests: new InMemoryQuestRepo(),
     badges: new InMemoryBadgeRepo(),
+    credentials: new InMemoryCredentialRepo(),
+    consent: new InMemoryConsentRepo(),
   };
 
   // --- 시드 로드 ---
@@ -111,6 +123,8 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     collection: repos.collection,
     quests: repos.quests,
     badges: repos.badges,
+    credentials: repos.credentials,
+    consent: repos.consent,
   });
 
   const flow = new ObservationFlow({
@@ -125,6 +139,9 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     freeDailyLimit: config.identification.freeDailyLimit,
   });
 
+  const mediaStore = new LocalDiskMediaStore(config.mediaStorage.localDir);
+  const pendingSightings = new PendingSightingStore();
+
   return {
     config,
     repos,
@@ -133,7 +150,10 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     authorizer,
     accounts,
     content,
+    collection,
     dataRights,
     flow,
+    mediaStore,
+    pendingSightings,
   };
 }

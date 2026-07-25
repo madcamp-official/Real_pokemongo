@@ -7,6 +7,7 @@ import type {
   QuestId,
   BadgeId,
   MediaRef,
+  SightingId,
 } from "./types.js";
 
 export const newUserId = () => randomUUID() as UserId;
@@ -14,5 +15,7 @@ export const newObservationId = () => randomUUID() as ObservationId;
 export const newTaxonId = () => randomUUID() as TaxonId;
 export const newQuestId = () => randomUUID() as QuestId;
 export const newBadgeId = () => randomUUID() as BadgeId;
+export const newSightingId = () => randomUUID() as SightingId;
 export const asMediaRef = (s: string) => s as MediaRef;
 export const asTaxonId = (s: string) => s as TaxonId;
+export const asSightingId = (s: string) => s as SightingId;

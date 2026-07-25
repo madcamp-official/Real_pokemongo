@@ -21,6 +21,8 @@ export type ObservationId = Brand<string, "ObservationId">;
 export type QuestId = Brand<string, "QuestId">;
 export type BadgeId = Brand<string, "BadgeId">;
 export type MediaRef = Brand<string, "MediaRef">;
+/** C단계: 업로드~동정확정 사이 임시 상태를 가리키는 식별자(PendingSightingStore). */
+export type SightingId = Brand<string, "SightingId">;
 
 // ---------------------------------------------------------------------------
 // 공통 열거형
@@ -149,4 +151,27 @@ export interface User {
   level: number;
   xp: number;
   createdAt: string;
+}
+
+/**
+ * 인증 자격증명(C단계) — 의도적으로 User 와 분리한다. User 는 RewardEngine 등 도메인
+ * 로직 전반에서 계속 읽고 쓰는 객체라, 비밀번호 해시처럼 민감한 필드를 거기 얹으면
+ * 도메인 코드가 자격증명을 실수로 건드릴 표면이 넓어진다. 이메일도 로그인 엔드포인트가
+ * 없는 지금 범위에선 가입 시 1회만 쓰이므로 User 에 중복 저장하지 않는다.
+ */
+export interface Credential {
+  userId: UserId;
+  email: string;
+  passwordHash: string; // node:crypto scrypt 파생값(솔트 포함, "salt:hash" 형식)
+}
+
+/** 동의 이력(F1) — 감사 추적용. User 의 locationStorageEnabled 는 이 중 location 필드로
+ * 갱신되지만(AccountService.setLocationStorage 재사용), 원본 동의 기록 자체는 별도 보관. */
+export interface ConsentRecord {
+  userId: UserId;
+  privacy: boolean;
+  location: boolean;
+  photo: boolean;
+  consentVersion: string;
+  agreedAt: string;
 }

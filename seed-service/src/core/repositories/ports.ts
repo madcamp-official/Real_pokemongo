@@ -16,6 +16,8 @@ import type {
   TaxonGroup,
   Season,
   Habitat,
+  Credential,
+  ConsentRecord,
 } from "../domain/types.js";
 import type { Quest, QuestProgress } from "../quest/questTypes.js";
 import type { EarnedBadge } from "../rewards/rewardTypes.js";
@@ -75,4 +77,19 @@ export interface BadgeRepository {
   award(badge: EarnedBadge): Promise<void>;
   has(userId: UserId, badgeId: string): Promise<boolean>;
   deleteByUser(userId: UserId): Promise<number>;
+}
+
+/** C단계: 인증 자격증명(이메일+비밀번호 해시). User 와 의도적으로 분리(domain/types.ts 참고). */
+export interface CredentialRepository {
+  save(c: Credential): Promise<void>;
+  findByEmail(email: string): Promise<Credential | null>;
+  getByUser(userId: UserId): Promise<Credential | null>;
+  deleteByUser(userId: UserId): Promise<boolean>;
+}
+
+/** C단계: 동의 이력(감사 추적용, F1). */
+export interface ConsentRepository {
+  save(c: ConsentRecord): Promise<void>;
+  getByUser(userId: UserId): Promise<ConsentRecord | null>;
+  deleteByUser(userId: UserId): Promise<boolean>;
 }

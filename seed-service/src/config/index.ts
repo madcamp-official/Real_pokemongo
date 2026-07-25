@@ -30,11 +30,17 @@ export interface AppConfig {
   };
 
   mediaStorage: {
-    // TODO(제공 필요): 오브젝트 스토리지 자격 증명
+    // TODO(제공 필요): 오브젝트 스토리지 자격 증명(프로덕션에서 클라우드로 교체할 때 사용)
     bucket?: string;
     region?: string;
     accessKey?: string;
     secretKey?: string;
+    /** C단계 MVP: 실제 클라우드 대신 로컬 디스크에 저장(과금 리스크 없음). */
+    localDir: string;
+  };
+
+  http: {
+    port: number;
   };
 
   identification: {
@@ -92,6 +98,11 @@ export function loadConfig(): AppConfig {
       region: env("MEDIA_STORAGE_REGION"),
       accessKey: env("MEDIA_STORAGE_ACCESS_KEY"),
       secretKey: env("MEDIA_STORAGE_SECRET_KEY"),
+      localDir: env("MEDIA_STORAGE_LOCAL_DIR") ?? "./data/media",
+    },
+    http: {
+      // app/src/config/env.ts의 API_BASE_URL('http://localhost:8080')과 기본값 일치.
+      port: envNumber("HTTP_PORT", 8080),
     },
     identification: {
       plantId: {

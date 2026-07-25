@@ -15,6 +15,8 @@ import type {
   TaxonGroup,
   Season,
   Habitat,
+  Credential,
+  ConsentRecord,
 } from "../../domain/types.js";
 import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
@@ -25,6 +27,8 @@ import type {
   CollectionRepository,
   QuestRepository,
   BadgeRepository,
+  CredentialRepository,
+  ConsentRepository,
 } from "../ports.js";
 
 export class InMemoryUserRepo implements UserRepository {
@@ -174,5 +178,40 @@ export class InMemoryBadgeRepo implements BadgeRepository {
     const before = this.m.length;
     this.m = this.m.filter((b) => b.userId !== userId);
     return before - this.m.length;
+  }
+}
+
+export class InMemoryCredentialRepo implements CredentialRepository {
+  private byUser = new Map<string, Credential>();
+  private byEmail = new Map<string, Credential>();
+  async save(c: Credential) {
+    this.byUser.set(c.userId, c);
+    this.byEmail.set(c.email.toLowerCase(), c);
+  }
+  async findByEmail(email: string) {
+    return this.byEmail.get(email.toLowerCase()) ?? null;
+  }
+  async getByUser(userId: UserId) {
+    return this.byUser.get(userId) ?? null;
+  }
+  async deleteByUser(userId: UserId) {
+    const c = this.byUser.get(userId);
+    if (!c) return false;
+    this.byUser.delete(userId);
+    this.byEmail.delete(c.email.toLowerCase());
+    return true;
+  }
+}
+
+export class InMemoryConsentRepo implements ConsentRepository {
+  private m = new Map<string, ConsentRecord>();
+  async save(c: ConsentRecord) {
+    this.m.set(c.userId, c);
+  }
+  async getByUser(userId: UserId) {
+    return this.m.get(userId) ?? null;
+  }
+  async deleteByUser(userId: UserId) {
+    return this.m.delete(userId);
   }
 }

@@ -33,6 +33,8 @@ import type {
   CollectionRepository,
   QuestRepository,
   BadgeRepository,
+  CredentialRepository,
+  ConsentRepository,
 } from "../../core/repositories/ports.js";
 import type { AuthContext, Authorizer } from "../../core/auth/Authorization.js";
 
@@ -62,6 +64,8 @@ export interface ErasureReport {
     questProgress: number;
     badges: number;
     profile: boolean;
+    credential: boolean;
+    consent: boolean;
   };
   /** TODO(제공 필요): 스토리지 어댑터가 실제 blob 을 파기해야 할 미디어 참조 목록. */
   mediaRefsToPurge: MediaRef[];
@@ -76,6 +80,8 @@ export class DataRightsService {
       collection: CollectionRepository;
       quests: QuestRepository;
       badges: BadgeRepository;
+      credentials: CredentialRepository;
+      consent: ConsentRepository;
     },
   ) {}
 
@@ -124,6 +130,8 @@ export class DataRightsService {
     const deletedCollection = await this.deps.collection.deleteByUser(userId);
     const deletedQuestProgress = await this.deps.quests.deleteProgressByUser(userId);
     const deletedBadges = await this.deps.badges.deleteByUser(userId);
+    const deletedCredential = await this.deps.credentials.deleteByUser(userId);
+    const deletedConsent = await this.deps.consent.deleteByUser(userId);
     const profileDeleted = await this.deps.users.delete(userId);
 
     return {
@@ -135,6 +143,8 @@ export class DataRightsService {
         questProgress: deletedQuestProgress,
         badges: deletedBadges,
         profile: profileDeleted,
+        credential: deletedCredential,
+        consent: deletedConsent,
       },
       mediaRefsToPurge,
     };

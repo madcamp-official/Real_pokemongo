@@ -6,9 +6,17 @@
  *
  * 게이트웨이/서비스/엔진을 조립해 "한 번의 관찰"이 일으키는 모든 상태 변화를 한 트랜잭션
  * 단위로 처리한다. 각 엔진은 여기서만 조립되고, 서로를 직접 알지 못한다(느슨한 결합).
+ *
+ * C단계: "동정 이후 기록"(위치 일반화→관찰기록→도감해금→퀘스트→보상) 부분을
+ * `recordIdentification()`으로 분리했다. `observe()`는 이를 내부에서 호출하도록만
+ * 바뀌었을 뿐 동작은 완전히 동일하다(순수 리팩터링). 분리한 이유: HTTP 계층의
+ * `POST /identify`(동정만, 기록 없음) / `POST /identify/confirm`(사용자가 고른 종을
+ * 그제서야 기록) 2단계 흐름이, "동정+기록을 한 번에" 하는 `observe()` 하나로는 표현이
+ * 안 되기 때문 — `recordIdentification()`은 `/identify/confirm` 핸들러가 직접 재사용한다.
  */
 import type {
   MediaRef,
+  Taxon,
   TaxonGroup,
   TaxonRank,
 } from "../core/domain/types.js";
@@ -39,20 +47,35 @@ export interface ObserveRequest {
   now?: Date;
 }
 
+/** `recordIdentification()`의 결과 — 도감/퀘스트/보상 반영분. */
+export interface RecordedOutcome {
+  observationId: string;
+  newlyUnlockedTaxonId?: string;
+  collectionRatio: number;
+  completedQuestTitles: string[];
+  xpGained: number;
+  newLevel: number | null;
+  newBadgeTitles: string[];
+}
+
+/** `recordIdentification()` 입력 — 이미 확정된(사용자가 고른, 또는 high 확신으로 자동 확정된) 종. */
+export interface RecordIdentificationParams {
+  taxon: Taxon;
+  rank: TaxonRank;
+  confidence: number;
+  source: string;
+  media: MediaRef[];
+  rawCoord?: RawCoordinate;
+  note?: string;
+  now?: Date;
+}
+
 /** 한 번의 관찰이 만든 결과 전체. UI 는 이것으로 연출을 구성한다. */
 export interface ObserveResult {
   identification: IdentificationOutcome;
   safety: SafetyNotice | null;
   /** 동정 성공(종 확정)일 때만 채워진다. */
-  recorded?: {
-    observationId: string;
-    newlyUnlockedTaxonId?: string;
-    collectionRatio: number;
-    completedQuestTitles: string[];
-    xpGained: number;
-    newLevel: number | null;
-    newBadgeTitles: string[];
-  };
+  recorded?: RecordedOutcome;
   /** 무료 한도 초과 등으로 동정을 진행하지 못한 경우. */
   blocked?: { reason: "daily_limit" };
 }
@@ -78,8 +101,6 @@ export class ObservationFlow {
     // ── 인가: 다른 어떤 처리(한도 체크, 동정 API 호출)보다 먼저 ──────────────
     // ctx 가 실제 존재하는 계정인지 확인하고 User 를 받는다(존재하지 않는/파기된 계정으로
     // 무료 한도·유료 동정 호출을 소진시키는 비용 공격을 진입점에서 차단, 체크리스트 §1.3).
-    // 단일 계정 모델에서는 이 한 번의 조회가 예전의 "소유권 검증 + 보호자 조회(2단계)"를
-    // 모두 대체한다 — User 자체에 plan/locationStorageEnabled 가 있으므로 별도 조회 불필요.
     const user = await this.deps.authorizer.requireUser(ctx);
 
     // ── 미디어 정화: 저장·외부 전송 이전에 EXIF GPS 등 메타데이터 제거(§1.4) ──
@@ -119,26 +140,51 @@ export class ObservationFlow {
       return { identification, safety: identification.safety };
     }
 
-    const taxon = identification.top.taxon;
+    const recorded = await this.recordIdentification(ctx, {
+      taxon: identification.top.taxon,
+      rank: identification.top.rank,
+      confidence: identification.top.confidence,
+      source: identification.source,
+      media: req.media,
+      rawCoord: req.rawCoord,
+      note: req.note,
+      now,
+    });
+
+    return { identification, safety: identification.safety, recorded };
+  }
+
+  /**
+   * 이미 확정된 종을 실제로 기록한다(위치 일반화→관찰기록→도감해금→퀘스트→보상).
+   * `observe()`(high 확신 자동 확정)와 HTTP `/identify/confirm`(medium 확신, 사용자가
+   * 고름) 양쪽이 공유하는 경로 — 독립적으로 호출해도 안전하도록 인가를 자체적으로
+   * 다시 수행한다(비용 저렴한 in-memory 조회라 observe() 경유 시 중복 조회는 무시 가능).
+   */
+  async recordIdentification(
+    ctx: AuthContext,
+    params: RecordIdentificationParams,
+  ): Promise<RecordedOutcome> {
+    const user = await this.deps.authorizer.requireUser(ctx);
+    const now = params.now ?? new Date();
+    const taxon = params.taxon;
 
     // ── F12 위치 일반화 (정밀 좌표는 이 함수 밖으로 나가지 않는다) ───────────
     const region = await resolveRegionForStorage({
       locationStorageEnabled: user.locationStorageEnabled,
-      rawCoord: req.rawCoord,
+      rawCoord: params.rawCoord,
       geocoder: this.deps.geocoder,
     });
 
     // ── F9 관찰 기록 ──────────────────────────────────────────────────────
-    const rank: TaxonRank = identification.top.rank;
     const observation = await this.deps.observations.record({
       userId: ctx.userId,
       taxonId: taxon.id,
-      taxonRank: rank,
-      media: req.media,
-      confidence: identification.top.confidence,
-      source: identification.source,
+      taxonRank: params.rank,
+      media: params.media,
+      confidence: params.confidence,
+      source: params.source,
       region,
-      note: req.note,
+      note: params.note,
       now,
     });
 
@@ -174,19 +220,13 @@ export class ObservationFlow {
     }
 
     return {
-      identification,
-      safety: identification.safety,
-      recorded: {
-        observationId: observation.id,
-        newlyUnlockedTaxonId: unlock?.newlyUnlocked
-          ? (taxon.id as string)
-          : undefined,
-        collectionRatio: progress.ratio,
-        completedQuestTitles: completed.map((u) => u.quest.title),
-        xpGained,
-        newLevel,
-        newBadgeTitles,
-      },
+      observationId: observation.id,
+      newlyUnlockedTaxonId: unlock?.newlyUnlocked ? (taxon.id as string) : undefined,
+      collectionRatio: progress.ratio,
+      completedQuestTitles: completed.map((u) => u.quest.title),
+      xpGained,
+      newLevel,
+      newBadgeTitles,
     };
   }
 
