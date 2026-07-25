@@ -10,6 +10,7 @@ node_modules/
 
 # typescript
 *.tsbuildinfo
+dist/
 
 # C단계: 로컬 디스크 미디어 저장소(개발용 스텁, 실제 사진 바이트) — 커밋 대상 아님
 seed-service/data/

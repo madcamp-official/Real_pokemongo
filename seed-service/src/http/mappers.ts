@@ -211,6 +211,31 @@ export function outcomeToIdentifyResponse(
   };
 }
 
+// ── F19. 터치 기반 사전 위험 경고 ─────────────────────────────────────────
+export interface ApiPreviewScanResponse {
+  species_guess: string;
+  is_dangerous: boolean;
+  confidence: number;
+}
+
+/**
+ * F19 프리뷰 스캔 응답. outcomeToIdentifyResponse(F4)와 달리 이건 화면에 바로 보여줄
+ * 이름(species_guess)을 돌려준다 — species_id가 아니다(도감에 등록되는 게 아니라 잠정
+ * 추정치 표시일 뿐이므로). top이 없으면(unknown) 모른다는 사실을 정직하게 채운다.
+ */
+export function buildPreviewScanResponse(
+  outcome: IdentificationOutcome,
+): ApiPreviewScanResponse {
+  if (!outcome.top) {
+    return { species_guess: "?", is_dangerous: false, confidence: 0 };
+  }
+  return {
+    species_guess: outcome.top.displayName,
+    is_dangerous: outcome.safety !== null,
+    confidence: outcome.top.confidence,
+  };
+}
+
 // ── F1/F18 ─────────────────────────────────────────────────────────────
 export interface ApiUserProfile {
   user_id: string;
