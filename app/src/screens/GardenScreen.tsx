@@ -156,18 +156,20 @@ export default function GardenScreen() {
         </View>
       </View>
 
-      {warn && (
-        <View style={styles.warnBanner}>
-          <Text style={styles.warnText}>{warn}</Text>
-        </View>
-      )}
-
       <CreatureTray
         creatures={trayCreatures}
         onDragStart={onDragStart}
         onDragMove={onDragMove}
         onDragEnd={onDragEnd}
       />
+
+      {/* CreatureTray보다 뒤에 그려야 한다 — 배너의 bottom:180이 트레이 영역과 겹쳐서,
+          먼저 그리면 트레이의 불투명 배경에 가려 안 보인다(실기기 테스트로 발견). */}
+      {warn && (
+        <View style={styles.warnBanner}>
+          <Text style={styles.warnText}>{warn}</Text>
+        </View>
+      )}
 
       {/* 드래그 고스트 */}
       {dragging && dragPos && draggingVisual && (

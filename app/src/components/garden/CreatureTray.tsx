@@ -27,22 +27,31 @@ interface DraggableProps {
 }
 
 function DraggableCreature({ creature, onDragStart, onDragMove, onDragEnd }: DraggableProps) {
+  // PanResponder.create()는 useRef 초기값이라 마운트 시 딱 한 번만 실행된다 — 그 안에서
+  // creature/onDragStart/onDragMove/onDragEnd를 직접 참조하면 "처음 렌더 때의 낡은 값"에
+  // 영원히 묶인다. 특히 onDragEnd가 그 시점의 dragging(=아직 null)을 계속 보게 돼,
+  // 실제 드래그 시 onDragEnd 맨 앞 `if (!c) return`에서 항상 조용히 끝나버려 배치가 전혀
+  // 동작하지 않았다(실기기 테스트로 발견). ref에 최신 값을 담아두고 그걸 통해서만
+  // 호출하면 PanResponder 자체는 그대로 유지하면서도 항상 최신 상태를 본다.
+  const latest = useRef({ creature, onDragStart, onDragMove, onDragEnd });
+  latest.current = { creature, onDragStart, onDragMove, onDragEnd };
+
   const responder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onMoveShouldSetPanResponder: () => true,
       onPanResponderGrant: (e: GestureResponderEvent) => {
-        onDragStart(creature);
-        onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
+        latest.current.onDragStart(latest.current.creature);
+        latest.current.onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
       },
       onPanResponderMove: (e: GestureResponderEvent) => {
-        onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
+        latest.current.onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
       },
       onPanResponderRelease: (e: GestureResponderEvent) => {
-        onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
+        latest.current.onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
       },
       onPanResponderTerminate: (e: GestureResponderEvent) => {
-        onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
+        latest.current.onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
       },
     })
   ).current;

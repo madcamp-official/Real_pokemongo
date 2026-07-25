@@ -22,6 +22,9 @@ import type { IdentificationOutcome } from "../core/identification/Identificatio
 import type { Quest, QuestProgress } from "../core/quest/questTypes.js";
 import type { BadgeDefinition, EarnedBadge } from "../core/rewards/rewardTypes.js";
 import { xpToNextLevel, type LevelCurve } from "../core/rewards/rewardTypes.js";
+import type { GardenLayout as DomainGardenLayout } from "../core/garden/gardenTypes.js";
+import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
+import { BOND_MAX } from "../core/garden/bondRules.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
 /** `app/src/types/api.ts`의 TaxonGroup — 우리 8종보다 좁은 4종 분류. */
@@ -329,5 +332,97 @@ export function questToApiQuest(quest: Quest, progress: QuestProgress | null): A
     status,
     reward_xp: quest.reward.xp,
     reward_badge_id: quest.reward.badgeId,
+  };
+}
+
+// ── F16. 홈 가든 ───────────────────────────────────────────────────────
+export interface ApiGardenTile {
+  row: number;
+  col: number;
+  type: string; // 한글 라벨(잔디/물웅덩이/흙/돌/꽃밭) — app/src/types/api.ts TileType
+}
+export interface ApiPlacement {
+  creature_id: string;
+  species_id: string;
+  row: number;
+  col: number;
+}
+export interface ApiGardenLayout {
+  tiles: ApiGardenTile[];
+  placements: ApiPlacement[];
+}
+
+/**
+ * 도메인 GardenLayout(영문 타일 코드, creatureId만) → API DTO(한글 라벨, species_id 포함).
+ * placements는 creature_id→taxonId를 미리 조회해서 넘겨받는다(이 함수 자체는 순수 함수로
+ * 유지 — DB 조회는 라우트가 한다, mappers.ts 파일 상단 원칙과 동일).
+ */
+export function gardenLayoutToApi(
+  layout: DomainGardenLayout,
+  taxonIdByCreatureId: Map<string, string>,
+): ApiGardenLayout {
+  return {
+    tiles: layout.tiles.map((t) => ({ row: t.row, col: t.col, type: TILE_TYPE_TO_KOREAN[t.type] })),
+    placements: layout.placements
+      .filter((p) => taxonIdByCreatureId.has(p.creatureId as string))
+      .map((p) => ({
+        creature_id: p.creatureId as string,
+        species_id: taxonIdByCreatureId.get(p.creatureId as string)!,
+        row: p.row,
+        col: p.col,
+      })),
+  };
+}
+
+// ── F9. 친밀도(Bond) ───────────────────────────────────────────────────
+export interface ApiCreatureStatus {
+  creature_id: string;
+  nickname: string | null;
+  days_together: number;
+  bond: number;
+  bond_max: number;
+  status_message: string;
+  is_reunion: boolean;
+}
+
+export function buildCreatureStatus(params: {
+  creatureId: string;
+  nickname: string | null;
+  daysTogether: number;
+  bond: number;
+  reunion: boolean;
+  message: string;
+}): ApiCreatureStatus {
+  return {
+    creature_id: params.creatureId,
+    nickname: params.nickname,
+    days_together: params.daysTogether,
+    bond: params.bond,
+    bond_max: BOND_MAX,
+    status_message: params.message,
+    is_reunion: params.reunion,
+  };
+}
+
+export interface ApiInteractResponse {
+  bond: number;
+  bond_max: number;
+  bond_leveled_up: boolean;
+  reaction_message: string;
+  is_reunion: boolean;
+}
+
+export function buildInteractResponse(params: {
+  bond: number;
+  bondLeveledUp: boolean;
+  reactionMessage: string;
+  wasReunion: boolean;
+}): ApiInteractResponse {
+  return {
+    bond: params.bond,
+    bond_max: BOND_MAX,
+    bond_leveled_up: params.bondLeveledUp,
+    reaction_message: params.reactionMessage,
+    is_reunion: params.wasReunion,
   };
 }

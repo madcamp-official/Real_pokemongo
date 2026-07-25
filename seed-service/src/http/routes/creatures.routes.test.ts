@@ -141,3 +141,97 @@ test("POST /creatures/:id/name: 남의 개체는 404(존재 여부 누설 방지
   });
   assert.equal(res.statusCode, 404);
 });
+
+test("GET /creatures/:id/status: 방금 생긴 개체는 함께한 일수 0, bond 1, 재회 아님", async () => {
+  const { app, server } = await testServer();
+  const { token, userId } = await signupWithUser(server);
+  await observeDandelion(app, token, server);
+  const creatureId = (await app.repos.creatures.listByUser(userId as never))[0]!.id as string;
+
+  const res = await server.inject({
+    method: "GET",
+    url: `/creatures/${creatureId}/status`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.creature_id, creatureId);
+  assert.equal(body.days_together, 0);
+  assert.equal(body.bond, 1);
+  assert.equal(body.bond_max, 5);
+  assert.equal(body.is_reunion, false);
+  assert.ok(body.status_message.length > 0);
+});
+
+test("GET /creatures/:id/status: 존재하지 않거나 남의 개체는 404", async () => {
+  const { app, server } = await testServer();
+  const { token: tokenA, userId: userIdA } = await signupWithUser(server);
+  await observeDandelion(app, tokenA, server);
+  const creatureId = (await app.repos.creatures.listByUser(userIdA as never))[0]!.id as string;
+
+  const { token: tokenB } = await signupWithUser(server);
+  const res = await server.inject({
+    method: "GET",
+    url: `/creatures/${creatureId}/status`,
+    headers: { authorization: `Bearer ${tokenB}` },
+  });
+  assert.equal(res.statusCode, 404);
+
+  const missing = await server.inject({
+    method: "GET",
+    url: `/creatures/${newCreatureId()}/status`,
+    headers: { authorization: `Bearer ${tokenA}` },
+  });
+  assert.equal(missing.statusCode, 404);
+});
+
+test("POST /creatures/:id/interact: bond가 1 오르고 lastInteractionAt이 저장된다", async () => {
+  const { app, server } = await testServer();
+  const { token, userId } = await signupWithUser(server);
+  await observeDandelion(app, token, server);
+  const creatureId = (await app.repos.creatures.listByUser(userId as never))[0]!.id as string;
+
+  const res = await server.inject({
+    method: "POST",
+    url: `/creatures/${creatureId}/interact`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.bond, 2, "초기 bond 1에서 상호작용 1회로 2");
+  assert.equal(body.bond_max, 5);
+  assert.equal(body.bond_leveled_up, true);
+
+  const stored = await app.repos.creatures.get(creatureId as never);
+  assert.equal(stored!.bond, 2);
+  assert.ok(stored!.lastInteractionAt, "상호작용 시각이 저장돼야 함");
+});
+
+test("POST /creatures/:id/interact: bond는 bond_max(5)를 넘지 않는다", async () => {
+  const { app, server } = await testServer();
+  const { token, userId } = await signupWithUser(server);
+  await observeDandelion(app, token, server);
+  const creatureId = (await app.repos.creatures.listByUser(userId as never))[0]!.id as string;
+
+  let last;
+  for (let i = 0; i < 10; i++) {
+    last = await server.inject({
+      method: "POST",
+      url: `/creatures/${creatureId}/interact`,
+      headers: { authorization: `Bearer ${token}` },
+    });
+  }
+  assert.equal(last!.json().bond, 5);
+  assert.equal(last!.json().bond_leveled_up, false, "이미 최대치라 더 안 오름");
+});
+
+test("POST /creatures/:id/interact: 존재하지 않거나 남의 개체는 404", async () => {
+  const { server } = await testServer();
+  const { token } = await signupWithUser(server);
+  const res = await server.inject({
+    method: "POST",
+    url: `/creatures/${newCreatureId()}/interact`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 404);
+});

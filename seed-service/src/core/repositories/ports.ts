@@ -23,6 +23,7 @@ import type {
 } from "../domain/types.js";
 import type { Quest, QuestProgress } from "../quest/questTypes.js";
 import type { EarnedBadge } from "../rewards/rewardTypes.js";
+import type { GardenLayout } from "../garden/gardenTypes.js";
 
 // 삭제 계약(체크리스트 §5.6 — 삭제권 이행):
 // 사용자 데이터를 담는 모든 저장소는 삭제 메서드를 구현해야 한다. 프로덕션 DB 어댑터를
@@ -108,4 +109,17 @@ export interface ConsentRepository {
   save(c: ConsentRecord): Promise<void>;
   getByUser(userId: UserId): Promise<ConsentRecord | null>;
   deleteByUser(userId: UserId): Promise<boolean>;
+}
+
+/**
+ * F16 홈가든(타일 배치). 한 번도 저장한 적 없는 사용자는 getLayout이 빈 상태가 아니라
+ * 기본 정원(gardenTypes.ts의 buildDefaultTiles)을 돌려준다 — 단, DB엔 아무것도 쓰지 않는다
+ * (실제로 저장은 사용자가 처음 saveLayout할 때 일어난다, "정직한 파생값" 원칙).
+ * saveLayout은 항상 전체 교체(PUT 시맨틱) — 기존 타일/배치를 지우고 새로 받은 것으로 대체한다.
+ */
+export interface GardenRepository {
+  getLayout(userId: UserId): Promise<GardenLayout>;
+  saveLayout(userId: UserId, layout: GardenLayout): Promise<void>;
+  /** 삭제권 이행(§5.6) — 삭제된 타일 행 수(배치는 타일 FK로 함께 지워짐). */
+  deleteByUser(userId: UserId): Promise<number>;
 }

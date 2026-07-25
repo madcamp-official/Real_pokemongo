@@ -22,6 +22,8 @@ import type {
 } from "../../domain/types.js";
 import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
+import type { GardenLayout } from "../../garden/gardenTypes.js";
+import { buildDefaultTiles } from "../../garden/gardenTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -32,6 +34,7 @@ import type {
   CredentialRepository,
   ConsentRepository,
   CreatureRepository,
+  GardenRepository,
 } from "../ports.js";
 
 export class InMemoryUserRepo implements UserRepository {
@@ -256,5 +259,23 @@ export class InMemoryConsentRepo implements ConsentRepository {
   }
   async deleteByUser(userId: UserId) {
     return this.m.delete(userId);
+  }
+}
+
+export class InMemoryGardenRepo implements GardenRepository {
+  private m = new Map<string, GardenLayout>();
+  async getLayout(userId: UserId) {
+    return this.m.get(userId) ?? { tiles: buildDefaultTiles(), placements: [] };
+  }
+  async saveLayout(userId: UserId, layout: GardenLayout) {
+    this.m.set(userId, layout);
+  }
+  async deleteByUser(userId: UserId) {
+    // Postgres 어댑터와 동일한 의미(실제 삭제된 타일 행 수)를 맞추려 저장돼 있던 타일
+    // 개수를 반환한다 — 저장한 적 없는 사용자는 getLayout이 기본 정원을 "가상으로만"
+    // 돌려줄 뿐 여기엔 아무것도 없으므로 0.
+    const layout = this.m.get(userId);
+    this.m.delete(userId);
+    return layout?.tiles.length ?? 0;
   }
 }

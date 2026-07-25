@@ -19,6 +19,7 @@ import {
   InMemoryCredentialRepo,
   InMemoryConsentRepo,
   InMemoryCreatureRepo,
+  InMemoryGardenRepo,
 } from "./core/repositories/memory/InMemoryRepositories.js";
 import {
   PgUserRepo,
@@ -30,6 +31,7 @@ import {
   PgCredentialRepo,
   PgConsentRepo,
   PgCreatureRepo,
+  PgGardenRepo,
   upsertBadgeDefinitions,
 } from "./core/repositories/postgres/PostgresRepositories.js";
 import type {
@@ -42,6 +44,7 @@ import type {
   CredentialRepository,
   ConsentRepository,
   CreatureRepository,
+  GardenRepository,
 } from "./core/repositories/ports.js";
 import { LocalDiskMediaStore } from "./core/media/LocalDiskMediaStore.js";
 import { PendingSightingStore } from "./core/observation/PendingSightingStore.js";
@@ -80,6 +83,7 @@ export interface App {
     credentials: CredentialRepository;
     consent: ConsentRepository;
     creatures: CreatureRepository;
+    garden: GardenRepository;
   };
   /** DATABASE_URL이 채워져 실Postgres로 붙었을 때만 존재. graceful shutdown 대상(serve.ts). */
   dbPool?: pg.Pool;
@@ -116,6 +120,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
       credentials: new PgCredentialRepo(dbPool),
       consent: new PgConsentRepo(dbPool),
       creatures: new PgCreatureRepo(dbPool),
+      garden: new PgGardenRepo(dbPool),
     };
     // quest.reward_badge_id / earned_badge.badge_id가 badge_definition(id)를 FK로 참조하므로
     // (db/schema.sql), 실제 배지 저작 데이터를 먼저 채워야 quest 업서트/배지 해금이 FK를 만족한다.
@@ -131,6 +136,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
       credentials: new InMemoryCredentialRepo(),
       consent: new InMemoryConsentRepo(),
       creatures: new InMemoryCreatureRepo(),
+      garden: new InMemoryGardenRepo(),
     };
   }
 
@@ -179,6 +185,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     credentials: repos.credentials,
     consent: repos.consent,
     creatures: repos.creatures,
+    garden: repos.garden,
   });
 
   const flow = new ObservationFlow({

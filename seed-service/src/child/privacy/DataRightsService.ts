@@ -37,6 +37,7 @@ import type {
   CredentialRepository,
   ConsentRepository,
   CreatureRepository,
+  GardenRepository,
 } from "../../core/repositories/ports.js";
 import type { AuthContext, Authorizer } from "../../core/auth/Authorization.js";
 
@@ -69,6 +70,7 @@ export interface ErasureReport {
     questProgress: number;
     badges: number;
     creatures: number;
+    gardenTiles: number;
     profile: boolean;
     credential: boolean;
     consent: boolean;
@@ -89,6 +91,7 @@ export class DataRightsService {
       credentials: CredentialRepository;
       consent: ConsentRepository;
       creatures: CreatureRepository;
+      garden: GardenRepository;
     },
   ) {}
 
@@ -140,6 +143,7 @@ export class DataRightsService {
     const deletedQuestProgress = await this.deps.quests.deleteProgressByUser(userId);
     const deletedBadges = await this.deps.badges.deleteByUser(userId);
     const deletedCreatures = await this.deps.creatures.deleteByUser(userId);
+    const deletedGardenTiles = await this.deps.garden.deleteByUser(userId);
     const deletedCredential = await this.deps.credentials.deleteByUser(userId);
     const deletedConsent = await this.deps.consent.deleteByUser(userId);
     const profileDeleted = await this.deps.users.delete(userId);
@@ -153,6 +157,7 @@ export class DataRightsService {
         questProgress: deletedQuestProgress,
         badges: deletedBadges,
         creatures: deletedCreatures,
+        gardenTiles: deletedGardenTiles,
         profile: profileDeleted,
         credential: deletedCredential,
         consent: deletedConsent,

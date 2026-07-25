@@ -31,6 +31,8 @@ import type {
 } from "../../domain/types.js";
 import type { Quest, QuestProgress, QuestCriteria } from "../../quest/questTypes.js";
 import type { EarnedBadge, BadgeDefinition } from "../../rewards/rewardTypes.js";
+import type { GardenLayout, GardenTile, CreaturePlacement, TileType } from "../../garden/gardenTypes.js";
+import { buildDefaultTiles } from "../../garden/gardenTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -41,6 +43,7 @@ import type {
   CredentialRepository,
   ConsentRepository,
   CreatureRepository,
+  GardenRepository,
 } from "../ports.js";
 
 type Pool = pg.Pool;
@@ -755,4 +758,78 @@ function rowToQuest(row: any): Quest {
     chapter: row.chapter ?? undefined,
     curriculumTags: row.curriculum_tags?.length > 0 ? row.curriculum_tags : undefined,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Garden (garden_tile + creature_placement) — F16
+// ---------------------------------------------------------------------------
+export class PgGardenRepo implements GardenRepository {
+  constructor(private pool: Pool) {}
+
+  async getLayout(userId: UserId): Promise<GardenLayout> {
+    const tileRows = await this.pool.query(
+      `SELECT "row", col, type FROM garden_tile WHERE user_id = $1`,
+      [userId],
+    );
+    // 저장한 적 없는 사용자 — 기본 정원을 가상으로 돌려준다(DB엔 안 씀, ports.ts 계약 참고).
+    if (tileRows.rows.length === 0) {
+      return { tiles: buildDefaultTiles(), placements: [] };
+    }
+    const tiles: GardenTile[] = tileRows.rows.map((r) => ({
+      row: r.row,
+      col: r.col,
+      type: r.type as TileType,
+    }));
+    const placementRows = await this.pool.query(
+      `SELECT "row", col, creature_id FROM creature_placement WHERE user_id = $1`,
+      [userId],
+    );
+    const placements: CreaturePlacement[] = placementRows.rows.map((r) => ({
+      row: r.row,
+      col: r.col,
+      creatureId: r.creature_id as CreatureId,
+    }));
+    return { tiles, placements };
+  }
+
+  /**
+   * 전체 교체(PUT 시맨틱): 기존 타일/배치를 지우고 새로 받은 것으로 대체한다.
+   * 타일을 먼저 넣어야 creature_placement의 (user_id,row,col)→garden_tile FK가 성립한다.
+   */
+  async saveLayout(userId: UserId, layout: GardenLayout): Promise<void> {
+    const client = await this.pool.connect();
+    try {
+      await client.query("BEGIN");
+      // creature_placement이 garden_tile을 FK로 참조하므로 배치를 먼저 지운다.
+      await client.query(`DELETE FROM creature_placement WHERE user_id = $1`, [userId]);
+      await client.query(`DELETE FROM garden_tile WHERE user_id = $1`, [userId]);
+      for (const t of layout.tiles) {
+        await client.query(
+          `INSERT INTO garden_tile (user_id, "row", col, type) VALUES ($1,$2,$3,$4)`,
+          [userId, t.row, t.col, t.type],
+        );
+      }
+      for (const p of layout.placements) {
+        await client.query(
+          `INSERT INTO creature_placement (user_id, "row", col, creature_id) VALUES ($1,$2,$3,$4)`,
+          [userId, p.row, p.col, p.creatureId],
+        );
+      }
+      await client.query("COMMIT");
+    } catch (err) {
+      await client.query("ROLLBACK");
+      throw err;
+    } finally {
+      client.release();
+    }
+  }
+
+  async deleteByUser(userId: UserId): Promise<number> {
+    // creature_placement은 garden_tile ON DELETE CASCADE라 타일만 지워도 함께 지워지지만,
+    // 파기 리포트가 "삭제 건수"를 요구하므로(§5.6) 명시적으로 지우고 그 건수를 반환한다.
+    const r = await this.pool.query(`DELETE FROM garden_tile WHERE user_id = $1 RETURNING "row"`, [
+      userId,
+    ]);
+    return r.rowCount ?? 0;
+  }
 }

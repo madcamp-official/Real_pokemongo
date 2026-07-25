@@ -1,11 +1,12 @@
 /**
- * F16 개체(Creature) 작명 라우트 (D단계). 홈가든 전체(배치·상호작용)는 범위 밖 —
- * 이번엔 "종을 처음 해금하면 개체가 자동 생성되고, 나중에 이름을 붙일 수 있다"만 다룬다.
+ * F16/F9 개체(Creature) 라우트. 작명(D단계) + 상태 조회/상호작용(유대감, 이번에 추가).
  */
 import type { FastifyInstance } from "fastify";
 import type { App } from "../../composition.js";
 import { requireAuthContext, type AuthenticateHandler } from "../auth.js";
 import { asCreatureId } from "../../core/domain/ids.js";
+import { daysTogether, isReunion, statusMessage, applyInteraction, reactionMessage } from "../../core/garden/bondRules.js";
+import { buildCreatureStatus, buildInteractResponse } from "../mappers.js";
 
 interface NameCreatureBody {
   nickname: string;
@@ -35,6 +36,54 @@ export function registerCreatureRoutes(
 
       await app.repos.creatures.save({ ...creature, nickname: request.body.nickname });
       return reply.code(200).send({});
+    },
+  );
+
+  server.get<{ Params: { creatureId: string } }>(
+    "/creatures/:creatureId/status",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const ctx = requireAuthContext(request);
+      const creature = await app.repos.creatures.get(asCreatureId(request.params.creatureId));
+      if (!creature || creature.userId !== ctx.userId) {
+        return reply.code(404).send({ error: "not_found" });
+      }
+
+      const reunion = isReunion(creature);
+      return buildCreatureStatus({
+        creatureId: creature.id,
+        nickname: creature.nickname ?? null,
+        daysTogether: daysTogether(creature.createdAt),
+        bond: creature.bond,
+        reunion,
+        message: statusMessage(creature.id, creature.bond, reunion),
+      });
+    },
+  );
+
+  server.post<{ Params: { creatureId: string } }>(
+    "/creatures/:creatureId/interact",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const ctx = requireAuthContext(request);
+      const creature = await app.repos.creatures.get(asCreatureId(request.params.creatureId));
+      if (!creature || creature.userId !== ctx.userId) {
+        return reply.code(404).send({ error: "not_found" });
+      }
+
+      const result = applyInteraction(creature);
+      await app.repos.creatures.save({
+        ...creature,
+        bond: result.bond,
+        lastInteractionAt: result.lastInteractionAt,
+      });
+
+      return buildInteractResponse({
+        bond: result.bond,
+        bondLeveledUp: result.bondLeveledUp,
+        reactionMessage: reactionMessage(creature.id),
+        wasReunion: result.wasReunion,
+      });
     },
   );
 }

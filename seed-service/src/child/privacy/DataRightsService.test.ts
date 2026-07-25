@@ -41,6 +41,12 @@ async function observe(app: App, ctx: AuthContext, sci: string, kor: string) {
 async function seedUserWithData(app: App, ctx: AuthContext) {
   await observe(app, ctx, "Taraxacum officinale", "민들레");
   await observe(app, ctx, "Forsythia koreana", "개나리");
+  // F16 홈가든: 개체가 이미 생겼으니(위 관찰들로 자동 생성) 정원에도 배치해 저장소를 채운다.
+  const creatures = await app.repos.creatures.listByUser(ctx.userId);
+  await app.repos.garden.saveLayout(ctx.userId, {
+    tiles: [{ row: 0, col: 0, type: "grass" }],
+    placements: creatures[0] ? [{ row: 0, col: 0, creatureId: creatures[0].id }] : [],
+  });
 }
 
 /** 그 계정의 데이터가 모든 저장소에 몇 건씩 있는지. */
@@ -52,6 +58,10 @@ async function footprint(app: App, userId: AuthContext["userId"]) {
     questProgress: (await app.repos.quests.listProgressByUser(userId)).length,
     badges: (await app.repos.badges.listByUser(userId)).length,
     creatures: (await app.repos.creatures.listByUser(userId)).length,
+    // 저장한 적 없는 사용자도 getLayout은 "가상 기본 정원"(항상 tiles가 채워짐, ports.ts
+    // 계약 참고)을 돌려주므로 tiles 길이로는 "실제 저장했는지"를 못 가른다. placements는
+    // 가상 기본값이 항상 빈 배열이라, 이걸로만 실제 저장 여부를 판별할 수 있다.
+    gardenPlacements: (await app.repos.garden.getLayout(userId)).placements.length,
   };
 }
 
@@ -70,7 +80,7 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   const before = await footprint(app, ctx.userId);
   assert.ok(
     before.observations >= 2 && before.collection >= 2 && before.badges >= 1 &&
-      before.creatures >= 2,
+      before.creatures >= 2 && before.gardenPlacements >= 1,
   );
 
   const report = await app.dataRights.eraseUserData(ctx);
@@ -82,11 +92,13 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   assert.equal(after.questProgress, 0);
   assert.equal(after.badges, 0);
   assert.equal(after.creatures, 0);
+  assert.equal(after.gardenPlacements, 0);
 
   // 리포트가 실제 삭제 건수를 정확히 보고.
   assert.equal(report.deleted.observations, before.observations);
   assert.equal(report.deleted.badges, before.badges);
   assert.equal(report.deleted.creatures, before.creatures);
+  assert.equal(report.deleted.gardenTiles, 1, "seedUserWithData가 심어둔 타일 1개");
   assert.equal(report.deleted.profile, true);
   // 미디어 blob 파기 대상이 수집됨.
   assert.equal(report.mediaRefsToPurge.length, before.observations);
@@ -108,6 +120,7 @@ test("과잉 삭제 방지: 다른 계정 데이터는 절대 지워지지 않�
   assert.ok(b.observations >= 2, "다른 계정 관찰 유지");
   assert.ok(b.collection >= 2, "다른 계정 도감 유지");
   assert.ok(b.creatures >= 2, "다른 계정 개체 유지");
+  assert.ok(b.gardenPlacements >= 1, "다른 계정 정원 배치 유지");
 });
 
 test("위조된 계정으로는 삭제도 내보내기도 할 수 없다", async () => {

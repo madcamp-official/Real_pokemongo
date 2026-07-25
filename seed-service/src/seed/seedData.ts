@@ -206,3 +206,18 @@ export const SEED_CONTENT: SpeciesContent[] = [
     curriculumTags: ["과학-동물의생활"],
   },
 ];
+
+/**
+ * F16 홈가든 — 타일-종 호환성(그룹→배치 가능한 타일). 계산값이 아니라 저작 콘텐츠(제품 결정,
+ * db/schema.sql 9번 섹션 주석 참고) — 지도의 blobs와 같은 성격이라 정적 상수로 둔다.
+ * 프론트(app/src/api/api.ts) TaxonGroup 4종 한글 라벨과 TileType 5종 한글 라벨을 그대로 키/값으로
+ * 쓴다 — 이 파일이 도메인 코드가 아니라 순수 authored config라 앱 DTO 라벨을 직접 써도 괜찮다.
+ * app/src/mocks/mockData.ts의 mockTileCompatibility와 동일한 값.
+ */
+export type GardenTaxonGroupLabel = "곤충" | "양서류" | "식물" | "기타";
+export const TILE_COMPATIBILITY: Record<GardenTaxonGroupLabel, string[]> = {
+  곤충: ["잔디", "꽃밭"],
+  양서류: ["물웅덩이", "잔디"],
+  식물: ["흙", "꽃밭"],
+  기타: ["흙", "잔디", "돌"],
+};

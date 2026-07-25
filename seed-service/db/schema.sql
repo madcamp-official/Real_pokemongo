@@ -324,16 +324,16 @@ CREATE TABLE creature (
     UNIQUE (user_id, taxon_id)                          -- 종당 최대 1마리(제품 결정, D단계)
 );
 CREATE INDEX creature_user_idx ON creature (user_id);
--- days_together, is_reunion, status_message 는 전부 파생값(저장 안 함) — F9 Bond 상호작용
--- 전체 구현(범위 밖) 시 계산 로직이 필요: days_together = now - created_at,
--- is_reunion = now - last_interaction_at > 임계(앱 상수), status_message = 시간/계절 기반.
+-- days_together, is_reunion, status_message 는 전부 파생값(저장 안 함) — core/garden/bondRules.ts가
+-- 요청마다 계산한다: days_together = now - created_at, is_reunion = now - (last_interaction_at ??
+-- created_at) > 임계(3일), status_message = 규칙 기반(재회/최대 유대감/그 외 소수 문구 중 결정).
 
 
 -- #############################################################################
--- [선행-계약 / FORWARD-LOOKING] — 프론트가 계약했으나 백엔드 도메인 로직이 아직 없음.
--- 아래 테이블은 현재 "어떤 코드도 쓰지 않는다"(F16 홈가든 배치). 구현하는 별도 단계에서
--- 로직과 함께 확정한다. 지금은 forward-safe(전부 nullable/additive)하게 두어, 나중 로직이
--- 올바른 형태를 강제받도록만 한다.
+-- F16 홈가든(타일 배치) + F9 유대감(Bond) — GardenRepository(core/garden/)가 사용한다.
+-- bond_max=5, 재회(reunion) 임계=3일은 core/garden/bondRules.ts에 앱 상수로 고정
+-- (제품 결정 — 이 스키마 자체에는 반영할 값 없음, creature.bond/last_interaction_at을
+-- 그대로 읽고 씀).
 -- #############################################################################
 
 -- =============================================================================
@@ -359,8 +359,8 @@ CREATE TABLE creature_placement (
     -- 배치 좌표는 실제 존재하는 타일이어야 한다(유효 타일 강제).
     FOREIGN KEY (user_id, "row", col) REFERENCES garden_tile(user_id, "row", col) ON DELETE CASCADE
 );
--- ★ 미해결 설계 질문: 타일-종 호환성(TileCompatibility, 그룹→배치가능 타일)은 정적 config인가
---   사용자 편집 대상인가? 현재 프론트는 정적 상수 → 지금은 앱/config 상수로 두고 테이블화하지 않음.
+-- 타일-종 호환성(TileCompatibility, 그룹→배치가능 타일)은 정적 config로 확정(제품 결정) —
+-- 사용자가 편집하는 대상이 아니라 seedData.ts의 TILE_COMPATIBILITY 상수. 테이블화하지 않음.
 
 COMMIT;
 
