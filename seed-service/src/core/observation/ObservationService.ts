@@ -1,8 +1,10 @@
 /**
  * 관찰 서비스 (명세서 F9 + §8: 범용 관찰 레코드).
  *
- * 관찰 레코드를 생성/저장한다. 위치는 resolveRegionForStorage 를 통해서만 들어오므로
- * 정밀 좌표가 저장 경로에 도달할 수 없다(프라이버시 강제).
+ * 관찰 레코드를 생성/저장한다. `region`(일반화 값)은 resolveRegionForStorage 를 통해서만
+ * 들어온다(동의 게이트 유지). `preciseCoord`는 D단계 제품 결정으로 동의와 무관하게 호출부가
+ * 그대로 전달한다 — 이 서비스는 둘 다 받은 그대로 저장할 뿐, 정책 판단은 호출부(ObservationFlow)
+ * 책임이다.
  *
  * 일일 동정 한도(무료 사용자) 체크도 여기서 제공(명세서 §15, config.freeDailyLimit).
  */
@@ -11,6 +13,7 @@ import type {
   Observation,
   ObservationId,
   ObservedRegion,
+  PreciseCoordinate,
   TaxonId,
   TaxonRank,
   MediaRef,
@@ -25,7 +28,8 @@ export interface CreateObservationInput {
   media: MediaRef[];
   confidence: number;
   source: string;
-  region: ObservedRegion | null; // 이미 일반화된 값 또는 null
+  region: ObservedRegion | null; // 이미 일반화된 값 또는 null(동의 게이트)
+  preciseCoord: PreciseCoordinate | null; // D단계: 동의와 무관하게 항상 저장(호출부가 이미 결정)
   note?: string;
   now?: Date;
 }
@@ -41,6 +45,7 @@ export class ObservationService {
       taxonRank: input.taxonRank,
       timestamp: (input.now ?? new Date()).toISOString(),
       region: input.region, // null 이거나 시·군·구 수준
+      preciseCoord: input.preciseCoord,
       media: input.media,
       confidence: input.confidence,
       source: input.source,

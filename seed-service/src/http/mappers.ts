@@ -14,10 +14,14 @@ import type {
   Habitat,
   CollectionEntry,
   User,
+  Creature,
 } from "../core/domain/types.js";
 import type { SpeciesContent } from "../child/content/ContentCardService.js";
 import type { SafetyNotice } from "../core/safety/SafetyFilter.js";
 import type { IdentificationOutcome } from "../core/identification/IdentificationGateway.js";
+import type { Quest, QuestProgress } from "../core/quest/questTypes.js";
+import type { BadgeDefinition, EarnedBadge } from "../core/rewards/rewardTypes.js";
+import { xpToNextLevel, type LevelCurve } from "../core/rewards/rewardTypes.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
 /** `app/src/types/api.ts`의 TaxonGroup — 우리 8종보다 좁은 4종 분류. */
@@ -133,17 +137,25 @@ export interface ApiDexCompletion {
   percentage: number;
 }
 
+/** 개체(Creature, D단계) → ApiCreature. */
+export function creatureToApiCreature(c: Creature): ApiCreature {
+  return {
+    id: c.id as string,
+    species_id: c.taxonId as string,
+    nickname: c.nickname,
+    discovered_at: c.createdAt,
+  };
+}
+
 /**
- * 종 + (있으면) 도감 기록 → DexEntry. 미해금 종은 mock 관례와 동일하게 name="???".
- *
- * `creatures`: 지금 `CollectionEntry`는 종 단위 unlock 여부만 추적하고, app이 기대하는
- * "개체(Creature) 여러 마리 각각 작명" 모델은 아직 없다(F16 홈가든 도메인이 생기면 대체).
- * 해금된 종마다 합성 개체 1개(작명 없음)만 만들어 구조를 맞춘다 — 거짓 데이터가 아니라
- * "지금 갖고 있는 만큼만" 정직하게 반영한 것.
+ * 종 + (있으면) 도감 기록 + 실제 개체 목록 → DexEntry. 미해금 종은 mock 관례와 동일하게
+ * name="???". D단계부터 `creatures`는 합성이 아니라 실제 `Creature` 레코드다(종당 최대
+ * 1마리 — ObservationFlow.recordIdentification이 첫 해금 때만 생성).
  */
 export function collectionEntryToDexEntry(
   taxon: Taxon,
   entry: CollectionEntry | null,
+  creatures: Creature[] = [],
 ): ApiDexEntry {
   const discovered = entry?.unlocked ?? false;
   return {
@@ -151,16 +163,7 @@ export function collectionEntryToDexEntry(
     name: discovered ? taxon.korName || taxon.sciName : "???",
     discovered,
     group: taxonGroupToKorean(taxon.group),
-    creatures:
-      discovered && entry
-        ? [
-            {
-              id: taxon.id as string,
-              species_id: taxon.id as string,
-              discovered_at: entry.firstObservedAt ?? "",
-            },
-          ]
-        : [],
+    creatures: discovered ? creatures.map(creatureToApiCreature) : [],
   };
 }
 
@@ -245,4 +248,86 @@ export function buildRestoreBundle(
   now: Date = new Date(),
 ): ApiRestoreBundleResponse {
   return { dex_count: dexCount, garden_layout_present: false, restored_at: now.toISOString() };
+}
+
+// ── F8. 배지 · 레벨 보상 (D단계) ──────────────────────────────────────────
+export interface ApiXpProfile {
+  level: number;
+  xp: number;
+  xp_to_next: number;
+  leveled_up?: boolean;
+}
+
+export function buildXpProfile(
+  user: User,
+  curve: LevelCurve,
+  leveledUp?: boolean,
+): ApiXpProfile {
+  return {
+    level: user.level,
+    xp: user.xp,
+    xp_to_next: xpToNextLevel(user.xp, curve),
+    leveled_up: leveledUp,
+  };
+}
+
+export interface ApiBadge {
+  badge_id: string;
+  title: string;
+  description: string;
+  theme: string;
+  icon: string;
+  unlocked: boolean;
+  claimed: boolean;
+}
+
+/** 전체 배지 정의 + (있으면) 이 사용자의 해금 기록 → ApiBadge. earned가 없으면 잠긴 상태. */
+export function badgeDefToApiBadge(def: BadgeDefinition, earned: EarnedBadge | null): ApiBadge {
+  return {
+    badge_id: def.id,
+    title: def.title,
+    description: def.description,
+    theme: def.theme,
+    icon: def.icon,
+    unlocked: earned !== null,
+    claimed: earned?.claimedAt !== undefined,
+  };
+}
+
+// ── F10. 퀘스트 (D단계) ───────────────────────────────────────────────────
+export type ApiQuestStatus = "active" | "completed" | "claimed";
+
+export interface ApiQuest {
+  quest_id: string;
+  title: string;
+  description: string;
+  hint_species_id?: string;
+  progress: number;
+  target: number;
+  status: ApiQuestStatus;
+  reward_xp: number;
+  reward_badge_id?: string;
+}
+
+/**
+ * Quest + (있으면) 이 사용자의 진행 상태 → ApiQuest.
+ * `hint_species_id`는 지어내지 않고 비워둔다 — QuestCriteria는 특정 종 하나가 아니라
+ * 그룹/계절/태그 같은 추상 조건이라, 힌트로 삼을 단일 taxonId가 도메인에 없다.
+ */
+export function questToApiQuest(quest: Quest, progress: QuestProgress | null): ApiQuest {
+  const status: ApiQuestStatus = progress?.claimedAt
+    ? "claimed"
+    : progress?.completed
+      ? "completed"
+      : "active";
+  return {
+    quest_id: quest.id,
+    title: quest.title,
+    description: quest.description,
+    progress: progress?.matchedTaxonIds.length ?? 0,
+    target: quest.criteria.distinctTaxa,
+    status,
+    reward_xp: quest.reward.xp,
+    reward_badge_id: quest.reward.badgeId,
+  };
 }

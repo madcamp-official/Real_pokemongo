@@ -1,21 +1,22 @@
 /**
- * 위치 일반화 (명세서 F12 / §8: 프라이버시 우선).
+ * 위치 일반화 (명세서 F12 / §8: 프라이버시 우선했던 원칙 — D단계에서 일부 수정됨).
  *
- * 앱(클라이언트)에서 정밀 GPS가 들어오더라도, 서버 도메인 경계를 넘기 전에
- * **행정구역 코드(시·군·구)로 일반화하고 원본 좌표는 폐기**한다.
- * Observation 타입에는 애초에 좌표 필드가 없다(스키마 강제). 이 함수는 그 경계에서
- * 좌표 → regionCode 변환을 담당한다.
+ * ⚠️ D단계 변경 사항: 이 함수(`resolveRegionForStorage`)는 여전히 `region`(일반화된
+ * 시·군·구 코드)만 만들고, 여기서 만든 값 밖으로 원본 좌표가 안 나간다는 계약은 그대로다.
+ * 하지만 **원본 좌표(정밀 GPS) 자체는 이제 별도 경로로 Observation.preciseCoord에 항상
+ * 저장된다**(제품 결정 — 동의 플래그와 무관, ObservationFlow.recordIdentification 참고).
+ * 즉 "정밀 좌표가 시스템 어디에도 안 남는다"는 옛 원칙은 더 이상 사실이 아니다 — 지금은
+ * "region(일반화 값)은 여전히 이 함수를 거쳐야만 나온다"만 유지되는 좁은 계약이다.
  *
  * TODO(제공 필요): 실제 역지오코딩(좌표→시군구코드).
  *   옵션 A) 국내 행정경계 GeoJSON 을 앱 내장 → 클라이언트에서 변환(좌표가 서버에 안 옴, 최선).
- *   옵션 B) 서버측 역지오코딩 서비스(SPECIES/GEO API). 이 경우에도 원본 좌표는 즉시 폐기.
+ *   옵션 B) 서버측 역지오코딩 서비스(SPECIES/GEO API). 이 경우에도 region 산출용 원본 좌표는
+ *           이 함수 밖으로 안 나간다(단, preciseCoord 저장 경로는 이 함수와 무관하게 별도로 존재).
  */
-import type { ObservedRegion } from "../domain/types.js";
+import type { ObservedRegion, PreciseCoordinate } from "../domain/types.js";
 
-export interface RawCoordinate {
-  lat: number;
-  lng: number;
-}
+/** `PreciseCoordinate`의 별칭 — 이 파일의 기존 호출부 이름을 그대로 유지하기 위함. */
+export type RawCoordinate = PreciseCoordinate;
 
 export interface Geocoder {
   /** 좌표를 시·군·구 코드로. 실패 시 null. */
@@ -51,5 +52,6 @@ export async function resolveRegionForStorage(params: {
   if (!params.locationStorageEnabled) return null; // 프라이버시 기본값
   if (!params.rawCoord) return null;
   return params.geocoder.toRegion(params.rawCoord);
-  // 주의: 이 함수를 벗어나는 순간 rawCoord 는 어디에도 저장되지 않는다.
+  // 주의: 이 함수가 만드는 region(일반화 값)은 이 함수를 거쳐야만 나온다는 계약만 유지된다.
+  // rawCoord 원본은(이 함수와 별개로) Observation.preciseCoord에 항상 저장된다 — 파일 상단 주석 참고.
 }

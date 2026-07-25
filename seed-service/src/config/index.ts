@@ -41,6 +41,10 @@ export interface AppConfig {
 
   http: {
     port: number;
+    /** 바인딩 주소. 기본은 127.0.0.1(로컬 전용, 안전). 같은 네트워크의 다른 기기(예: 실기기
+     * Expo Go 테스트)에서 접근하려면 명시적으로 0.0.0.0으로 채워야 한다 — BIOCLIP_ENDPOINT와
+     * 같은 관례("채워야만 켜짐, 기본은 안전"). */
+    host: string;
   };
 
   identification: {
@@ -103,6 +107,7 @@ export function loadConfig(): AppConfig {
     http: {
       // app/src/config/env.ts의 API_BASE_URL('http://localhost:8080')과 기본값 일치.
       port: envNumber("HTTP_PORT", 8080),
+      host: env("HTTP_HOST") ?? "127.0.0.1",
     },
     identification: {
       plantId: {

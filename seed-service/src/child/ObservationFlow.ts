@@ -30,10 +30,11 @@ import {
 import type { CollectionEngine } from "../core/collection/CollectionEngine.js";
 import type { QuestEngine } from "../core/quest/QuestEngine.js";
 import type { RewardEngine } from "../core/rewards/RewardEngine.js";
-import type { AccountService } from "./account/AccountService.js";
 import type { SafetyNotice } from "../core/safety/SafetyFilter.js";
 import type { AuthContext, Authorizer } from "../core/auth/Authorization.js";
 import { sanitizeImages } from "../core/media/MediaSanitizer.js";
+import { newCreatureId } from "../core/domain/ids.js";
+import type { CreatureRepository } from "../core/repositories/ports.js";
 
 export interface ObserveRequest {
   /** 클라이언트가 올린 원시 이미지 바이트. 저장·외부 전송 전 이 플로우에서 정화된다. */
@@ -47,7 +48,17 @@ export interface ObserveRequest {
   now?: Date;
 }
 
-/** `recordIdentification()`의 결과 — 도감/퀘스트/보상 반영분. */
+/**
+ * `recordIdentification()`의 결과 — 도감/퀘스트/보상 반영분.
+ *
+ * D단계 이후 의미가 바뀐 필드 주의:
+ *  - `completedQuestTitles`: 이번에 조건을 채워 완료된 퀘스트 제목(UI 토스트용). **보상은
+ *    아직 지급되지 않았다** — 사용자가 `POST /quests/:id/claim`을 호출해야 XP가 들어온다.
+ *  - `xpGained`/`newLevel`: 오직 관찰 자체의 기본 XP(10/2)만 반영한다(변경 없이 자동 지급).
+ *    퀘스트/배지 보상 XP는 포함되지 않는다.
+ *  - `newBadgeTitles`: 이번에 "해금"된(조건 충족) 배지 제목. 아직 claim 전이라 XP는
+ *    안 들어온 상태 — `POST /badges/claim`으로 별도 수령해야 한다.
+ */
 export interface RecordedOutcome {
   observationId: string;
   newlyUnlockedTaxonId?: string;
@@ -88,9 +99,9 @@ export class ObservationFlow {
       collection: CollectionEngine;
       quests: QuestEngine;
       rewards: RewardEngine;
-      accounts: AccountService;
       authorizer: Authorizer;
       geocoder: Geocoder;
+      creatures: CreatureRepository;
       freeDailyLimit: number;
     },
   ) {}
@@ -168,12 +179,18 @@ export class ObservationFlow {
     const now = params.now ?? new Date();
     const taxon = params.taxon;
 
-    // ── F12 위치 일반화 (정밀 좌표는 이 함수 밖으로 나가지 않는다) ───────────
+    // ── F12 위치 일반화(region, 동의 게이트 그대로 유지) ────────────────────
     const region = await resolveRegionForStorage({
       locationStorageEnabled: user.locationStorageEnabled,
       rawCoord: params.rawCoord,
       geocoder: this.deps.geocoder,
     });
+
+    // ── D단계: 정밀 좌표는 동의(locationStorageEnabled)와 무관하게 항상 저장한다
+    // (제품 결정). 나중에 이 결정을 되돌리려면 이 한 줄만 `user.locationStorageEnabled
+    // ? (params.rawCoord ?? null) : null` 형태로 감싸면 된다 — region과 달리 별도 게이트가
+    // 없다는 걸 명시적으로 드러내기 위해 일부러 삼항 없이 그대로 둔다.
+    const preciseCoord = params.rawCoord ?? null;
 
     // ── F9 관찰 기록 ──────────────────────────────────────────────────────
     const observation = await this.deps.observations.record({
@@ -184,6 +201,7 @@ export class ObservationFlow {
       confidence: params.confidence,
       source: params.source,
       region,
+      preciseCoord,
       note: params.note,
       now,
     });
@@ -192,41 +210,42 @@ export class ObservationFlow {
     const unlock = await this.deps.collection.applyObservation(observation);
     const progress = await this.deps.collection.progress(ctx.userId);
 
+    // ── D단계: 개체(Creature) 자동 생성 — 이 종의 첫 해금일 때만(종당 최대 1마리,
+    // newlyUnlocked가 곧 "이 유저가 이 종을 처음 해금했다"는 뜻이라 별도 중복 체크 불필요).
+    if (unlock?.newlyUnlocked) {
+      await this.deps.creatures.save({
+        id: newCreatureId(),
+        userId: ctx.userId,
+        taxonId: taxon.id,
+        originObservationId: observation.id,
+        bond: 1,
+        createdAt: now.toISOString(),
+      });
+    }
+
     // ── F7 퀘스트 반영 ────────────────────────────────────────────────────
+    // completed=true만 기록한다. 보상(XP)은 더 이상 여기서 자동 지급하지 않는다 —
+    // D단계 결정: 퀘스트 완료 보상은 사용자가 명시적으로 claim해야 지급된다
+    // (RewardEngine.claimQuest, POST /quests/:id/claim). 관찰 자체의 기본 XP만 아래에서
+    // 계속 자동 지급된다(이 부분은 이번 결정 대상이 아니었음).
     const questUpdates = await this.deps.quests.applyObservation(observation, now);
     const completed = questUpdates.filter((u) => u.justCompleted);
 
-    // ── F8 보상 (관찰 + 완료 퀘스트) ──────────────────────────────────────
+    // ── F8 보상: 관찰 자체의 기본 XP만 자동 지급(변경 없음). 배지는 규칙 충족 시
+    // "해금"만 되고(evaluateBadges), XP는 별도 claim(POST /badges/claim) 전까지 안 들어간다.
     const obsReward = await this.deps.rewards.onObservation(user, {
       newlyUnlocked: unlock?.newlyUnlocked ?? false,
       now,
     });
-    const newBadgeTitles = [...obsReward.newBadges.map((b) => b.title)];
-    let xpGained = obsReward.xpGained;
-    let newLevel = obsReward.newLevel;
-
-    for (const u of completed) {
-      // 사용자의 최신 상태를 다시 읽어 XP 누적이 정확하도록.
-      const fresh = (await this.deps.accounts.getUser(ctx.userId)) ?? user;
-      const questReward = await this.deps.rewards.onQuestComplete(
-        fresh,
-        u.quest.reward.xp,
-        u.quest.reward.badgeId,
-        now,
-      );
-      xpGained += questReward.xpGained;
-      newLevel = questReward.newLevel ?? newLevel;
-      newBadgeTitles.push(...questReward.newBadges.map((b) => b.title));
-    }
 
     return {
       observationId: observation.id,
       newlyUnlockedTaxonId: unlock?.newlyUnlocked ? (taxon.id as string) : undefined,
       collectionRatio: progress.ratio,
       completedQuestTitles: completed.map((u) => u.quest.title),
-      xpGained,
-      newLevel,
-      newBadgeTitles,
+      xpGained: obsReward.xpGained,
+      newLevel: obsReward.newLevel,
+      newBadgeTitles: obsReward.newBadges.map((b) => b.title),
     };
   }
 

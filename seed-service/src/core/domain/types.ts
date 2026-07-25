@@ -23,6 +23,8 @@ export type BadgeId = Brand<string, "BadgeId">;
 export type MediaRef = Brand<string, "MediaRef">;
 /** C단계: 업로드~동정확정 사이 임시 상태를 가리키는 식별자(PendingSightingStore). */
 export type SightingId = Brand<string, "SightingId">;
+/** D단계: 개체(친구) 식별자(F9/F16). */
+export type CreatureId = Brand<string, "CreatureId">;
 
 // ---------------------------------------------------------------------------
 // 공통 열거형
@@ -100,12 +102,25 @@ export interface Taxon {
 // ---------------------------------------------------------------------------
 
 /**
- * 관찰 위치. **정밀 좌표(lat/lng) 필드가 없다.** 오직 행정구역 코드만.
- * 프라이버시 원칙을 스키마 수준에서 강제한다(명세서 §8, F12).
+ * 관찰 위치(일반화). 오직 행정구역 코드만 — 정밀 좌표는 여기 없다.
+ * 프라이버시 원칙을 스키마 수준에서 강제한다(명세서 §8, F12). 이 필드는 여전히
+ * `locationStorageEnabled`(보호자 동의) 게이트를 그대로 따른다(D단계에서도 변경 없음).
  */
 export interface ObservedRegion {
   regionCode: string; // 시·군·구 수준 행정구역 코드 (예: "11680" 강남구)
   regionLabel?: string; // 표시용 (예: "서울 강남구")
+}
+
+/**
+ * 정밀 좌표(D단계, 제품 결정). **`ObservedRegion`과 별개 필드**다 — region은 여전히
+ * 동의(locationStorageEnabled) 게이트를 따르지만, 이 필드는 사용자가 명시적으로
+ * "정밀 위치를 동의 여부와 무관하게 항상 저장하기"로 결정한 대상이다(regionGeneralizer.ts의
+ * resolveRegionForStorage와는 다른, 별도 경로로 채워짐 — ObservationFlow.recordIdentification
+ * 참고). 나중에 이 결정을 되돌려 동의 게이트 안으로 옮기기 쉽도록 region과 분리해뒀다.
+ */
+export interface PreciseCoordinate {
+  lat: number;
+  lng: number;
 }
 
 export interface Observation {
@@ -115,7 +130,8 @@ export interface Observation {
   taxonRank: TaxonRank | null; // 어느 계급까지 확정됐는지 (species가 아닐 수 있음)
   timestamp: string; // ISO8601
 
-  region: ObservedRegion | null; // 위치 저장 OFF면 null
+  region: ObservedRegion | null; // 위치 저장 OFF면 null(동의 게이트, 기존과 동일)
+  preciseCoord: PreciseCoordinate | null; // 클라이언트가 좌표를 안 줬으면 null(D단계, 동의 무관)
 
   media: MediaRef[];
   confidence: number; // 0..1
@@ -133,6 +149,26 @@ export interface CollectionEntry {
   firstObservedAt?: string; // 첫 발견 시각
   firstObservationId?: ObservationId;
   timesObserved: number;
+}
+
+// ---------------------------------------------------------------------------
+// 개체 & 친밀도 (Creature, F9/F16 — D단계)
+// ---------------------------------------------------------------------------
+
+/**
+ * 종 단위 해금(CollectionEntry) 위에 얹히는 "개체 단위 동반자". 종을 처음 해금할 때
+ * 자동으로 1마리 생성되고(ObservationFlow.recordIdentification), 종당 최대 1마리로
+ * 제한한다(제품 결정 — D단계). 홈가든(F16) 화면이 이 레코드를 배치·표시한다.
+ */
+export interface Creature {
+  id: CreatureId;
+  userId: UserId;
+  taxonId: TaxonId;
+  nickname?: string; // 아이가 나중에 붙일 수 있음(작명 API)
+  originObservationId?: ObservationId; // 유래한 관찰(선택 — 관찰이 파기돼도 개체는 유지)
+  bond: number; // 친밀도(F9). 기본 1.
+  lastInteractionAt?: string; // 재회(reunion) 판정 기준
+  createdAt: string; // "함께한 일수" 파생 기준
 }
 
 // ---------------------------------------------------------------------------

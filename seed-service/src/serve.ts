@@ -15,8 +15,8 @@ async function main() {
   const app = await buildApp(config);
   const server = await buildHttpServer(app);
 
-  await server.listen({ port: config.http.port, host: "127.0.0.1" });
-  console.log(`API 서버가 http://127.0.0.1:${config.http.port} 에서 시작되었습니다.`);
+  await server.listen({ port: config.http.port, host: config.http.host });
+  console.log(`API 서버가 http://${config.http.host}:${config.http.port} 에서 시작되었습니다.`);
   console.log(
     `동정 모드: ${app.config.identification.bioclip.endpoint ? "BioCLIP(실제 GPU 서버)" : "Mock(개발)"}`,
   );

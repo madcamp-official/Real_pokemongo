@@ -17,6 +17,8 @@ import type {
   Habitat,
   Credential,
   ConsentRecord,
+  Creature,
+  CreatureId,
 } from "../../domain/types.js";
 import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
@@ -29,6 +31,7 @@ import type {
   BadgeRepository,
   CredentialRepository,
   ConsentRepository,
+  CreatureRepository,
 } from "../ports.js";
 
 export class InMemoryUserRepo implements UserRepository {
@@ -169,15 +172,55 @@ export class InMemoryBadgeRepo implements BadgeRepository {
     return this.m.filter((b) => b.userId === userId);
   }
   async award(badge: EarnedBadge) {
+    // 멱등: 이미 해금돼 있으면(existing) 덮어쓰지 않는다 — claimedAt 등 기존 상태 보존.
+    const existing = this.m.find((b) => b.userId === badge.userId && b.badgeId === badge.badgeId);
+    if (existing) return;
     this.m.push(badge);
   }
   async has(userId: UserId, badgeId: string) {
     return this.m.some((b) => b.userId === userId && b.badgeId === badgeId);
   }
+  async get(userId: UserId, badgeId: string) {
+    return this.m.find((b) => b.userId === userId && b.badgeId === badgeId) ?? null;
+  }
+  async markClaimed(userId: UserId, badgeId: string, claimedAt: string) {
+    const b = this.m.find((x) => x.userId === userId && x.badgeId === badgeId);
+    if (!b) return false;
+    b.claimedAt = claimedAt;
+    return true;
+  }
   async deleteByUser(userId: UserId) {
     const before = this.m.length;
     this.m = this.m.filter((b) => b.userId !== userId);
     return before - this.m.length;
+  }
+}
+
+export class InMemoryCreatureRepo implements CreatureRepository {
+  private m = new Map<string, Creature>();
+  async save(c: Creature) {
+    this.m.set(c.id, c);
+  }
+  async get(id: CreatureId) {
+    return this.m.get(id) ?? null;
+  }
+  async getByUserAndTaxon(userId: UserId, taxonId: TaxonId) {
+    return (
+      [...this.m.values()].find((c) => c.userId === userId && c.taxonId === taxonId) ?? null
+    );
+  }
+  async listByUser(userId: UserId) {
+    return [...this.m.values()].filter((c) => c.userId === userId);
+  }
+  async deleteByUser(userId: UserId) {
+    let n = 0;
+    for (const [k, v] of this.m) {
+      if (v.userId === userId) {
+        this.m.delete(k);
+        n++;
+      }
+    }
+    return n;
   }
 }
 

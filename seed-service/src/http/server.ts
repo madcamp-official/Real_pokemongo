@@ -10,11 +10,15 @@ import { randomBytes } from "node:crypto";
 import type { App } from "../composition.js";
 import { AuthorizationError } from "../core/auth/Authorization.js";
 import { UnsupportedImageFormatError } from "../core/media/MediaSanitizer.js";
+import { ClaimError } from "../core/rewards/RewardEngine.js";
 import { createAuthenticate } from "./auth.js";
 import { registerAuthRoutes } from "./routes/auth.routes.js";
 import { registerSightingsRoutes } from "./routes/sightings.routes.js";
 import { registerDexRoutes } from "./routes/dex.routes.js";
 import { registerAccountRoutes } from "./routes/account.routes.js";
+import { registerBadgeRoutes } from "./routes/badges.routes.js";
+import { registerQuestRoutes } from "./routes/quests.routes.js";
+import { registerCreatureRoutes } from "./routes/creatures.routes.js";
 
 /**
  * `config.auth.jwtSecret`이 비어있으면(개발 환경) 부팅 시 임의 시크릿을 생성한다.
@@ -52,6 +56,9 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   registerSightingsRoutes(server, app, authenticate);
   registerDexRoutes(server, app, authenticate);
   registerAccountRoutes(server, app, authenticate);
+  registerBadgeRoutes(server, app, authenticate);
+  registerQuestRoutes(server, app, authenticate);
+  registerCreatureRoutes(server, app, authenticate);
 
   // 전역 에러 매핑 — core/auth/Authorization.ts의 원칙("소유권 없음/미존재는 같은 404,
   // 자원 존재 여부를 누설하지 않는다")을 HTTP 계층에서도 그대로 지킨다. 이걸 안 걸면
@@ -63,6 +70,12 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
     }
     if (error instanceof UnsupportedImageFormatError) {
       return reply.code(400).send({ error: "invalid_image", message: error.message });
+    }
+    if (error instanceof ClaimError) {
+      // not_found는 존재 여부 누설 방지 원칙과 같은 이유로 404, 나머지(아직 조건 미충족/
+      // 이미 수령함)는 "요청 자체는 이해했지만 지금 시점엔 처리 불가"인 400이 맞다.
+      const status = error.reason === "not_found" ? 404 : 400;
+      return reply.code(status).send({ error: error.reason });
     }
     // Fastify 자체 검증 에러(스키마 불일치 등)는 이미 올바른 statusCode를 갖고 있다.
     const err = error as Error & { statusCode?: number };

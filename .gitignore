@@ -13,3 +13,6 @@ node_modules/
 
 # C단계: 로컬 디스크 미디어 저장소(개발용 스텁, 실제 사진 바이트) — 커밋 대상 아님
 seed-service/data/
+
+# 세션 간 인수인계용 개인 메모(커밋 대상 아님)
+HANDOFF_NEXT_SESSION.md

@@ -27,6 +27,16 @@ export interface RewardOutcome {
   newBadges: BadgeDefinition[];
 }
 
+/**
+ * D단계: claim(수령) 요청이 유효하지 않을 때. `reason`으로 HTTP 계층이 상태 코드를 매핑한다
+ * (server.ts 전역 에러 핸들러 참고) — 존재하지 않음/아직 조건 미충족/이미 수령함을 구분한다.
+ */
+export class ClaimError extends Error {
+  constructor(public readonly reason: "not_found" | "not_completed" | "already_claimed") {
+    super(`claim 불가: ${reason}`);
+  }
+}
+
 export class RewardEngine {
   constructor(
     private readonly badgeDefs: BadgeDefinition[],
@@ -38,6 +48,16 @@ export class RewardEngine {
     private readonly taxa: TaxonRepository,
     private readonly curve: LevelCurve = DEFAULT_LEVEL_CURVE,
   ) {}
+
+  /** HTTP 라우트(GET /badges)가 "아직 해금 안 된 배지"까지 포함해 전체 목록을 보여줄 때 씀. */
+  listBadgeDefinitions(): BadgeDefinition[] {
+    return this.badgeDefs;
+  }
+
+  /** HTTP 라우트(GET /profile/xp 등)가 xp_to_next를 계산할 때 씀. */
+  getLevelCurve(): LevelCurve {
+    return this.curve;
+  }
 
   /**
    * 관찰(및 연관된 도감 해금) 이후 보상 평가.
@@ -51,21 +71,61 @@ export class RewardEngine {
     return this.grant(user, baseXp, opts.now);
   }
 
-  /** 퀘스트 완료 보상. */
-  async onQuestComplete(
-    user: User,
-    questXp: number,
-    questBadgeId: string | undefined,
+  /**
+   * D단계: 퀘스트 보상 수령(claim). `POST /quests/:id/claim`이 호출한다.
+   * `progress.completed`가 true여야 하고, 이미 claim했으면 다시 못 한다(멱등 아님 —
+   * 중복 지급 방지가 목적이라 의도적으로 에러).
+   *
+   * 프론트 mock(`claimMockQuest`)과 동일한 동작: 퀘스트 자체의 XP는 지급하고,
+   * `reward.badgeId`가 있으면 그 배지를 "해금"만 한다(claim은 별도 — claimBadge에서).
+   */
+  async claimQuest(
+    userId: UserId,
+    questId: string,
     now: Date = new Date(),
   ): Promise<RewardOutcome> {
-    const outcome = await this.grant(user, questXp, now);
-    if (questBadgeId && !(await this.badges.has(user.id, questBadgeId))) {
-      const def = this.badgeDefs.find((b) => b.id === questBadgeId);
+    const quest = await this.quests.get(questId);
+    if (!quest) throw new ClaimError("not_found");
+    const progress = await this.quests.getProgress(userId, questId);
+    if (!progress || !progress.completed) throw new ClaimError("not_completed");
+    if (progress.claimedAt) throw new ClaimError("already_claimed");
+
+    const user = await this.users.get(userId);
+    if (!user) throw new ClaimError("not_found");
+
+    const outcome = await this.grant(user, quest.reward.xp, now);
+    if (quest.reward.badgeId && !(await this.badges.has(userId, quest.reward.badgeId))) {
+      const def = this.badgeDefs.find((b) => b.id === quest.reward.badgeId);
       if (def) {
-        await this.awardBadge(user.id, def, now);
+        await this.awardBadge(userId, def, now); // 해금만(claimedAt 없음) — XP는 별도 claim.
         outcome.newBadges.push(def);
       }
     }
+
+    await this.quests.saveProgress({ ...progress, claimedAt: now.toISOString() });
+    return outcome;
+  }
+
+  /**
+   * D단계: 배지 보상 수령(claim). `POST /badges/claim`이 호출한다. 배지가 해금(존재)돼
+   * 있고 아직 claim 전이어야 한다.
+   */
+  async claimBadge(
+    userId: UserId,
+    badgeId: string,
+    now: Date = new Date(),
+  ): Promise<RewardOutcome> {
+    const earned = await this.badges.get(userId, badgeId);
+    if (!earned) throw new ClaimError("not_found");
+    if (earned.claimedAt) throw new ClaimError("already_claimed");
+
+    const def = this.badgeDefs.find((b) => b.id === badgeId);
+    if (!def) throw new ClaimError("not_found");
+    const user = await this.users.get(userId);
+    if (!user) throw new ClaimError("not_found");
+
+    const outcome = await this.grant(user, def.xp, now);
+    await this.badges.markClaimed(userId, badgeId, now.toISOString());
     return outcome;
   }
 

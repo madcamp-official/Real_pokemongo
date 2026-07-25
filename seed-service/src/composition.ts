@@ -17,6 +17,7 @@ import {
   InMemoryBadgeRepo,
   InMemoryCredentialRepo,
   InMemoryConsentRepo,
+  InMemoryCreatureRepo,
 } from "./core/repositories/memory/InMemoryRepositories.js";
 import { LocalDiskMediaStore } from "./core/media/LocalDiskMediaStore.js";
 import { PendingSightingStore } from "./core/observation/PendingSightingStore.js";
@@ -54,6 +55,7 @@ export interface App {
     badges: InMemoryBadgeRepo;
     credentials: InMemoryCredentialRepo;
     consent: InMemoryConsentRepo;
+    creatures: InMemoryCreatureRepo;
   };
   mock: MockProvider; // 데모에서 시나리오 주입용
   gateway: IdentificationGateway;
@@ -61,6 +63,8 @@ export interface App {
   accounts: AccountService;
   content: ContentCardService;
   collection: CollectionEngine;
+  quests: QuestEngine;
+  rewards: RewardEngine;
   dataRights: DataRightsService;
   flow: ObservationFlow;
   /** C단계: HTTP 계층 전용 조각(사진 로컬 저장, 업로드~동정확정 임시 상태). */
@@ -79,6 +83,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     badges: new InMemoryBadgeRepo(),
     credentials: new InMemoryCredentialRepo(),
     consent: new InMemoryConsentRepo(),
+    creatures: new InMemoryCreatureRepo(),
   };
 
   // --- 시드 로드 ---
@@ -125,6 +130,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     badges: repos.badges,
     credentials: repos.credentials,
     consent: repos.consent,
+    creatures: repos.creatures,
   });
 
   const flow = new ObservationFlow({
@@ -133,9 +139,9 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     collection,
     quests,
     rewards,
-    accounts,
     authorizer,
     geocoder: new StubGridGeocoder(),
+    creatures: repos.creatures,
     freeDailyLimit: config.identification.freeDailyLimit,
   });
 
@@ -151,6 +157,8 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     accounts,
     content,
     collection,
+    quests,
+    rewards,
     dataRights,
     flow,
     mediaStore,

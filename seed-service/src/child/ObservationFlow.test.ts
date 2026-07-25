@@ -6,7 +6,8 @@
  *  - 위험 종도 도감에는 수집되되 안전 안내가 먼저.
  *  - 재관찰은 중복 해금/중복 배지를 만들지 않음(멱등성).
  *  - 일일 한도 초과 시 외부 동정 API를 '호출하지 않고' 차단(비용 안전).
- *  - 정밀 좌표를 줘도 저장 데이터에 남지 않음(프라이버시 종단).
+ *  - D단계 제품 결정: 정밀 좌표(preciseCoord)는 위치 저장 동의(locationStorageEnabled)와
+ *    무관하게 항상 저장된다. region(일반화 값)은 여전히 동의 게이트를 그대로 따른다.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -121,6 +122,11 @@ test("재관찰은 중복 해금·중복 배지를 만들지 않는다(멱등성
   // XP: 첫 해금 +10, 재관찰 +2 → 누적 12.
   const fresh = await app.accounts.getUser(ctx.userId);
   assert.equal(fresh!.xp, 12);
+
+  // D단계: 개체도 첫 해금 때만 1마리 생성되고, 재관찰로 추가 생성되지 않는다(종당 최대 1마리).
+  const creatures = await app.repos.creatures.listByUser(ctx.userId);
+  const dandelionCreatures = creatures.filter((c) => c.taxonId === "taxon-dandelion");
+  assert.equal(dandelionCreatures.length, 1, "재관찰해도 개체는 여전히 1마리여야 함");
 });
 
 test("일일 한도 초과 시 외부 동정 API를 호출하지 않고 차단한다(비용 안전)", async () => {
@@ -136,14 +142,25 @@ test("일일 한도 초과 시 외부 동정 API를 호출하지 않고 차단�
   assert.equal(app.mock.identifyCalls, 1, "차단 시 외부 API가 호출되면 안 됨(비용 발생)");
 });
 
-test("정밀 좌표를 줘도 위치 저장 OFF면 저장 데이터에 좌표가 없다", async () => {
+test("정밀 좌표는 위치 저장 동의(OFF)와 무관하게 항상 저장된다(region만 동의 게이트)", async () => {
   const { app, ctx } = await setup();
   const res = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant", {
     rawCoord: { lat: 37.512345, lng: 127.056789 },
   });
   const obs = await app.repos.observations.get(res.recorded!.observationId as never);
-  assert.equal(obs!.region, null, "위치 OFF면 region은 null");
-  assert.equal(JSON.stringify(obs).includes("37.512345"), false, "정밀 좌표가 저장되면 안 됨");
+  assert.equal(obs!.region, null, "위치 OFF면 region(일반화 값)은 여전히 null");
+  assert.deepEqual(
+    obs!.preciseCoord,
+    { lat: 37.512345, lng: 127.056789 },
+    "정밀 좌표는 동의 여부와 무관하게 저장돼야 함(D단계 제품 결정)",
+  );
+});
+
+test("좌표를 안 주면 preciseCoord도 null이다(있는 것만 저장, 지어내지 않음)", async () => {
+  const { app, ctx } = await setup();
+  const res = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
+  const obs = await app.repos.observations.get(res.recorded!.observationId as never);
+  assert.equal(obs!.preciseCoord, null);
 });
 
 test("GPS EXIF 사진을 올려도 외부 동정 API에는 EXIF 없는 바이트만 전달된다", async () => {
@@ -172,7 +189,7 @@ test("GPS EXIF 사진을 올려도 외부 동정 API에는 EXIF 없는 바이트
   assert.equal(hasSeq(a("GPS37.512345")), false, "외부로 나가는 바이트에 좌표가 없어야 함");
 });
 
-test("위치 저장 ON이어도 시·군·구 코드만 저장되고 정밀 좌표는 없다", async () => {
+test("위치 저장 ON이면 region(일반화 값)도 함께 채워지고, 정밀 좌표도 여전히 저장된다", async () => {
   const { app, ctx } = await setup();
   await app.accounts.setLocationStorage(ctx, true);
 
@@ -182,6 +199,5 @@ test("위치 저장 ON이어도 시·군·구 코드만 저장되고 정밀 좌�
   const obs = await app.repos.observations.get(res.recorded!.observationId as never);
   assert.ok(obs!.region, "위치 ON이면 region이 있어야 함");
   assert.ok(obs!.region!.regionCode.length > 0);
-  assert.equal(JSON.stringify(obs).includes("37.512345"), false, "정밀 위도가 저장되면 안 됨");
-  assert.equal(JSON.stringify(obs).includes("127.056789"), false, "정밀 경도가 저장되면 안 됨");
+  assert.deepEqual(obs!.preciseCoord, { lat: 37.512345, lng: 127.056789 });
 });

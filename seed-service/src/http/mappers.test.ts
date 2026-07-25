@@ -6,15 +6,22 @@ import {
   habitatTagsToDisplay,
   taxonToSpeciesCard,
   collectionEntryToDexEntry,
+  creatureToApiCreature,
   buildDexCompletion,
   outcomeToIdentifyResponse,
   buildSignupResponse,
   buildRestoreBundle,
+  badgeDefToApiBadge,
+  questToApiQuest,
+  buildXpProfile,
 } from "./mappers.js";
-import { asTaxonId, newUserId } from "../core/domain/ids.js";
-import type { Taxon, TaxonGroup, CollectionEntry, User } from "../core/domain/types.js";
+import { asTaxonId, newUserId, newCreatureId } from "../core/domain/ids.js";
+import type { Taxon, TaxonGroup, CollectionEntry, User, Creature } from "../core/domain/types.js";
 import type { SafetyNotice } from "../core/safety/SafetyFilter.js";
 import type { IdentificationOutcome } from "../core/identification/IdentificationGateway.js";
+import type { BadgeDefinition, EarnedBadge } from "../core/rewards/rewardTypes.js";
+import { DEFAULT_LEVEL_CURVE } from "../core/rewards/rewardTypes.js";
+import type { Quest, QuestProgress } from "../core/quest/questTypes.js";
 
 function taxon(overrides: Partial<Taxon> = {}): Taxon {
   return {
@@ -96,7 +103,34 @@ test("collectionEntryToDexEntry: 미해금은 이름 '???'(mock 관례와 동일
   assert.deepEqual(entry.creatures, []);
 });
 
-test("collectionEntryToDexEntry: 해금됐으면 실제 이름 + 합성 개체 1개", () => {
+test("collectionEntryToDexEntry: 해금됐으면 실제 이름 + 실제 개체(D단계, 합성 아님)", () => {
+  const t = taxon();
+  const userId = newUserId();
+  const collectionEntry: CollectionEntry = {
+    userId,
+    taxonId: t.id,
+    unlocked: true,
+    firstObservedAt: "2026-01-01T00:00:00.000Z",
+    timesObserved: 1,
+  };
+  const creature: Creature = {
+    id: newCreatureId(),
+    userId,
+    taxonId: t.id,
+    nickname: "점박이",
+    bond: 1,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  };
+  const entry = collectionEntryToDexEntry(t, collectionEntry, [creature]);
+  assert.equal(entry.discovered, true);
+  assert.equal(entry.name, "민들레");
+  assert.equal(entry.creatures.length, 1);
+  assert.equal(entry.creatures[0]?.species_id, "taxon-x");
+  assert.equal(entry.creatures[0]?.nickname, "점박이");
+  assert.equal(entry.creatures[0]?.discovered_at, "2026-01-01T00:00:00.000Z");
+});
+
+test("collectionEntryToDexEntry: 해금됐어도 개체를 안 넘기면(D단계 기본) creatures는 빈 배열", () => {
   const t = taxon();
   const collectionEntry: CollectionEntry = {
     userId: newUserId(),
@@ -106,11 +140,7 @@ test("collectionEntryToDexEntry: 해금됐으면 실제 이름 + 합성 개체 1
     timesObserved: 1,
   };
   const entry = collectionEntryToDexEntry(t, collectionEntry);
-  assert.equal(entry.discovered, true);
-  assert.equal(entry.name, "민들레");
-  assert.equal(entry.creatures.length, 1);
-  assert.equal(entry.creatures[0]?.species_id, "taxon-x");
-  assert.equal(entry.creatures[0]?.discovered_at, "2026-01-01T00:00:00.000Z");
+  assert.deepEqual(entry.creatures, []);
 });
 
 test("buildDexCompletion: 백분율 계산 및 0종일 때 0%", () => {
@@ -190,4 +220,126 @@ test("buildRestoreBundle: garden_layout_present는 항상 false(홈가든 도메
   assert.equal(res.dex_count, 5);
   assert.equal(res.garden_layout_present, false);
   assert.equal(res.restored_at, "2026-01-01T00:00:00.000Z");
+});
+
+// ── D단계: 개체/배지/퀘스트/XP 매퍼 ────────────────────────────────────────
+
+test("creatureToApiCreature: id/species_id/nickname/discovered_at 매핑", () => {
+  const c: Creature = {
+    id: newCreatureId(),
+    userId: newUserId(),
+    taxonId: asTaxonId("taxon-x"),
+    nickname: "점박이",
+    bond: 2,
+    createdAt: "2026-01-01T00:00:00.000Z",
+  };
+  const res = creatureToApiCreature(c);
+  assert.equal(res.id, c.id as string);
+  assert.equal(res.species_id, "taxon-x");
+  assert.equal(res.nickname, "점박이");
+  assert.equal(res.discovered_at, "2026-01-01T00:00:00.000Z");
+});
+
+function badgeDef(): BadgeDefinition {
+  return {
+    id: "badge-x",
+    title: "테스트 배지",
+    description: "설명",
+    rule: { kind: "firstObservation" },
+    xp: 10,
+    theme: "수집",
+    icon: "🔍",
+  };
+}
+
+test("badgeDefToApiBadge: earned가 null이면 잠김(unlocked=false, claimed=false)", () => {
+  const res = badgeDefToApiBadge(badgeDef(), null);
+  assert.equal(res.unlocked, false);
+  assert.equal(res.claimed, false);
+  assert.equal(res.theme, "수집");
+  assert.equal(res.icon, "🔍");
+});
+
+test("badgeDefToApiBadge: earned 있고 claimedAt 없으면 unlocked만 true", () => {
+  const earned: EarnedBadge = { userId: newUserId(), badgeId: "badge-x", earnedAt: "2026-01-01T00:00:00.000Z" };
+  const res = badgeDefToApiBadge(badgeDef(), earned);
+  assert.equal(res.unlocked, true);
+  assert.equal(res.claimed, false);
+});
+
+test("badgeDefToApiBadge: claimedAt 있으면 claimed=true", () => {
+  const earned: EarnedBadge = {
+    userId: newUserId(),
+    badgeId: "badge-x",
+    earnedAt: "2026-01-01T00:00:00.000Z",
+    claimedAt: "2026-01-02T00:00:00.000Z",
+  };
+  const res = badgeDefToApiBadge(badgeDef(), earned);
+  assert.equal(res.unlocked, true);
+  assert.equal(res.claimed, true);
+});
+
+function quest(): Quest {
+  return {
+    id: "quest-x",
+    type: "theme",
+    title: "테스트 퀘스트",
+    description: "설명",
+    criteria: { distinctTaxa: 3 },
+    reward: { xp: 30, badgeId: "badge-x" },
+    activeFrom: "2026-01-01T00:00:00.000Z",
+  };
+}
+
+test("questToApiQuest: progress 없으면 active, progress=0", () => {
+  const res = questToApiQuest(quest(), null);
+  assert.equal(res.status, "active");
+  assert.equal(res.progress, 0);
+  assert.equal(res.target, 3);
+  assert.equal(res.reward_badge_id, "badge-x");
+  assert.equal(res.hint_species_id, undefined, "지어내지 않고 비워둠");
+});
+
+test("questToApiQuest: completed=true, claimedAt 없으면 completed 상태", () => {
+  const progress: QuestProgress = {
+    userId: newUserId(),
+    questId: "quest-x",
+    matchedTaxonIds: ["a", "b", "c"],
+    completed: true,
+    completedAt: "2026-01-01T00:00:00.000Z",
+  };
+  const res = questToApiQuest(quest(), progress);
+  assert.equal(res.status, "completed");
+  assert.equal(res.progress, 3);
+});
+
+test("questToApiQuest: claimedAt 있으면 claimed 상태", () => {
+  const progress: QuestProgress = {
+    userId: newUserId(),
+    questId: "quest-x",
+    matchedTaxonIds: ["a", "b", "c"],
+    completed: true,
+    completedAt: "2026-01-01T00:00:00.000Z",
+    claimedAt: "2026-01-02T00:00:00.000Z",
+  };
+  const res = questToApiQuest(quest(), progress);
+  assert.equal(res.status, "claimed");
+});
+
+test("buildXpProfile: level/xp/xp_to_next 계산, leveled_up 전달", () => {
+  const user: User = {
+    id: newUserId(),
+    plan: "free",
+    locationStorageEnabled: false,
+    nickname: "탐험가",
+    avatar: "fox",
+    level: 2,
+    xp: 80, // thresholds: [0,50,120,...] -> level 2, 다음 문턱 120까지 40 남음
+    createdAt: new Date().toISOString(),
+  };
+  const res = buildXpProfile(user, DEFAULT_LEVEL_CURVE, true);
+  assert.equal(res.level, 2);
+  assert.equal(res.xp, 80);
+  assert.equal(res.xp_to_next, 40);
+  assert.equal(res.leveled_up, true);
 });

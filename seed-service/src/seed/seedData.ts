@@ -143,6 +143,8 @@ export const SEED_BADGES: BadgeDefinition[] = [
     description: "처음으로 생물을 관찰했어요.",
     rule: { kind: "firstObservation" },
     xp: 5,
+    theme: "수집",
+    icon: "🔍",
   },
   {
     id: "badge-collector-10",
@@ -150,6 +152,8 @@ export const SEED_BADGES: BadgeDefinition[] = [
     description: "관찰 10번 달성.",
     rule: { kind: "totalObservations", count: 10 },
     xp: 20,
+    theme: "수집",
+    icon: "📚",
   },
   {
     id: "badge-bug-master",
@@ -157,6 +161,8 @@ export const SEED_BADGES: BadgeDefinition[] = [
     description: "서로 다른 곤충 3종을 모았어요.",
     rule: { kind: "distinctTaxaInGroup", group: "insect", count: 3 },
     xp: 25,
+    theme: "탐험",
+    icon: "🧭",
   },
   {
     id: "badge-spring-explorer",
@@ -164,6 +170,8 @@ export const SEED_BADGES: BadgeDefinition[] = [
     description: "봄 퀘스트를 완료했어요.",
     rule: { kind: "questCount", count: 1 },
     xp: 15,
+    theme: "탐험",
+    icon: "🌱",
   },
   {
     id: "badge-bug-friend",
@@ -171,6 +179,8 @@ export const SEED_BADGES: BadgeDefinition[] = [
     description: "날개 퀘스트를 완료했어요.",
     rule: { kind: "questCount", count: 2 },
     xp: 15,
+    theme: "우정",
+    icon: "🦋",
   },
 ];
 

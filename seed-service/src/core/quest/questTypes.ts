@@ -69,4 +69,10 @@ export interface QuestProgress {
   matchedTaxonIds: string[];
   completed: boolean;
   completedAt?: string;
+  /**
+   * D단계: 명시적 "받기"(claim) 시각. `completed=true`가 되는 시점(QuestEngine)과
+   * 보상이 실제 지급되는 시점(RewardEngine.claimQuest)이 분리돼 있다 — 완료됐다고
+   * 자동으로 XP가 들어오지 않는다. undefined면 아직 안 받은 것.
+   */
+  claimedAt?: string;
 }

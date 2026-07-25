@@ -51,6 +51,7 @@ async function footprint(app: App, userId: AuthContext["userId"]) {
     collection: (await app.repos.collection.listByUser(userId)).length,
     questProgress: (await app.repos.quests.listProgressByUser(userId)).length,
     badges: (await app.repos.badges.listByUser(userId)).length,
+    creatures: (await app.repos.creatures.listByUser(userId)).length,
   };
 }
 
@@ -65,9 +66,12 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   const { app, ctx } = await oneUser();
   await seedUserWithData(app, ctx);
 
-  // 사전 조건: 데이터가 실제로 쌓였는지.
+  // 사전 조건: 데이터가 실제로 쌓였는지(개체는 D단계: 종 첫 해금마다 자동 생성).
   const before = await footprint(app, ctx.userId);
-  assert.ok(before.observations >= 2 && before.collection >= 2 && before.badges >= 1);
+  assert.ok(
+    before.observations >= 2 && before.collection >= 2 && before.badges >= 1 &&
+      before.creatures >= 2,
+  );
 
   const report = await app.dataRights.eraseUserData(ctx);
 
@@ -77,10 +81,12 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   assert.equal(after.collection, 0);
   assert.equal(after.questProgress, 0);
   assert.equal(after.badges, 0);
+  assert.equal(after.creatures, 0);
 
   // 리포트가 실제 삭제 건수를 정확히 보고.
   assert.equal(report.deleted.observations, before.observations);
   assert.equal(report.deleted.badges, before.badges);
+  assert.equal(report.deleted.creatures, before.creatures);
   assert.equal(report.deleted.profile, true);
   // 미디어 blob 파기 대상이 수집됨.
   assert.equal(report.mediaRefsToPurge.length, before.observations);
@@ -101,6 +107,7 @@ test("과잉 삭제 방지: 다른 계정 데이터는 절대 지워지지 않�
   assert.ok(b.user, "다른 계정 프로필은 유지");
   assert.ok(b.observations >= 2, "다른 계정 관찰 유지");
   assert.ok(b.collection >= 2, "다른 계정 도감 유지");
+  assert.ok(b.creatures >= 2, "다른 계정 개체 유지");
 });
 
 test("위조된 계정으로는 삭제도 내보내기도 할 수 없다", async () => {
@@ -117,7 +124,7 @@ test("위조된 계정으로는 삭제도 내보내기도 할 수 없다", async
   );
 });
 
-test("이동권: 내보내기는 내 데이터 사본을 반환하되 정밀 좌표는 없다", async () => {
+test("이동권: 내보내기는 내 데이터 사본(개체 포함)을 반환한다", async () => {
   const { app, ctx } = await oneUser("첫째");
   await seedUserWithData(app, ctx);
 
@@ -125,9 +132,25 @@ test("이동권: 내보내기는 내 데이터 사본을 반환하되 정밀 좌
   assert.equal(dump.profile.nickname, "첫째");
   assert.ok(dump.observations.length >= 2);
   assert.ok(dump.collection.length >= 2);
-  // 내보낸 관찰에 정밀 좌표가 없어야 한다(프라이버시 유지).
-  assert.equal(JSON.stringify(dump).includes('"lat"'), false);
-  assert.equal(JSON.stringify(dump).includes('"lng"'), false);
+  assert.ok(dump.creatures.length >= 2, "종 첫 해금마다 자동 생성된 개체도 포함돼야 함");
+  // 이 시나리오는 좌표를 안 줬으므로 preciseCoord는 null(있는 것만 내보냄, 지어내지 않음).
+  assert.ok(dump.observations.every((o) => o.preciseCoord === null));
+});
+
+test("이동권: 좌표를 준 관찰은 내보내기에 본인의 정밀 좌표가 그대로 포함된다(D단계)", async () => {
+  const { app, ctx } = await oneUser("첫째");
+  app.mock.enqueue([
+    { scientificName: "Taraxacum officinale", vernacularName: "민들레", rank: "species", confidence: 0.92 },
+  ]);
+  await app.flow.observe(ctx, {
+    images: [makeCleanJpeg()],
+    media: [],
+    groupHint: "plant",
+    rawCoord: { lat: 37.1, lng: 127.2 },
+  });
+
+  const dump = await app.dataRights.exportUserData(ctx);
+  assert.deepEqual(dump.observations[0]!.preciseCoord, { lat: 37.1, lng: 127.2 });
 });
 
 test("파기 후 재호출은 인가 단계에서 거부된다(프로필 부재)", async () => {

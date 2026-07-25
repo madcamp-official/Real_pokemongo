@@ -18,6 +18,8 @@ import type {
   Habitat,
   Credential,
   ConsentRecord,
+  Creature,
+  CreatureId,
 } from "../domain/types.js";
 import type { Quest, QuestProgress } from "../quest/questTypes.js";
 import type { EarnedBadge } from "../rewards/rewardTypes.js";
@@ -74,8 +76,22 @@ export interface QuestRepository {
 
 export interface BadgeRepository {
   listByUser(userId: UserId): Promise<EarnedBadge[]>;
+  /** 해금(존재만, claimedAt 없음) 또는 이미 있으면 그대로 둔다(멱등). */
   award(badge: EarnedBadge): Promise<void>;
   has(userId: UserId, badgeId: string): Promise<boolean>;
+  /** D단계: unlocked/claimed 구분을 위해 전체 레코드 조회. */
+  get(userId: UserId, badgeId: string): Promise<EarnedBadge | null>;
+  /** D단계: claim 시각을 기록. 대상이 없으면 false. */
+  markClaimed(userId: UserId, badgeId: string, claimedAt: string): Promise<boolean>;
+  deleteByUser(userId: UserId): Promise<number>;
+}
+
+/** D단계: 개체(Creature). 종당 최대 1마리 — getByUserAndTaxon으로 첫 해금 여부를 판정. */
+export interface CreatureRepository {
+  save(c: Creature): Promise<void>;
+  get(id: CreatureId): Promise<Creature | null>;
+  getByUserAndTaxon(userId: UserId, taxonId: TaxonId): Promise<Creature | null>;
+  listByUser(userId: UserId): Promise<Creature[]>;
   deleteByUser(userId: UserId): Promise<number>;
 }
 

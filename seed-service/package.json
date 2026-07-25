@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "demo": "tsx src/demo.ts",
-    "serve": "tsx src/serve.ts",
+    "serve": "tsx --env-file=.env src/serve.ts",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

@@ -24,6 +24,7 @@ import type {
   MediaRef,
   Observation,
   CollectionEntry,
+  Creature,
 } from "../../core/domain/types.js";
 import type { QuestProgress } from "../../core/quest/questTypes.js";
 import type { EarnedBadge } from "../../core/rewards/rewardTypes.js";
@@ -35,6 +36,7 @@ import type {
   BadgeRepository,
   CredentialRepository,
   ConsentRepository,
+  CreatureRepository,
 } from "../../core/repositories/ports.js";
 import type { AuthContext, Authorizer } from "../../core/auth/Authorization.js";
 
@@ -48,10 +50,13 @@ export interface UserDataExport {
     xp: number;
     createdAt: string;
   };
-  observations: Observation[]; // region 은 이미 시·군·구 수준 또는 null(정밀좌표 없음)
+  // D단계: observations[].preciseCoord 가 포함될 수 있다(정밀 좌표를 이제 저장하므로) —
+  // 이동권(본인에게 자기 데이터 사본을 주는 것)이라 본인 정밀 위치가 포함되는 게 맞다.
+  observations: Observation[];
   collection: CollectionEntry[];
   questProgress: QuestProgress[];
   badges: EarnedBadge[];
+  creatures: Creature[];
 }
 
 /** 삭제권(파기) 결과 — 어디서 몇 건이 지워졌는지 검증 가능한 리포트. */
@@ -63,6 +68,7 @@ export interface ErasureReport {
     collectionEntries: number;
     questProgress: number;
     badges: number;
+    creatures: number;
     profile: boolean;
     credential: boolean;
     consent: boolean;
@@ -82,17 +88,19 @@ export class DataRightsService {
       badges: BadgeRepository;
       credentials: CredentialRepository;
       consent: ConsentRepository;
+      creatures: CreatureRepository;
     },
   ) {}
 
   /** 이동권: 내 데이터 전체를 내보낸다(본인만). */
   async exportUserData(ctx: AuthContext): Promise<UserDataExport> {
     const user = await this.deps.authorizer.requireUser(ctx);
-    const [observations, collection, questProgress, badges] = await Promise.all([
+    const [observations, collection, questProgress, badges, creatures] = await Promise.all([
       this.deps.observations.listByUser(ctx.userId),
       this.deps.collection.listByUser(ctx.userId),
       this.deps.quests.listProgressByUser(ctx.userId),
       this.deps.badges.listByUser(ctx.userId),
+      this.deps.creatures.listByUser(ctx.userId),
     ]);
     return {
       exportedAt: new Date().toISOString(),
@@ -107,6 +115,7 @@ export class DataRightsService {
       collection,
       questProgress,
       badges,
+      creatures,
     };
   }
 
@@ -130,6 +139,7 @@ export class DataRightsService {
     const deletedCollection = await this.deps.collection.deleteByUser(userId);
     const deletedQuestProgress = await this.deps.quests.deleteProgressByUser(userId);
     const deletedBadges = await this.deps.badges.deleteByUser(userId);
+    const deletedCreatures = await this.deps.creatures.deleteByUser(userId);
     const deletedCredential = await this.deps.credentials.deleteByUser(userId);
     const deletedConsent = await this.deps.consent.deleteByUser(userId);
     const profileDeleted = await this.deps.users.delete(userId);
@@ -142,6 +152,7 @@ export class DataRightsService {
         collectionEntries: deletedCollection,
         questProgress: deletedQuestProgress,
         badges: deletedBadges,
+        creatures: deletedCreatures,
         profile: profileDeleted,
         credential: deletedCredential,
         consent: deletedConsent,
