@@ -5,6 +5,8 @@ import type { RootTabParamList } from '@/navigation/types';
 import CameraScreen from '@/screens/CameraScreen';
 import DexScreen from '@/screens/DexScreen';
 import GardenScreen from '@/screens/GardenScreen';
+import MapScreen from '@/screens/MapScreen';
+import RewardsScreen from '@/screens/RewardsScreen';
 import SettingsScreen from '@/screens/SettingsScreen';
 
 const Tab = createBottomTabNavigator<RootTabParamList>();
@@ -14,6 +16,8 @@ const tabEmoji: Record<keyof RootTabParamList, string> = {
   Camera: '📷',
   Dex: '📖',
   Garden: '🌿',
+  Map: '🗺️',
+  Rewards: '🏆',
   Settings: '⚙️',
 };
 
@@ -31,6 +35,8 @@ export function MainTabs() {
       <Tab.Screen name="Camera" component={CameraScreen} options={{ title: '촬영' }} />
       <Tab.Screen name="Dex" component={DexScreen} options={{ title: '도감' }} />
       <Tab.Screen name="Garden" component={GardenScreen} options={{ title: '홈 가든' }} />
+      <Tab.Screen name="Map" component={MapScreen} options={{ title: '지도' }} />
+      <Tab.Screen name="Rewards" component={RewardsScreen} options={{ title: '보상함' }} />
       <Tab.Screen name="Settings" component={SettingsScreen} options={{ title: '설정' }} />
     </Tab.Navigator>
   );

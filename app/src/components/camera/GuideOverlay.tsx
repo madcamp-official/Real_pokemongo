@@ -8,9 +8,12 @@ import { StyleSheet, Text, View } from 'react-native';
  */
 interface Props {
   hint?: string;
+  /** F8 레벨업 언락 시 프레임 강조색(기본은 흰색). 예: 골드 프레임. */
+  accentColor?: string;
 }
 
-export function GuideOverlay({ hint = '생물을 가운데 담아요' }: Props) {
+export function GuideOverlay({ hint = '생물을 가운데 담아요', accentColor }: Props) {
+  const cornerColor = accentColor ?? DEFAULT_COLOR;
   return (
     <View style={styles.overlay} pointerEvents="none">
       <View style={styles.topHint}>
@@ -19,10 +22,10 @@ export function GuideOverlay({ hint = '생물을 가운데 담아요' }: Props) 
 
       {/* 중앙 프레이밍 가이드 (네 모서리) */}
       <View style={styles.frame}>
-        <View style={[styles.corner, styles.tl]} />
-        <View style={[styles.corner, styles.tr]} />
-        <View style={[styles.corner, styles.bl]} />
-        <View style={[styles.corner, styles.br]} />
+        <View style={[styles.corner, styles.tl, { borderColor: cornerColor }]} />
+        <View style={[styles.corner, styles.tr, { borderColor: cornerColor }]} />
+        <View style={[styles.corner, styles.bl, { borderColor: cornerColor }]} />
+        <View style={[styles.corner, styles.br, { borderColor: cornerColor }]} />
       </View>
     </View>
   );
@@ -30,7 +33,7 @@ export function GuideOverlay({ hint = '생물을 가운데 담아요' }: Props) 
 
 const CORNER = 28;
 const BORDER = 3;
-const COLOR = 'rgba(255,255,255,0.9)';
+const DEFAULT_COLOR = 'rgba(255,255,255,0.9)';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -52,7 +55,7 @@ const styles = StyleSheet.create({
   },
   hintText: { color: '#fff', fontSize: 15, fontWeight: '600' },
   frame: { width: '72%', aspectRatio: 1, maxWidth: 320 },
-  corner: { position: 'absolute', width: CORNER, height: CORNER, borderColor: COLOR },
+  corner: { position: 'absolute', width: CORNER, height: CORNER },
   tl: { top: 0, left: 0, borderTopWidth: BORDER, borderLeftWidth: BORDER, borderTopLeftRadius: 8 },
   tr: { top: 0, right: 0, borderTopWidth: BORDER, borderRightWidth: BORDER, borderTopRightRadius: 8 },
   bl: { bottom: 0, left: 0, borderBottomWidth: BORDER, borderLeftWidth: BORDER, borderBottomLeftRadius: 8 },

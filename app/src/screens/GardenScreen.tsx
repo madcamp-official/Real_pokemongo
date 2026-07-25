@@ -11,6 +11,7 @@ import { CreatureStatusSheet } from '@/components/garden/CreatureStatusSheet';
 import { getSpeciesVisual } from '@/theme/species';
 import { screenToTile } from '@/theme/garden';
 import { colors } from '@/theme/colors';
+import { useRewardsStore, isGardenBorderUnlocked } from '@/store/rewardsStore';
 
 /**
  * F16 홈 가든 (2D). isometric 6×6 격자에 개체를 드래그 배치.
@@ -131,6 +132,10 @@ export default function GardenScreen() {
 
   const draggingVisual = dragging ? getSpeciesVisual(dragging.species_id) : null;
 
+  // F8 레벨업 언락: 일정 레벨 이상이면 정원 그리드에 반짝이는 테두리 장식.
+  const level = useRewardsStore((s) => s.level);
+  const borderUnlocked = isGardenBorderUnlocked(level);
+
   return (
     <View ref={rootRef} collapsable={false} style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
@@ -139,14 +144,16 @@ export default function GardenScreen() {
       </View>
 
       <View style={styles.gridArea}>
-        <IsoGrid
-          ref={gridRef}
-          tiles={tiles}
-          placements={placements}
-          isDragging={!!dragging}
-          compatibleTiles={compatibleTiles}
-          onCreaturePress={setSelectedId}
-        />
+        <View style={[styles.gridFrame, borderUnlocked && styles.gridFrameUnlocked]}>
+          <IsoGrid
+            ref={gridRef}
+            tiles={tiles}
+            placements={placements}
+            isDragging={!!dragging}
+            compatibleTiles={compatibleTiles}
+            onCreaturePress={setSelectedId}
+          />
+        </View>
       </View>
 
       {warn && (
@@ -186,6 +193,11 @@ const styles = StyleSheet.create({
   title: { fontSize: 26, fontWeight: '800', color: colors.textPrimary },
   greeting: { fontSize: 14, color: colors.textSecondary, fontWeight: '600', marginTop: 2 },
   gridArea: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  gridFrame: { borderRadius: 24, padding: 6, borderWidth: 3, borderColor: 'transparent' },
+  gridFrameUnlocked: {
+    borderColor: colors.funFactAccent,
+    backgroundColor: 'rgba(224, 169, 62, 0.08)',
+  },
   warnBanner: {
     position: 'absolute',
     bottom: 180,

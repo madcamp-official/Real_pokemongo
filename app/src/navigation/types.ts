@@ -6,6 +6,8 @@ export type RootTabParamList = {
   Camera: undefined; // F2 촬영
   Dex: undefined; // F5 도감
   Garden: undefined; // F16 홈 가든
+  Map: undefined; // F11 지도 & 탐험 기록
+  Rewards: undefined; // F8/F10 보상함(배지·퀘스트)
   Settings: undefined; // F18 설정
 };
 

@@ -6,6 +6,8 @@ import {
   StyleSheet,
   Text,
   View,
+  type LayoutChangeEvent,
+  type GestureResponderEvent,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
@@ -15,12 +17,16 @@ import { GuideOverlay } from '@/components/camera/GuideOverlay';
 import { CaptureButton, type CaptureMode } from '@/components/camera/CaptureButton';
 import { CapturingLoader } from '@/components/camera/CapturingLoader';
 import { UploadStatusStrip } from '@/components/camera/UploadStatusStrip';
+import { PreviewScanOverlay } from '@/components/camera/PreviewScanOverlay';
 import { useCapture } from '@/hooks/useCapture';
+import { usePreviewScan } from '@/hooks/usePreviewScan';
 import { pickFromGallery } from '@/services/gallery';
 import { persistPhoto } from '@/services/photoStorage';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { useAuthStore, GUEST_SIGHTING_LIMIT } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { useRewardsStore, isCameraFrameUnlocked } from '@/store/rewardsStore';
+import { colors } from '@/theme/colors';
 import type { RootStackParamList } from '@/navigation/types';
 
 /**
@@ -39,10 +45,14 @@ export default function CameraScreen() {
   const [isImporting, setIsImporting] = useState(false);
 
   const { isCapturing, capture } = useCapture(cameraRef, attachLocation);
+  const { scanning, point, result, scanAt, clear } = usePreviewScan(cameraRef);
+  const [previewSize, setPreviewSize] = useState({ w: 0, h: 0 });
   const enqueue = useUploadQueue((s) => s.enqueue);
 
   const isGuest = useAuthStore((s) => s.isGuest);
   const guestSightingCount = useAuthStore((s) => s.guestSightingCount);
+  const level = useRewardsStore((s) => s.level);
+  const frameUnlocked = isCameraFrameUnlocked(level);
   const navigation = useNavigation();
 
   const guestLimitReached = isGuest && guestSightingCount >= GUEST_SIGHTING_LIMIT;
@@ -127,11 +137,52 @@ export default function CameraScreen() {
     if (uploadId) openIdentify(uploadId);
   };
 
+  // F19: 프리뷰 빈 영역 터치 → 사전 위험 스캔 (셔터와 별도 동작)
+  const onPreviewLayout = (e: LayoutChangeEvent) => {
+    const { width, height } = e.nativeEvent.layout;
+    setPreviewSize({ w: width, h: height });
+  };
+  const onPreviewTouch = (e: GestureResponderEvent) => {
+    if (isCapturing) return;
+    const { locationX, locationY } = e.nativeEvent;
+    void scanAt(locationX, locationY, previewSize.w, previewSize.h);
+  };
+
   return (
     <View style={styles.root}>
       <CameraView ref={cameraRef} style={StyleSheet.absoluteFill} facing={facing} />
 
-      <GuideOverlay hint={mode === 'burst' ? '연속으로 여러 장 담아요' : '생물을 가운데 담아요'} />
+      {/* F19: 프리뷰 터치 감지 레이어 (컨트롤 아래, 카메라 위) */}
+      <View
+        style={StyleSheet.absoluteFill}
+        onLayout={onPreviewLayout}
+        onStartShouldSetResponder={() => true}
+        onResponderRelease={onPreviewTouch}
+      />
+
+      <GuideOverlay
+        hint={
+          mode === 'burst'
+            ? '연속으로 여러 장 담아요'
+            : '생물을 가운데 담아요 · 톡 누르면 미리 알려줘요'
+        }
+        accentColor={frameUnlocked ? colors.funFactAccent : undefined}
+      />
+
+      {frameUnlocked && (
+        <View pointerEvents="none" style={[styles.frameUnlockBadge, { top: insets.top + 8 }]}>
+          <Text style={styles.frameUnlockText}>✨ 골드 프레임</Text>
+        </View>
+      )}
+
+      <PreviewScanOverlay
+        scanning={scanning}
+        point={point}
+        result={result}
+        containerW={previewSize.w}
+        containerH={previewSize.h}
+        onDismiss={clear}
+      />
 
       {isGuest && (
         <View style={[styles.guestBadge, { top: insets.top + 8 }]}>
@@ -191,6 +242,22 @@ export default function CameraScreen() {
 
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#000' },
+  frameUnlockBadge: {
+    position: 'absolute',
+    left: 0,
+    right: 0,
+    alignItems: 'center',
+  },
+  frameUnlockText: {
+    color: '#fff',
+    fontSize: 11,
+    fontWeight: '700',
+    backgroundColor: 'rgba(0,0,0,0.4)',
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
   centered: {
     flex: 1,
     alignItems: 'center',

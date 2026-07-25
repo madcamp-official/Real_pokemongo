@@ -11,6 +11,13 @@ import type {
   TileCompatibility,
   TileType,
   CreatureStatus,
+  InteractResponse,
+  XPProfile,
+  Badge,
+  Quest,
+  MapPin,
+  ExploredRegionsResponse,
+  WeeklyExploreStats,
 } from '@/types/api';
 import type { GuestConvertResponse } from '@/api/auth';
 
@@ -144,6 +151,17 @@ export const mockPreviewScan: PreviewScanResponse = {
   confidence: 0.78,
 };
 
+const PREVIEW_SCANS: PreviewScanResponse[] = [
+  { species_guess: '무당벌레', is_dangerous: false, confidence: 0.78 },
+  { species_guess: '나비', is_dangerous: false, confidence: 0.66 },
+  { species_guess: '벌', is_dangerous: true, confidence: 0.71 },
+];
+
+/** 데모용: 호출마다 안전/위험 결과를 섞어 보여준다(위험은 약 1/3). */
+export function pickMockPreviewScan(): PreviewScanResponse {
+  return PREVIEW_SCANS[Math.floor(Math.random() * PREVIEW_SCANS.length)];
+}
+
 // ─── F1. 온보딩 & 인증 (단일 사용자 계정) ────────────────
 export function buildMockSignup(
   email: string,
@@ -200,21 +218,227 @@ const STATUS_MESSAGES = [
   '주변을 탐험하는 중이에요.',
 ];
 
+const BOND_MAX = 5;
+const REUNION_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3; // 3일
+
+function seedOf(id: string): number {
+  return id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+}
+
+// creatureId → {bond, lastInteractionAt}. F9 상호작용으로 갱신되는 세션 내 상태.
+const bondState = new Map<string, { bond: number; lastInteractionAt: number }>();
+
+function getBondEntry(creatureId: string) {
+  if (!bondState.has(creatureId)) {
+    const seed = seedOf(creatureId);
+    bondState.set(creatureId, {
+      bond: (seed % BOND_MAX) + 1,
+      // 초기값은 "며칠 전"으로 세팅해, 처음 열었을 때 재회 연출이 자연스레 나오게 한다.
+      lastInteractionAt: Date.now() - REUNION_THRESHOLD_MS - 1000 * 60 * 60 * (seed % 24),
+    });
+  }
+  return bondState.get(creatureId)!;
+}
+
 export function buildMockCreatureStatus(
   creatureId: string,
   nickname: string | null
 ): CreatureStatus {
-  // days_together, bond 는 creatureId 해시로 안정적인 더미 값 생성.
-  const seed = creatureId.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+  const seed = seedOf(creatureId);
+  const entry = getBondEntry(creatureId);
   return {
     creature_id: creatureId,
     nickname,
     days_together: (seed % 30) + 1,
-    bond: (seed % 5) + 1,
-    bond_max: 5,
+    bond: entry.bond,
+    bond_max: BOND_MAX,
     status_message: STATUS_MESSAGES[seed % STATUS_MESSAGES.length],
+    is_reunion: Date.now() - entry.lastInteractionAt > REUNION_THRESHOLD_MS,
   };
 }
+
+const REACTION_MESSAGES = [
+  '기분이 좋아졌어요! 🐾',
+  '꼬리를 살랑살랑 흔들어요.',
+  '당신 쪽으로 다가와요.',
+  '반짝반짝 눈을 빛내요.',
+];
+
+/** F9 상호작용(쓰다듬기 등). Bond는 최대치까지 1씩 증가. */
+export function interactMockCreature(creatureId: string): InteractResponse {
+  const entry = getBondEntry(creatureId);
+  const now = Date.now();
+  const isReunion = now - entry.lastInteractionAt > REUNION_THRESHOLD_MS;
+  const before = entry.bond;
+
+  entry.bond = Math.min(entry.bond + 1, BOND_MAX);
+  entry.lastInteractionAt = now;
+
+  return {
+    bond: entry.bond,
+    bond_max: BOND_MAX,
+    bond_leveled_up: entry.bond > before,
+    reaction_message: REACTION_MESSAGES[Math.floor(Math.random() * REACTION_MESSAGES.length)],
+    is_reunion: isReunion,
+  };
+}
+
+// ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
+let xpState: XPProfile = { level: 3, xp: 180, xp_to_next: 220 };
+
+export function getMockXpProfile(): XPProfile {
+  return { ...xpState };
+}
+
+function addMockXp(amount: number): XPProfile {
+  xpState.xp += amount;
+  let leveledUp = false;
+  while (xpState.xp >= xpState.xp_to_next) {
+    xpState.xp -= xpState.xp_to_next;
+    xpState.level += 1;
+    xpState.xp_to_next = Math.round(xpState.xp_to_next * 1.25);
+    leveledUp = true;
+  }
+  return { ...xpState, leveled_up: leveledUp };
+}
+
+let badgesState: Badge[] = [
+  {
+    badge_id: 'bd_first_find',
+    title: '첫 발견',
+    description: '처음으로 생물을 도감에 기록했어요',
+    theme: '수집',
+    icon: '🔍',
+    unlocked: true,
+    claimed: true,
+  },
+  {
+    badge_id: 'bd_collector_10',
+    title: '수집가',
+    description: '10종을 발견했어요',
+    theme: '수집',
+    icon: '📚',
+    unlocked: true,
+    claimed: false,
+  },
+  {
+    badge_id: 'bd_explorer',
+    title: '탐험가',
+    description: '벌처럼 조심스러운 친구도 안전하게 관찰했어요',
+    theme: '탐험',
+    icon: '🧭',
+    unlocked: false,
+    claimed: false,
+  },
+  {
+    badge_id: 'bd_bestfriend',
+    title: '단짝 친구',
+    description: '한 친구와 Bond를 최고치까지 올렸어요',
+    theme: '우정',
+    icon: '💛',
+    unlocked: false,
+    claimed: false,
+  },
+  {
+    badge_id: 'bd_streak_3',
+    title: '3일 연속 탐험',
+    description: '3일 연속으로 앱을 열었어요',
+    theme: '연속출석',
+    icon: '🔥',
+    unlocked: true,
+    claimed: false,
+  },
+];
+
+export function getMockBadges(): Badge[] {
+  return badgesState.map((b) => ({ ...b }));
+}
+
+export function claimMockBadge(badgeId: string): XPProfile {
+  const badge = badgesState.find((b) => b.badge_id === badgeId);
+  if (badge && badge.unlocked && !badge.claimed) {
+    badge.claimed = true;
+    return addMockXp(50);
+  }
+  return { ...xpState, leveled_up: false };
+}
+
+// ─── F10. 퀘스트 ──────────────────────────────────────────
+let questsState: Quest[] = [
+  {
+    quest_id: 'q_ladybug_3',
+    title: '무당벌레 친구들',
+    description: '무당벌레를 3마리 찾아보세요',
+    hint_species_id: 'sp_ladybug',
+    progress: 2,
+    target: 3,
+    status: 'active',
+    reward_xp: 30,
+  },
+  {
+    quest_id: 'q_bee_1',
+    title: '조심스러운 만남',
+    description: '벌을 안전하게 관찰해보세요',
+    hint_species_id: 'sp_bee',
+    progress: 1,
+    target: 1,
+    status: 'completed',
+    reward_xp: 40,
+    reward_badge_id: 'bd_explorer',
+  },
+  {
+    quest_id: 'q_streak_3',
+    title: '3일 연속 탐험',
+    description: '3일 연속으로 앱을 열어보세요',
+    progress: 3,
+    target: 3,
+    status: 'claimed',
+    reward_xp: 20,
+  },
+];
+
+export function getMockQuests(): Quest[] {
+  return questsState.map((q) => ({ ...q }));
+}
+
+export function claimMockQuest(questId: string): XPProfile {
+  const quest = questsState.find((q) => q.quest_id === questId);
+  if (quest && quest.status === 'completed') {
+    quest.status = 'claimed';
+    if (quest.reward_badge_id) {
+      const badge = badgesState.find((b) => b.badge_id === quest.reward_badge_id);
+      if (badge) badge.unlocked = true;
+    }
+    return addMockXp(quest.reward_xp);
+  }
+  return { ...xpState, leveled_up: false };
+}
+
+// ─── F11. 지도 & 탐험 기록 ────────────────────────────────
+export const mockMapPins: MapPin[] = [
+  { id: 'pin_1', species_id: 'sp_frog', species_name: '개구리', group: '양서류', x: 0.3, y: 0.32 },
+  { id: 'pin_2', species_id: 'sp_ladybug', species_name: '무당벌레', group: '곤충', x: 0.4, y: 0.56 },
+  { id: 'pin_3', species_id: 'sp_butterfly', species_name: '나비', group: '곤충', x: 0.52, y: 0.62 },
+  { id: 'pin_4', species_id: 'sp_snail', species_name: '달팽이', group: '기타', x: 0.56, y: 0.74 },
+];
+
+export const mockExploredRegions: ExploredRegionsResponse = {
+  blobs: [
+    { id: 'b_nature_1', cx: 0.28, cy: 0.28, w: 0.5, h: 0.42, kind: 'nature' },
+    { id: 'b_nature_2', cx: 0.68, cy: 0.6, w: 0.62, h: 0.5, kind: 'nature' },
+    { id: 'b_water_river', cx: 0.35, cy: 0.34, w: 0.9, h: 0.16, kind: 'water', rotate: -22 },
+    { id: 'b_water_pond', cx: 0.32, cy: 0.72, w: 0.42, h: 0.34, kind: 'water' },
+    { id: 'b_unexplored', cx: 0.82, cy: 0.22, w: 0.5, h: 0.42, kind: 'unexplored', label: '아직 안 가본 곳' },
+  ],
+  home_zone: { cx: 0.44, cy: 0.6, radius: 0.26, label: '나만의 탐험 구역' },
+  current_location: { x: 0.42, y: 0.57 },
+};
+
+export const mockWeeklyStats: WeeklyExploreStats = {
+  places_discovered: 7,
+  distance_km: 3,
+  new_species: 5,
+};
 
 // ─── F18. 설정 & 계정 관리 ────────────────────────────────
 export const mockRestoreBundle: RestoreBundleResponse = {

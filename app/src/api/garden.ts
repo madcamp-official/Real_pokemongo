@@ -3,6 +3,7 @@ import type {
   GardenLayout,
   TileCompatibility,
   CreatureStatus,
+  InteractResponse,
 } from '@/types/api';
 
 /** F16 홈 가든 API. */
@@ -30,4 +31,12 @@ export async function fetchCreatureStatus(creatureId: string): Promise<CreatureS
 /** 작명 (F16). */
 export async function nameCreature(creatureId: string, nickname: string): Promise<void> {
   await apiClient.post(`/creatures/${creatureId}/name`, { nickname });
+}
+
+/** F9 친밀도 상호작용(쓰다듬기 등). 홈 가든 탭 상호작용 이벤트. */
+export async function interactWithCreature(creatureId: string): Promise<InteractResponse> {
+  const { data } = await apiClient.post<InteractResponse>(
+    `/creatures/${creatureId}/interact`
+  );
+  return data;
 }

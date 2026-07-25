@@ -4,13 +4,22 @@ import {
   mockDexCompletion,
   getMockSpeciesCard,
   mockIdentify,
-  mockPreviewScan,
+  pickMockPreviewScan,
   buildMockSignup,
   mockGuestConvert,
   mockRestoreBundle,
   mockGardenLayout,
   mockTileCompatibility,
   buildMockCreatureStatus,
+  interactMockCreature,
+  getMockXpProfile,
+  getMockBadges,
+  claimMockBadge,
+  getMockQuests,
+  claimMockQuest,
+  mockMapPins,
+  mockExploredRegions,
+  mockWeeklyStats,
 } from '@/mocks/mockData';
 
 function speciesIdFromUrl(url: string): string {
@@ -21,6 +30,11 @@ function speciesIdFromUrl(url: string): string {
 function creatureIdFromUrl(url: string): string {
   const m = url.match(/\/creatures\/([^/]+)\//);
   return m ? m[1] : 'cr_1';
+}
+
+function questIdFromUrl(url: string): string {
+  const m = url.match(/\/quests\/([^/]+)\//);
+  return m ? m[1] : '';
 }
 
 /**
@@ -51,7 +65,7 @@ const routes: Array<[string, RegExp, Handler]> = [
   ['GET', /\/species\/[^/]+\/card/, (config) => getMockSpeciesCard(speciesIdFromUrl(config.url ?? ''))],
   ['POST', /\/identify\/confirm$/, () => ({})],
   ['POST', /\/identify$/, () => mockIdentify],
-  ['POST', /\/vision\/preview-scan$/, () => mockPreviewScan],
+  ['POST', /\/vision\/preview-scan$/, () => pickMockPreviewScan()],
   ['POST', /\/sightings\/upload$/, () => ({ sighting_id: 'sgt_mock_1', status: 'done' })],
   [
     'POST',
@@ -79,6 +93,30 @@ const routes: Array<[string, RegExp, Handler]> = [
     /\/creatures\/[^/]+\/status$/,
     (config) => buildMockCreatureStatus(creatureIdFromUrl(config.url ?? ''), null),
   ],
+  [
+    'POST',
+    /\/creatures\/[^/]+\/interact$/,
+    (config) => interactMockCreature(creatureIdFromUrl(config.url ?? '')),
+  ],
+  // F8 배지 · 레벨 보상
+  ['GET', /\/profile\/xp$/, () => getMockXpProfile()],
+  ['GET', /\/badges$/, () => getMockBadges()],
+  [
+    'POST',
+    /\/badges\/claim$/,
+    (config) => claimMockBadge((parseBody(config).badge_id as string) ?? ''),
+  ],
+  // F10 퀘스트
+  ['GET', /\/quests/, () => getMockQuests()],
+  [
+    'POST',
+    /\/quests\/[^/]+\/claim$/,
+    (config) => claimMockQuest(questIdFromUrl(config.url ?? '')),
+  ],
+  // F11 지도 & 탐험 기록
+  ['GET', /\/map\/pins$/, () => mockMapPins],
+  ['GET', /\/map\/explored-regions$/, () => mockExploredRegions],
+  ['GET', /\/map\/weekly-stats$/, () => mockWeeklyStats],
 ];
 
 const LATENCY_MS = 400;

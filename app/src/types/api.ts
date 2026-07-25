@@ -123,6 +123,92 @@ export interface CreatureStatus {
   bond_max: number;
   /** 오늘의 상태 문구 (시간/계절 반영) */
   status_message: string;
+  /** 마지막 상호작용 후 오래 지나 재회로 판정됐는지 (F9) */
+  is_reunion: boolean;
+}
+
+// ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
+export interface XPProfile {
+  level: number;
+  xp: number;
+  xp_to_next: number;
+  /** claim 응답에서만 채워짐: 이번 claim으로 레벨업했는지 */
+  leveled_up?: boolean;
+}
+export type BadgeTheme = '수집' | '탐험' | '우정' | '연속출석';
+export interface Badge {
+  badge_id: ID;
+  title: string;
+  description: string;
+  theme: BadgeTheme;
+  icon: string;
+  unlocked: boolean;
+  claimed: boolean;
+}
+
+// ─── F9. 친밀도(Bond) 상호작용 ────────────────────────────
+export interface InteractResponse {
+  bond: number;
+  bond_max: number;
+  /** 이번 상호작용으로 Bond 구간이 올라갔는지(모션 풀·장식 해금 트리거) */
+  bond_leveled_up: boolean;
+  reaction_message: string;
+  /** 마지막 상호작용 후 오래 지나 재회로 판정됐는지 */
+  is_reunion: boolean;
+}
+
+// ─── F10. 퀘스트 ──────────────────────────────────────────
+export type QuestStatus = 'active' | 'completed' | 'claimed';
+export interface Quest {
+  quest_id: ID;
+  title: string;
+  description: string;
+  /** 힌트로 연동할 종 카드(F6) */
+  hint_species_id?: ID;
+  progress: number;
+  target: number;
+  status: QuestStatus;
+  reward_xp: number;
+  reward_badge_id?: ID;
+}
+
+// ─── F11. 지도 & 탐험 기록 ────────────────────────────────
+// 정밀 GPS 대신 일러스트 스타일 맵의 정규화 좌표(0~1)로 표현한다(geo-fuzzing 결과).
+export interface MapPin {
+  id: ID;
+  species_id: ID;
+  species_name: string;
+  group: TaxonGroup;
+  x: number; // 0~1
+  y: number; // 0~1
+}
+export type MapBlobKind = 'nature' | 'water' | 'unexplored';
+export interface MapBlob {
+  id: ID;
+  cx: number;
+  cy: number;
+  w: number; // 정규화 너비
+  h: number; // 정규화 높이
+  kind: MapBlobKind;
+  rotate?: number; // deg (강 등 기울인 형태)
+  label?: string; // 예: "아직 안 가본 곳"
+}
+export interface HomeZone {
+  cx: number;
+  cy: number;
+  radius: number; // 컨테이너 너비 대비 정규화 반경
+  label?: string;
+}
+export interface ExploredRegionsResponse {
+  blobs: MapBlob[];
+  home_zone: HomeZone | null;
+  /** 현재 위치(정규화). 위치 수집이 꺼져 있으면 null. */
+  current_location: { x: number; y: number } | null;
+}
+export interface WeeklyExploreStats {
+  places_discovered: number;
+  distance_km: number;
+  new_species: number;
 }
 
 // ─── F18. 설정 & 계정 관리 ───────────────────────────────
