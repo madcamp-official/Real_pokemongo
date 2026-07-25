@@ -7,6 +7,7 @@
  * - 동정 API 키가 있으면 실제 프로바이더를, 없으면 MockProvider 를 우선순위 뒤에 둔다.
  * - 저장소는 지금 in-memory. 프로덕션은 DB 어댑터로 교체(TODO: DATABASE_URL).
  */
+import pg from "pg";
 import { loadConfig, type AppConfig } from "./config/index.js";
 import {
   InMemoryUserRepo,
@@ -19,6 +20,29 @@ import {
   InMemoryConsentRepo,
   InMemoryCreatureRepo,
 } from "./core/repositories/memory/InMemoryRepositories.js";
+import {
+  PgUserRepo,
+  PgTaxonRepo,
+  PgObservationRepo,
+  PgCollectionRepo,
+  PgQuestRepo,
+  PgBadgeRepo,
+  PgCredentialRepo,
+  PgConsentRepo,
+  PgCreatureRepo,
+  upsertBadgeDefinitions,
+} from "./core/repositories/postgres/PostgresRepositories.js";
+import type {
+  UserRepository,
+  TaxonRepository,
+  ObservationRepository,
+  CollectionRepository,
+  QuestRepository,
+  BadgeRepository,
+  CredentialRepository,
+  ConsentRepository,
+  CreatureRepository,
+} from "./core/repositories/ports.js";
 import { LocalDiskMediaStore } from "./core/media/LocalDiskMediaStore.js";
 import { PendingSightingStore } from "./core/observation/PendingSightingStore.js";
 import { IdentificationGateway } from "./core/identification/IdentificationGateway.js";
@@ -47,16 +71,18 @@ import {
 export interface App {
   config: AppConfig;
   repos: {
-    users: InMemoryUserRepo;
-    taxa: InMemoryTaxonRepo;
-    observations: InMemoryObservationRepo;
-    collection: InMemoryCollectionRepo;
-    quests: InMemoryQuestRepo;
-    badges: InMemoryBadgeRepo;
-    credentials: InMemoryCredentialRepo;
-    consent: InMemoryConsentRepo;
-    creatures: InMemoryCreatureRepo;
+    users: UserRepository;
+    taxa: TaxonRepository;
+    observations: ObservationRepository;
+    collection: CollectionRepository;
+    quests: QuestRepository;
+    badges: BadgeRepository;
+    credentials: CredentialRepository;
+    consent: ConsentRepository;
+    creatures: CreatureRepository;
   };
+  /** DATABASE_URL이 채워져 실Postgres로 붙었을 때만 존재. graceful shutdown 대상(serve.ts). */
+  dbPool?: pg.Pool;
   mock: MockProvider; // 데모에서 시나리오 주입용
   gateway: IdentificationGateway;
   authorizer: Authorizer;
@@ -74,17 +100,39 @@ export interface App {
 
 export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   // --- 저장소 ---
-  const repos = {
-    users: new InMemoryUserRepo(),
-    taxa: new InMemoryTaxonRepo(),
-    observations: new InMemoryObservationRepo(),
-    collection: new InMemoryCollectionRepo(),
-    quests: new InMemoryQuestRepo(),
-    badges: new InMemoryBadgeRepo(),
-    credentials: new InMemoryCredentialRepo(),
-    consent: new InMemoryConsentRepo(),
-    creatures: new InMemoryCreatureRepo(),
-  };
+  // DATABASE_URL이 채워져 있으면 Postgres(GPU 서버, .env.example 참고), 비어 있으면(기본)
+  // InMemory — bioclip 프로바이더와 동일한 "채워야만 켜짐" 관례(config/index.ts).
+  let dbPool: pg.Pool | undefined;
+  let repos: App["repos"];
+  if (config.database.url) {
+    dbPool = new pg.Pool({ connectionString: config.database.url });
+    repos = {
+      users: new PgUserRepo(dbPool),
+      taxa: new PgTaxonRepo(dbPool),
+      observations: new PgObservationRepo(dbPool),
+      collection: new PgCollectionRepo(dbPool),
+      quests: new PgQuestRepo(dbPool),
+      badges: new PgBadgeRepo(dbPool),
+      credentials: new PgCredentialRepo(dbPool),
+      consent: new PgConsentRepo(dbPool),
+      creatures: new PgCreatureRepo(dbPool),
+    };
+    // quest.reward_badge_id / earned_badge.badge_id가 badge_definition(id)를 FK로 참조하므로
+    // (db/schema.sql), 실제 배지 저작 데이터를 먼저 채워야 quest 업서트/배지 해금이 FK를 만족한다.
+    await upsertBadgeDefinitions(dbPool, SEED_BADGES);
+  } else {
+    repos = {
+      users: new InMemoryUserRepo(),
+      taxa: new InMemoryTaxonRepo(),
+      observations: new InMemoryObservationRepo(),
+      collection: new InMemoryCollectionRepo(),
+      quests: new InMemoryQuestRepo(),
+      badges: new InMemoryBadgeRepo(),
+      credentials: new InMemoryCredentialRepo(),
+      consent: new InMemoryConsentRepo(),
+      creatures: new InMemoryCreatureRepo(),
+    };
+  }
 
   // --- 시드 로드 ---
   await repos.taxa.upsertMany(SEED_TAXA);
@@ -151,6 +199,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   return {
     config,
     repos,
+    dbPool,
     mock,
     gateway,
     authorizer,

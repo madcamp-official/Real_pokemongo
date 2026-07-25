@@ -80,7 +80,7 @@ src/
 |---|---|---|
 | **동정 유료 API 키** | `.env` `PLANT_ID_API_KEY`, `PLANTNET_API_KEY` | 없으면 Mock으로 동작 |
 | 동정 API 요청/응답 매핑 | `providers/PlantIdProvider.ts`, `PlantNetProvider.ts` | 벤더 스펙 확정 후 `normalize()` 구현 |
-| **DB 연결** | `.env` `DATABASE_URL` | in-memory 저장소를 DB 어댑터로 교체 |
+| **DB 연결** | `.env` `DATABASE_URL` | PostgreSQL 14를 BioCLIP과 같은 GPU 서버에 설치 완료. `.env.example`의 SSH 터널 안내대로 접속. `DATABASE_URL`이 비어 있으면 지금처럼 in-memory로 동작(회귀 없음) |
 | **미디어 저장소** | `.env` `MEDIA_STORAGE_*` | 사진 업로드용 오브젝트 스토리지 |
 | **종 마스터 데이터** | `.env` `SPECIES_MASTER_*` | 국가생물종지식정보시스템 등 (라이선스 확인) |
 | **역지오코딩** | `observation/regionGeneralizer.ts` | 좌표→시군구. 앱 내장 처리 권장 |

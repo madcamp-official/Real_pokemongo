@@ -20,6 +20,18 @@ async function main() {
   console.log(
     `동정 모드: ${app.config.identification.bioclip.endpoint ? "BioCLIP(실제 GPU 서버)" : "Mock(개발)"}`,
   );
+  console.log(`저장소: ${app.dbPool ? "PostgreSQL(실DB)" : "InMemory(개발용, 재시작 시 소실)"}`);
+
+  // DB 커넥션 풀을 쓰는 경우, 종료 시그널에 정상적으로 풀을 닫는다(터널이 끊겨도 프로세스가
+  // 좀비 커넥션을 붙들고 있지 않도록).
+  const shutdown = async (signal: string) => {
+    console.log(`\n${signal} 수신 — 서버를 종료합니다.`);
+    await server.close();
+    if (app.dbPool) await app.dbPool.end();
+    process.exit(0);
+  };
+  process.on("SIGINT", () => void shutdown("SIGINT"));
+  process.on("SIGTERM", () => void shutdown("SIGTERM"));
 }
 
 main().catch((err) => {
