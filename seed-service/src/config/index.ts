@@ -87,6 +87,13 @@ export interface AppConfig {
     // TODO(제공 필요): 프로덕션 서명 키
     jwtSecret?: string;
   };
+
+  map: {
+    /** F11 카카오맵 JS SDK 키. 비어 있으면(기본) /map.html이 지도를 못 띄운다(개발자가
+     * developers.kakao.com에서 직접 발급받아 .env에 채워야 함 — 다른 유료 프로바이더와
+     * 같은 관례). */
+    kakaoJsKey?: string;
+  };
 }
 
 export function loadConfig(): AppConfig {
@@ -148,6 +155,9 @@ export function loadConfig(): AppConfig {
     },
     auth: {
       jwtSecret: env("AUTH_JWT_SECRET"),
+    },
+    map: {
+      kakaoJsKey: env("KAKAO_MAP_JS_KEY"),
     },
   };
 }

@@ -451,3 +451,39 @@ export function buildInteractResponse(params: {
     is_reunion: params.wasReunion,
   };
 }
+
+// ── F11. 지도 & 탐험 기록 ─────────────────────────────────────────────────
+// 실제 지도(카카오맵) 위에 찍을 핀이라 정규화 좌표가 아니라 위도/경도 그대로 쓴다
+// (일러스트 지도 시절의 MapBlob/HomeZone 개념은 실제 지도에는 안 맞아 폐기 — 방문
+// 지역 시각화는 후속 과제로 남긴다, ExploredRegionsResponse 주석 참고).
+export interface ApiMapPin {
+  species_id: string;
+  species_name: string;
+  group: ApiTaxonGroup;
+  lat: number;
+  lng: number;
+}
+
+export function buildMapPin(taxon: Taxon, lat: number, lng: number): ApiMapPin {
+  return {
+    species_id: taxon.id as string,
+    species_name: taxon.korName || taxon.sciName,
+    group: taxonGroupToKorean(taxon.group),
+    lat,
+    lng,
+  };
+}
+
+export interface ApiExploredRegionsResponse {
+  /** 일러스트 지도의 "탐험 구역" 블롭 — 실제 지도로 전환하며 폐기, 항상 빈 배열.
+   * 방문 지역을 실제 지도 위에 원/히트맵으로 표시하는 건 후속 과제(TODO). */
+  blobs: [];
+  home_zone: null;
+  current_location: { lat: number; lng: number } | null;
+}
+
+export function buildExploredRegions(
+  currentLocation: { lat: number; lng: number } | null,
+): ApiExploredRegionsResponse {
+  return { blobs: [], home_zone: null, current_location: currentLocation };
+}

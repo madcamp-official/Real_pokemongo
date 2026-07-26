@@ -180,42 +180,19 @@ export interface Quest {
 }
 
 // ─── F11. 지도 & 탐험 기록 ────────────────────────────────
-// 정밀 GPS 대신 일러스트 스타일 맵의 정규화 좌표(0~1)로 표현한다(geo-fuzzing 결과).
+// v2: 일러스트 스타일 정규화 좌표(0~1) 대신 실제 카카오맵 위경도를 쓴다.
 export interface MapPin {
-  id: ID;
   species_id: ID;
   species_name: string;
   group: TaxonGroup;
-  x: number; // 0~1
-  y: number; // 0~1
+  lat: number;
+  lng: number;
 }
-export type MapBlobKind = 'nature' | 'water' | 'unexplored';
-export interface MapBlob {
-  id: ID;
-  cx: number;
-  cy: number;
-  w: number; // 정규화 너비
-  h: number; // 정규화 높이
-  kind: MapBlobKind;
-  rotate?: number; // deg (강 등 기울인 형태)
-  label?: string; // 예: "아직 안 가본 곳"
-}
-export interface HomeZone {
-  cx: number;
-  cy: number;
-  radius: number; // 컨테이너 너비 대비 정규화 반경
-  label?: string;
-}
+/** 방문 지역 시각화(blob/home_zone)는 실제 지도 전환과 함께 폐기 — 후속 과제. */
 export interface ExploredRegionsResponse {
-  blobs: MapBlob[];
-  home_zone: HomeZone | null;
-  /** 현재 위치(정규화). 위치 수집이 꺼져 있으면 null. */
-  current_location: { x: number; y: number } | null;
-}
-export interface WeeklyExploreStats {
-  places_discovered: number;
-  distance_km: number;
-  new_species: number;
+  blobs: [];
+  home_zone: null;
+  current_location: { lat: number; lng: number } | null;
 }
 
 // ─── F18. 설정 & 계정 관리 ───────────────────────────────

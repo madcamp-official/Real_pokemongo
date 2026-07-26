@@ -17,7 +17,6 @@ import type {
   Quest,
   MapPin,
   ExploredRegionsResponse,
-  WeeklyExploreStats,
 } from '@/types/api';
 import type { GuestConvertResponse } from '@/api/auth';
 
@@ -415,29 +414,18 @@ export function claimMockQuest(questId: string): XPProfile {
 }
 
 // ─── F11. 지도 & 탐험 기록 ────────────────────────────────
+// v2: 실제 카카오맵 위경도(서울 시내 임의 좌표, 개발용 예시일 뿐 실제 관찰 위치 아님).
 export const mockMapPins: MapPin[] = [
-  { id: 'pin_1', species_id: 'sp_frog', species_name: '개구리', group: '양서류', x: 0.3, y: 0.32 },
-  { id: 'pin_2', species_id: 'sp_ladybug', species_name: '무당벌레', group: '곤충', x: 0.4, y: 0.56 },
-  { id: 'pin_3', species_id: 'sp_butterfly', species_name: '나비', group: '곤충', x: 0.52, y: 0.62 },
-  { id: 'pin_4', species_id: 'sp_snail', species_name: '달팽이', group: '기타', x: 0.56, y: 0.74 },
+  { species_id: 'sp_frog', species_name: '개구리', group: '양서류', lat: 37.5665, lng: 126.978 },
+  { species_id: 'sp_ladybug', species_name: '무당벌레', group: '곤충', lat: 37.5651, lng: 126.9895 },
+  { species_id: 'sp_butterfly', species_name: '나비', group: '곤충', lat: 37.5633, lng: 126.9751 },
+  { species_id: 'sp_snail', species_name: '달팽이', group: '기타', lat: 37.5700, lng: 126.9820 },
 ];
 
 export const mockExploredRegions: ExploredRegionsResponse = {
-  blobs: [
-    { id: 'b_nature_1', cx: 0.28, cy: 0.28, w: 0.5, h: 0.42, kind: 'nature' },
-    { id: 'b_nature_2', cx: 0.68, cy: 0.6, w: 0.62, h: 0.5, kind: 'nature' },
-    { id: 'b_water_river', cx: 0.35, cy: 0.34, w: 0.9, h: 0.16, kind: 'water', rotate: -22 },
-    { id: 'b_water_pond', cx: 0.32, cy: 0.72, w: 0.42, h: 0.34, kind: 'water' },
-    { id: 'b_unexplored', cx: 0.82, cy: 0.22, w: 0.5, h: 0.42, kind: 'unexplored', label: '아직 안 가본 곳' },
-  ],
-  home_zone: { cx: 0.44, cy: 0.6, radius: 0.26, label: '나만의 탐험 구역' },
-  current_location: { x: 0.42, y: 0.57 },
-};
-
-export const mockWeeklyStats: WeeklyExploreStats = {
-  places_discovered: 7,
-  distance_km: 3,
-  new_species: 5,
+  blobs: [],
+  home_zone: null,
+  current_location: { lat: 37.5665, lng: 126.978 },
 };
 
 // ─── F18. 설정 & 계정 관리 ────────────────────────────────

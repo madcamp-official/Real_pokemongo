@@ -19,7 +19,6 @@ import {
   claimMockQuest,
   mockMapPins,
   mockExploredRegions,
-  mockWeeklyStats,
 } from '@/mocks/mockData';
 
 function speciesIdFromUrl(url: string): string {
@@ -125,7 +124,6 @@ const routes: Array<[string, RegExp, Handler]> = [
   // F11 지도 & 탐험 기록
   ['GET', /\/map\/pins$/, () => mockMapPins],
   ['GET', /\/map\/explored-regions$/, () => mockExploredRegions],
-  ['GET', /\/map\/weekly-stats$/, () => mockWeeklyStats],
 ];
 
 const LATENCY_MS = 400;
