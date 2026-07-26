@@ -283,6 +283,14 @@ export interface ApiXpProfile {
   level: number;
   xp: number;
   xp_to_next: number;
+  /**
+   * 현재 레벨이 시작된 시점의 누적 XP 문턱값(= curve.thresholds[level-1]).
+   * 프론트가 "이번 레벨 안에서의 진행률"(xp - xp_level_start) / ((xp - xp_level_start) +
+   * xp_to_next)을 계산하려면 이 기준선이 필요하다 — xp/xp_to_next 둘 다 누적 XP 기준이라
+   * 기준선 없이는 프론트가 레벨 내 진행률을 재구성할 수 없다(실제로 XPBar가 이 기준선 없이
+   * xp를 xp_to_next로 나누다가 "49/1 XP" 같은 무의미한 값을 표시하던 버그의 원인이었다).
+   */
+  xp_level_start: number;
   leveled_up?: boolean;
 }
 
@@ -295,6 +303,7 @@ export function buildXpProfile(
     level: user.level,
     xp: user.xp,
     xp_to_next: xpToNextLevel(user.xp, curve),
+    xp_level_start: curve.thresholds[user.level - 1] ?? 0,
     leveled_up: leveledUp,
   };
 }

@@ -10,7 +10,12 @@ interface Props {
 }
 
 export function XPBar({ profile }: Props) {
-  const ratio = profile.xp_to_next > 0 ? Math.min(profile.xp / profile.xp_to_next, 1) : 0;
+  // profile.xp(누적 총량)와 profile.xp_to_next(다음 레벨까지 남은 양)는 서로 기준이 달라
+  // 그대로 나누면 안 된다(예: xp=49, xp_to_next=1일 때 49/1 같은 무의미한 값이 나옴).
+  // xp_level_start(현재 레벨 시작 문턱값)를 빼서 "이번 레벨 안에서의 진행량"으로 정규화한다.
+  const xpIntoLevel = Math.max(0, profile.xp - profile.xp_level_start);
+  const xpForLevel = xpIntoLevel + profile.xp_to_next; // 이번 레벨의 총 폭(최고 레벨이면 xp_to_next=0)
+  const ratio = xpForLevel > 0 ? Math.min(xpIntoLevel / xpForLevel, 1) : 1;
 
   return (
     <View style={styles.container}>
@@ -22,7 +27,7 @@ export function XPBar({ profile }: Props) {
           <View style={[styles.fill, { width: `${ratio * 100}%` }]} />
         </View>
         <Text style={styles.xpText}>
-          {profile.xp} / {profile.xp_to_next} XP
+          {xpIntoLevel} / {xpForLevel} XP
         </Text>
       </View>
     </View>

@@ -283,22 +283,44 @@ export function interactMockCreature(creatureId: string): InteractResponse {
 }
 
 // ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
-let xpState: XPProfile = { level: 3, xp: 180, xp_to_next: 220 };
+// 실서버(seed-service/src/core/rewards/rewardTypes.ts의 DEFAULT_LEVEL_CURVE)와 반드시 같은
+// 값을 유지해야 한다 — 두 값이 갈리면 mock 모드와 실서버 모드에서 XPBar가 서로 다르게
+// 동작한다(실제로 이 값이 서버와 달라(레벨별로 리셋되는 xp + 1.25배씩 커지는 요구량 방식)
+// XPBar가 "어느 쪽 계약에 맞춰야 할지" 애매해지는 문제가 있었다).
+const LEVEL_THRESHOLDS = [0, 50, 120, 220, 360, 540, 760, 1020, 1320, 1660];
+
+function levelForMockXp(xp: number): number {
+  let level = 1;
+  for (let i = 0; i < LEVEL_THRESHOLDS.length; i++) {
+    if (xp >= LEVEL_THRESHOLDS[i]!) level = i + 1;
+    else break;
+  }
+  return level;
+}
+
+function buildMockXpProfile(totalXp: number, leveledUp?: boolean): XPProfile {
+  const level = levelForMockXp(totalXp);
+  const nextThreshold = LEVEL_THRESHOLDS[level]; // level은 1-index라 그대로 다음 문턱값 인덱스
+  return {
+    level,
+    xp: totalXp,
+    xp_to_next: nextThreshold === undefined ? 0 : Math.max(0, nextThreshold - totalXp),
+    xp_level_start: LEVEL_THRESHOLDS[level - 1] ?? 0,
+    leveled_up: leveledUp,
+  };
+}
+
+let totalXpState = 180; // 초기 데모 상태(레벨 3 근처, thresholds[2]=120 <= 180 < thresholds[3]=220)
 
 export function getMockXpProfile(): XPProfile {
-  return { ...xpState };
+  return buildMockXpProfile(totalXpState);
 }
 
 function addMockXp(amount: number): XPProfile {
-  xpState.xp += amount;
-  let leveledUp = false;
-  while (xpState.xp >= xpState.xp_to_next) {
-    xpState.xp -= xpState.xp_to_next;
-    xpState.level += 1;
-    xpState.xp_to_next = Math.round(xpState.xp_to_next * 1.25);
-    leveledUp = true;
-  }
-  return { ...xpState, leveled_up: leveledUp };
+  const beforeLevel = levelForMockXp(totalXpState);
+  totalXpState += amount;
+  const afterLevel = levelForMockXp(totalXpState);
+  return buildMockXpProfile(totalXpState, afterLevel > beforeLevel);
 }
 
 let badgesState: Badge[] = [
@@ -359,7 +381,7 @@ export function claimMockBadge(badgeId: string): XPProfile {
     badge.claimed = true;
     return addMockXp(50);
   }
-  return { ...xpState, leveled_up: false };
+  return buildMockXpProfile(totalXpState, false);
 }
 
 // ─── F10. 퀘스트 ──────────────────────────────────────────
@@ -410,7 +432,7 @@ export function claimMockQuest(questId: string): XPProfile {
     }
     return addMockXp(quest.reward_xp);
   }
-  return { ...xpState, leveled_up: false };
+  return buildMockXpProfile(totalXpState, false);
 }
 
 // ─── F11. 지도 & 탐험 기록 ────────────────────────────────

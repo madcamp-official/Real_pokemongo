@@ -58,6 +58,11 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
       }
     }
     void queryClient.invalidateQueries({ queryKey: ['dex'] });
+    // 관찰 확정으로 서버 XP/레벨/퀘스트 진행이 바뀌었을 수 있다(ObservationFlow.recordIdentification이
+    // 내부적으로 RewardEngine.onObservation과 QuestEngine.applyObservation을 호출) — 보상함
+    // 화면이 30초 staleTime이 지나기 전에도 최신 값을 받도록 무효화한다.
+    void queryClient.invalidateQueries({ queryKey: ['xp-profile'] });
+    void queryClient.invalidateQueries({ queryKey: ['quests', 'active'] });
     navigation.replace('SpeciesCard', { speciesId });
   };
 

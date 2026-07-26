@@ -341,5 +341,23 @@ test("buildXpProfile: level/xp/xp_to_next 계산, leveled_up 전달", () => {
   assert.equal(res.level, 2);
   assert.equal(res.xp, 80);
   assert.equal(res.xp_to_next, 40);
+  assert.equal(res.xp_level_start, 50, "레벨 2 시작 문턱값(thresholds[1])");
   assert.equal(res.leveled_up, true);
+});
+
+test("buildXpProfile: 최고 레벨에서는 xp_to_next=0, xp_level_start는 마지막 문턱값", () => {
+  const user: User = {
+    id: newUserId(),
+    plan: "free",
+    locationStorageEnabled: false,
+    nickname: "탐험가",
+    avatar: "fox",
+    level: 10,
+    xp: 1700, // thresholds 마지막 값(1660) 이상 -> 레벨 10(최고), 더 오를 문턱 없음
+    createdAt: new Date().toISOString(),
+  };
+  const res = buildXpProfile(user, DEFAULT_LEVEL_CURVE);
+  assert.equal(res.level, 10);
+  assert.equal(res.xp_to_next, 0, "최고 레벨은 다음 문턱이 없어 0");
+  assert.equal(res.xp_level_start, 1660, "레벨 10 시작 문턱값(thresholds[9])");
 });

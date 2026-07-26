@@ -137,8 +137,12 @@ export interface CreatureStatus {
 // ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
 export interface XPProfile {
   level: number;
+  /** 계정 생성 이후 누적된 전체 XP (레벨업해도 리셋되지 않음) */
   xp: number;
+  /** 다음 레벨까지 "남은" XP (누적 요구량이 아님) */
   xp_to_next: number;
+  /** 현재 레벨이 시작된 시점의 누적 XP 문턱값. (xp - xp_level_start)가 "이번 레벨 안에서의 진행량". */
+  xp_level_start: number;
   /** claim 응답에서만 채워짐: 이번 claim으로 레벨업했는지 */
   leveled_up?: boolean;
 }
