@@ -8,6 +8,7 @@ import { requireAuthContext, type AuthenticateHandler } from "../auth.js";
 import { outcomeToIdentifyResponse } from "../mappers.js";
 import { asSightingId } from "../../core/domain/ids.js";
 import { sanitizeImages } from "../../core/media/MediaSanitizer.js";
+import { enhanceImages } from "../../core/media/ImageEnhancer.js";
 import type { RawCoordinate } from "../../core/observation/regionGeneralizer.js";
 
 interface IdentifyBody {
@@ -67,10 +68,49 @@ export function registerSightingsRoutes(
         ? { lat, lng }
         : undefined;
 
-    const sighting = app.pendingSightings.create(ctx.userId, sanitized.images, rawCoord);
+    // F3 사진 보정 — 여러 프레임(버스트)을 병합·화질 보정해 대표 이미지 1장을 만든다.
+    // 실패해도 절대 throw하지 않는다(ImageEnhancer.ts 상단 주석) — 업로드 자체는 항상 성공해야 함.
+    const { image: enhanced, report: enhancement } = await enhanceImages(sanitized.images);
+
+    // 실기기 테스트 관찰용 — 프론트에 아직 UI가 없어 콘솔로 확인한다. 값 자체가
+    // 민감정보가 아니라(품질 지표일 뿐) 상시 남겨둬도 무방한 수준의 로그.
+    console.log(
+      `[F3] frames=${enhancement.framesUsed} merge=${enhancement.mergeStrategy} ` +
+        `blur=${enhancement.blurScore.toFixed(2)} exposure=${enhancement.exposureScore.toFixed(2)} ` +
+        `confidence=${enhancement.confidence.toFixed(2)} retake_suggested=${enhancement.retakeSuggested}`,
+    );
+
+    const sighting = app.pendingSightings.create(
+      ctx.userId,
+      sanitized.images,
+      enhanced,
+      enhancement,
+      rawCoord,
+    );
+
+    // F3 "재학습용 데이터 수집" — 보정기가 저품질로 판단했고(가장 개선에 쓸모 있는 표본),
+    // 사용자가 사진 관련 동의를 한 경우에만 원본을 별도 보관한다. 저장 실패가 업로드
+    // 응답을 막으면 안 되므로 실패는 조용히 무시한다(부가 기능, 핵심 경로 아님).
+    if (enhancement.retakeSuggested) {
+      try {
+        const consent = await app.repos.consent.getByUser(ctx.userId);
+        if (consent?.photo) {
+          await Promise.all(
+            sanitized.images.map((img) => app.mediaStore.saveTrainingSample(img, "retake_suggested")),
+          );
+        }
+      } catch {
+        // 재학습 데이터 수집은 부가 기능 — 실패해도 업로드 자체는 성공으로 응답한다.
+      }
+    }
 
     // 목업(mockAdapter.ts)과 동일한 값: 이 호출 안에서 정화까지는 실제로 끝나므로 'done'.
-    return { sighting_id: sighting.id, status: "done" as const };
+    // retake_suggested는 하위호환 추가 필드(app/src/types/api.ts의 기존 계약을 깨지 않음).
+    return {
+      sighting_id: sighting.id,
+      status: "done" as const,
+      retake_suggested: enhancement.retakeSuggested,
+    };
   });
 
   server.post<{ Body: IdentifyBody }>(
@@ -88,7 +128,9 @@ export function registerSightingsRoutes(
 
       // IdentificationGateway.identify()는 순수 함수(부수효과 없음) — 도감/퀘스트/보상은
       // 절대 여기서 건드리지 않는다. 결과는 sighting에 매달아 /identify/confirm이 재사용.
-      const outcome = await app.gateway.identify({ images: sighting.images });
+      // F3 보정본(enhanced)을 넘긴다 — 원본 프레임이 아니라 병합·화질보정을 거친 대표
+      // 이미지 1장(버스트도 이미 여기서 합쳐졌음)이라 BioCLIP 등 프로바이더 정확도에 유리하다.
+      const outcome = await app.gateway.identify({ images: [sighting.enhanced] });
       app.pendingSightings.attachIdentification(sighting.id, outcome);
 
       return outcomeToIdentifyResponse(outcome);
@@ -122,7 +164,11 @@ export function registerSightingsRoutes(
           .send({ error: "invalid_species_id", message: "동정 후보에 없는 종입니다." });
       }
 
-      const media = await Promise.all(sighting.images.map((img) => app.mediaStore.save(img)));
+      // F3 "원본 폐기" 정책: 확정 시 디스크에 남기는 건 보정본 1장뿐이다. 정화된 원본
+      // 프레임(sighting.images)은 PendingSightingStore가 프로세스 메모리에만 들고 있다가
+      // consume()으로 사라진다 — 애초에 디스크에 쓰인 적이 없으므로 "폐기"는 별도 삭제
+      // 절차가 필요 없다(안 쓴 것 자체가 정책 구현).
+      const media = [await app.mediaStore.save(sighting.enhanced)];
 
       await app.flow.recordIdentification(ctx, {
         taxon: chosen.taxon,

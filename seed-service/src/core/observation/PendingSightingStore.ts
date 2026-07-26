@@ -10,13 +10,18 @@
 import { newSightingId } from "../domain/ids.js";
 import type { SightingId, UserId } from "../domain/types.js";
 import type { SanitizedImage } from "../media/MediaSanitizer.js";
+import type { EnhancementReport } from "../media/ImageEnhancer.js";
 import type { RawCoordinate } from "./regionGeneralizer.js";
 import type { IdentificationOutcome } from "../identification/IdentificationGateway.js";
 
 export interface PendingSighting {
   id: SightingId;
   userId: UserId;
+  /** 정화(EXIF 제거)만 거친 원본 프레임 — F3 보정 전. 확정(confirm) 시 저장하지 않는다(원본 폐기 정책). */
   images: SanitizedImage[];
+  /** F3(사진 보정)가 여러 프레임을 병합·보정해서 만든 대표 이미지 1장. /identify와 최종 저장은 이걸 쓴다. */
+  enhanced: SanitizedImage;
+  enhancement: EnhancementReport;
   rawCoord?: RawCoordinate;
   createdAt: string;
   /** POST /identify가 계산해 매달아둔 결과 — POST /identify/confirm이 재추론 없이 재사용. */
@@ -26,11 +31,19 @@ export interface PendingSighting {
 export class PendingSightingStore {
   private m = new Map<string, PendingSighting>();
 
-  create(userId: UserId, images: SanitizedImage[], rawCoord?: RawCoordinate): PendingSighting {
+  create(
+    userId: UserId,
+    images: SanitizedImage[],
+    enhanced: SanitizedImage,
+    enhancement: EnhancementReport,
+    rawCoord?: RawCoordinate,
+  ): PendingSighting {
     const sighting: PendingSighting = {
       id: newSightingId(),
       userId,
       images,
+      enhanced,
+      enhancement,
       rawCoord,
       createdAt: new Date().toISOString(),
     };
