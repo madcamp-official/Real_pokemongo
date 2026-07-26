@@ -48,7 +48,13 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   const server = Fastify({ logger: false });
 
   await server.register(fastifyJwt, { secret: resolveJwtSecret(app) });
-  await server.register(fastifyMultipart);
+  // limits.fileSize를 안 주면 Fastify 기본 bodyLimit(1MB)을 그대로 물려받는다 — 실제
+  // 폰 카메라 사진(quality 0.7로 압축해도 보통 1MB 초과)이 전부 413으로 거부되는 걸
+  // 실기기 테스트에서 발견했다. 버스트(최대 3장) 중 가장 큰 프레임도 넉넉히 통과하도록
+  // 여유 있게 잡는다.
+  await server.register(fastifyMultipart, {
+    limits: { fileSize: 15 * 1024 * 1024 }, // 15MB/프레임
+  });
 
   // 한 번만 생성해 모든 라우트 그룹에 동일한 preHandler를 건다 — 계정 존재 여부 확인을
   // 개별 라우트가 각자 판단하게 두지 않기 위함(auth.ts의 createAuthenticate 주석 참고).
@@ -89,7 +95,10 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
     if (typeof err.statusCode === "number" && err.statusCode >= 400 && err.statusCode < 500) {
       return reply.code(err.statusCode).send({ error: err.message });
     }
-    request.log.error(error);
+    // logger:false라 request.log.error()는 원래 아무것도 안 찍는다(no-op) — 그래서 지금까지
+    // 500이 나도 터미널에 흔적이 전혀 안 남았다(실기기 업로드 실패 원인 조사 중 발견).
+    // 진단 가능하도록 최소한 콘솔에는 실제로 남긴다.
+    console.error("[server] 처리되지 않은 에러:", error);
     return reply.code(500).send({ error: "internal_error" });
   });
 
