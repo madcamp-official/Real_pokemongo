@@ -83,7 +83,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-baetis-fuscatus"),
     sciName: "Baetis fuscatus",
-    korName: "꼬마하루살이",
+    korName: "개똥하루살이",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -109,7 +109,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-propylea-japonica"),
     sciName: "Propylea japonica",
-    korName: "꼬마무당벌레",
+    korName: "꼬마남생이무당벌레",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -134,7 +134,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-coccinella-septempunctata"),
-    sciName: "Coccinella septempunctata",
+    sciName: "Coccinella (Coccinella) septempunctata",
     korName: "칠성무당벌레",
     rank: "species",
     group: "insect",
@@ -161,7 +161,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-pieris-melete"),
     sciName: "Pieris melete",
-    korName: "큰배추흰나비",
+    korName: "큰줄흰나비",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -174,7 +174,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-epeorus-pellucidus"),
     sciName: "Epeorus pellucidus",
-    korName: "흰부채하루살이",
+    korName: "부채하루살이",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -200,7 +200,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-ecdyonurus-levis"),
     sciName: "Ecdyonurus levis",
-    korName: "두점하루살이",
+    korName: "네점하루살이",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -251,7 +251,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-elkalyce-argiades"),
-    sciName: "Elkalyce argiades",
+    sciName: "Cupido argiades",
     korName: "암먹부전나비",
     rank: "species",
     group: "insect",
@@ -277,7 +277,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-sphaerophoria-scripta"),
-    sciName: "Sphaerophoria scripta",
+    sciName: "Sphaerophoria menthastri",
     korName: "꼬마꽃등에",
     rank: "species",
     group: "insect",
@@ -291,7 +291,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-ecdyonurus-kibunensis"),
     sciName: "Ecdyonurus kibunensis",
-    korName: "네점하루살이",
+    korName: "두점하루살이",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -304,7 +304,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-pachygrontha-antennata"),
     sciName: "Pachygrontha antennata",
-    korName: "십자무늬긴노린재",
+    korName: "더듬이긴노린재",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -317,7 +317,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-cletus-schmidti"),
     sciName: "Cletus schmidti",
-    korName: "벼허리노린재",
+    korName: "우리가시허리노린재",
     rank: "species",
     group: "insect",
     seasonTags: [],
@@ -499,7 +499,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-humulus-scandens"),
-    sciName: "Humulus scandens",
+    sciName: "Humulus japonicus",
     korName: "환삼덩굴",
     rank: "species",
     group: "plant",
@@ -565,7 +565,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-neillia-incisa"),
-    sciName: "Neillia incisa",
+    sciName: "Stephanandra incisa",
     korName: "국수나무",
     rank: "species",
     group: "plant",
@@ -591,7 +591,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-pueraria-montana"),
-    sciName: "Pueraria montana",
+    sciName: "Pueraria lobata",
     korName: "칡",
     rank: "species",
     group: "plant",
@@ -955,7 +955,7 @@ export const SEED_TAXA: Taxon[] = [
   },
   {
     id: asTaxonId("taxon-sinosuthora-webbiana"),
-    sciName: "Sinosuthora webbiana",
+    sciName: "Suthora webbiana",
     korName: "붉은머리오목눈이",
     rank: "species",
     group: "bird",
@@ -1204,10 +1204,10 @@ export const SEED_CONTENT: SpeciesContent[] = [
   },
   {
     taxonId: asTaxonId("taxon-baetis-fuscatus"),
-    funFact: "꼬마하루살이는 물이 깨끗한 개울에서만 애벌레 시절을 보내요. 그래서 이 벌레가 있으면 물이 맑다는 뜻이에요.",
+    funFact: "개똥하루살이는 물이 깨끗한 개울에서만 애벌레 시절을 보내요. 그래서 이 벌레가 있으면 물이 맑다는 뜻이에요.",
     observePoints: ["개울가 돌 밑을 살펴봐요(애벌레)", "물 위를 낮게 나는 어른벌레를 봐요"],
     quiz: [
-      { q: "꼬마하루살이가 많이 사는 곳은 어떤 물일까요?", options: ["더러운 물", "깨끗한 물", "짠 바닷물"], answerIndex: 1 },
+      { q: "개똥하루살이가 많이 사는 곳은 어떤 물일까요?", options: ["더러운 물", "깨끗한 물", "짠 바닷물"], answerIndex: 1 },
     ],
     curriculumTags: ["과학-물속생물"],
   },
@@ -1219,7 +1219,7 @@ export const SEED_CONTENT: SpeciesContent[] = [
   },
   {
     taxonId: asTaxonId("taxon-propylea-japonica"),
-    funFact: "꼬마무당벌레는 무당벌레보다 몸집이 작지만 똑같이 진딧물을 잡아먹어요.",
+    funFact: "꼬마남생이무당벌레는 무당벌레보다 몸집이 작지만 똑같이 진딧물을 잡아먹어요.",
     observePoints: ["무당벌레와 크기를 비교해봐요", "등딱지 무늬 모양을 봐요"],
     curriculumTags: ["과학-곤충의한살이"],
   },
@@ -1252,13 +1252,13 @@ export const SEED_CONTENT: SpeciesContent[] = [
   },
   {
     taxonId: asTaxonId("taxon-pieris-melete"),
-    funFact: "큰배추흰나비는 배추흰나비와 닮았지만 몸집이 조금 더 크고 산이나 숲 근처에서 자주 보여요.",
+    funFact: "큰줄흰나비는 배추흰나비와 닮았지만 몸집이 조금 더 크고 산이나 숲 근처에서 자주 보여요.",
     observePoints: ["배추흰나비와 크기를 비교해봐요", "날개 아랫면의 초록빛 무늬를 봐요"],
     curriculumTags: ["통합교과-봄"],
   },
   {
     taxonId: asTaxonId("taxon-epeorus-pellucidus"),
-    funFact: "흰부채하루살이 애벌레는 부채처럼 납작한 몸으로 물살이 빠른 돌 표면에 딱 붙어살아요.",
+    funFact: "부채하루살이 애벌레는 부채처럼 납작한 몸으로 물살이 빠른 돌 표면에 딱 붙어살아요.",
     observePoints: ["개울 돌 표면을 살펴봐요(애벌레)", "투명한 날개를 가진 어른벌레를 봐요"],
     curriculumTags: ["과학-물속생물"],
   },
@@ -1324,13 +1324,13 @@ export const SEED_CONTENT: SpeciesContent[] = [
   },
   {
     taxonId: asTaxonId("taxon-pachygrontha-antennata"),
-    funFact: "십자무늬긴노린재는 몸이 길쭉하고 날씬해서 풀줄기와 잘 구분되지 않아요.",
+    funFact: "더듬이긴노린재는 몸이 길쭉하고 날씬해서 풀줄기와 잘 구분되지 않아요.",
     observePoints: ["몸의 십자 무늬를 찾아봐요", "벼과 풀밭에서 찾아봐요"],
     curriculumTags: ["과학-곤충의한살이"],
   },
   {
     taxonId: asTaxonId("taxon-cletus-schmidti"),
-    funFact: "벼허리노린재는 허리가 잘록하고 뒷다리가 넓적해요. 벼나 풀의 즙을 빨아 먹어요.",
+    funFact: "우리가시허리노린재는 허리가 잘록하고 뒷다리가 넓적해요. 벼나 풀의 즙을 빨아 먹어요.",
     observePoints: ["잘록한 허리 모양을 봐요", "넓적한 뒷다리를 봐요"],
     curriculumTags: ["과학-곤충의한살이"],
   },

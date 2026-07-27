@@ -28,20 +28,20 @@
 
 /** [학명A, 학명B] — 순서 무관(대칭). */
 const RAW_PAIRS: readonly [string, string][] = [
-  ["Episyrphus balteatus", "Sphaerophoria scripta"], // 호리꽃등에 vs 꼬마꽃등에
-  ["Harmonia axyridis", "Coccinella septempunctata"], // 무당벌레 vs 칠성무당벌레
-  ["Ecdyonurus levis", "Ecdyonurus kibunensis"], // 두점하루살이 vs 네점하루살이
-  ["Celastrina argiolus", "Elkalyce argiades"], // 푸른부전나비 vs 암먹부전나비
+  ["Episyrphus balteatus", "Sphaerophoria menthastri"], // 호리꽃등에 vs 꼬마꽃등에
+  ["Harmonia axyridis", "Coccinella (Coccinella) septempunctata"], // 무당벌레 vs 칠성무당벌레
+  ["Ecdyonurus levis", "Ecdyonurus kibunensis"], // 네점하루살이 vs 두점하루살이
+  ["Celastrina argiolus", "Cupido argiades"], // 푸른부전나비 vs 암먹부전나비
   ["Erigeron annuus", "Erigeron canadensis"], // 개망초 vs 망초
   ["Quercus mongolica", "Quercus variabilis"], // 신갈나무 vs 굴참나무
   ["Ardea cinerea", "Ardea alba"], // 왜가리 vs 대백로
-  ["Pieris rapae", "Pieris melete"], // 배추흰나비 vs 큰배추흰나비
-  ["Epeorus pellucidus", "Ecdyonurus kibunensis"], // 흰부채하루살이 vs 네점하루살이
+  ["Pieris rapae", "Pieris melete"], // 배추흰나비 vs 큰줄흰나비
+  ["Epeorus pellucidus", "Ecdyonurus kibunensis"], // 부채하루살이 vs 두점하루살이
   ["Acrida cinerea", "Atractomorpha lata"], // 방아깨비 vs 섬서구메뚜기
   ["Trifolium repens", "Oxalis corniculata"], // 토끼풀 vs 괭이밥
   ["Polygonia c-aureum", "Eurema mandarina"], // 네발나비 vs 남방노랑나비
   ["Papilio xuthus", "Neptis sappho"], // 호랑나비 vs 애기세줄나비
-  ["Epeorus pellucidus", "Ecdyonurus levis"], // 흰부채하루살이 vs 두점하루살이
+  ["Epeorus pellucidus", "Ecdyonurus levis"], // 부채하루살이 vs 네점하루살이
   ["Anas platyrhynchos", "Anas zonorhyncha"], // 청둥오리 vs 흰뺨검둥오리
   ["Pieris rapae", "Celastrina argiolus"], // 배추흰나비 vs 푸른부전나비
 ];

@@ -16,7 +16,7 @@ test("같은 학명을 두 번 넣으면 false(자기 자신과는 혼동 쌍이
 });
 
 test("목록에 등록된 대표 쌍 몇 개가 실제로 조회된다", () => {
-  assert.equal(isConfusablePair("Harmonia axyridis", "Coccinella septempunctata"), true, "무당벌레 vs 칠성무당벌레");
+  assert.equal(isConfusablePair("Harmonia axyridis", "Coccinella (Coccinella) septempunctata"), true, "무당벌레 vs 칠성무당벌레");
   assert.equal(isConfusablePair("Anas platyrhynchos", "Anas zonorhyncha"), true, "청둥오리 vs 흰뺨검둥오리");
   assert.equal(isConfusablePair("Ardea cinerea", "Ardea alba"), true, "왜가리 vs 대백로");
 });

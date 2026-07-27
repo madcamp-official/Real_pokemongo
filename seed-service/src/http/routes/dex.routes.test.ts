@@ -176,7 +176,7 @@ test("GET /species/:id/card: observe_points/quiz가 콘텐츠에서 채워진다
 
 test("GET /species/:id/card: similar_species가 confusionPairs 기반 실제 taxonId로 채워진다", async () => {
   const { server } = await testServer();
-  // 배추흰나비(Pieris rapae)는 confusionPairs.ts에 큰배추흰나비/푸른부전나비 두 쌍으로 등록돼 있다.
+  // 배추흰나비(Pieris rapae)는 confusionPairs.ts에 큰줄흰나비/푸른부전나비 두 쌍으로 등록돼 있다.
   const res = await server.inject({ method: "GET", url: "/species/taxon-cabbage-white/card" });
   assert.equal(res.statusCode, 200);
   const card = res.json();
@@ -184,7 +184,7 @@ test("GET /species/:id/card: similar_species가 confusionPairs 기반 실제 tax
   assert.deepEqual(ids, ["taxon-celastrina-argiolus", "taxon-pieris-melete"]);
   // 탭했을 때 실제 종 카드로 이동할 수 있어야 하므로 name도 실제 국명이어야 한다(문자열 placeholder 아님).
   const melete = card.similar_species.find((s: { species_id: string }) => s.species_id === "taxon-pieris-melete");
-  assert.equal(melete.name, "큰배추흰나비");
+  assert.equal(melete.name, "큰줄흰나비");
 });
 
 test("GET /species/:id/card: observe_points/quiz는 항상 배열로 나온다(콘텐츠 없어도 404 아님)", async () => {
