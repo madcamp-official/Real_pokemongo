@@ -1,0 +1,84 @@
+{
+  "selfSimilarity": {
+    "mean": 0.9610652923583984,
+    "percentiles": {
+      "min": 0.8828802108764648,
+      "p1": 0.9008544278144837,
+      "p5": 0.9290920585393906,
+      "p10": 0.9389955043792725,
+      "p25": 0.9540961533784866,
+      "median": 0.9652907848358154,
+      "p75": 0.9723225980997086,
+      "p90": 0.9778193175792694,
+      "p95": 0.9805257469415665,
+      "p99": 0.9836833864450455,
+      "max": 0.9873748421669006
+    }
+  },
+  "worstChanged": [
+    {
+      "sciName": "Ephemera orientalis",
+      "selfSim": 0.8828802108764648
+    },
+    {
+      "sciName": "Mogera wogura",
+      "selfSim": 0.885266125202179
+    },
+    {
+      "sciName": "Edessena hamada",
+      "selfSim": 0.8867901563644409
+    },
+    {
+      "sciName": "Irpex consors",
+      "selfSim": 0.8876955509185791
+    },
+    {
+      "sciName": "Vespa mandarinia",
+      "selfSim": 0.887706458568573
+    },
+    {
+      "sciName": "Micropercops swinhonis",
+      "selfSim": 0.8926184177398682
+    },
+    {
+      "sciName": "Phrynarachne katoi",
+      "selfSim": 0.8946857452392578
+    },
+    {
+      "sciName": "Acusta redfieldi",
+      "selfSim": 0.8974834084510803
+    },
+    {
+      "sciName": "Teleogryllus emma",
+      "selfSim": 0.8995235562324524
+    },
+    {
+      "sciName": "Zacco platypus",
+      "selfSim": 0.9005494713783264
+    },
+    {
+      "sciName": "Verasper variegatus",
+      "selfSim": 0.9008575081825256
+    },
+    {
+      "sciName": "Plautia stali",
+      "selfSim": 0.9017419219017029
+    },
+    {
+      "sciName": "Anahita fauna",
+      "selfSim": 0.902440071105957
+    },
+    {
+      "sciName": "Tridentiger trigonocephalus",
+      "selfSim": 0.902723491191864
+    },
+    {
+      "sciName": "Pungtungia herzi",
+      "selfSim": 0.9033803343772888
+    }
+  ],
+  "neighborOverlapTop10": {
+    "meanOverlapOf10": 7.866666666666666,
+    "sampleSize": 30
+  }
+}

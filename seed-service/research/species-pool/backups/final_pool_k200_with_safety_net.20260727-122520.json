@@ -1,0 +1,1723 @@
+{
+  "baseK": 200,
+  "isolationThreshold": 0.52,
+  "minWeightForRescue": 0.3,
+  "rescuedCount": 13,
+  "finalPoolSize": 213,
+  "byGroup": {
+    "reptile": 4,
+    "plant": 53,
+    "fungus": 33,
+    "insect": 44,
+    "other": 39,
+    "bird": 32,
+    "amphibian": 1,
+    "mammal": 7
+  },
+  "pool": [
+    {
+      "sciName": "Rhabdophis tigrinus",
+      "group": "reptile",
+      "koreaObservationCount": 4709,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Toxicodendron vernicifluum",
+      "group": "plant",
+      "koreaObservationCount": 228,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Amanita muscaria",
+      "group": "fungus",
+      "koreaObservationCount": 5,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Vespa mandarinia",
+      "group": "insect",
+      "koreaObservationCount": 903,
+      "percentileInSource": 0.3946488294314381,
+      "mustInclude": true,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Koreoleptoxis tegulata",
+      "group": "other",
+      "koreaObservationCount": 491,
+      "percentileInSource": 0.8367346938775511,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Atractomorpha lata",
+      "group": "insect",
+      "koreaObservationCount": 2879,
+      "percentileInSource": 0.9163879598662208,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hypholoma fasciculare",
+      "group": "fungus",
+      "koreaObservationCount": 128,
+      "percentileInSource": 0.978494623655914,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Microphysogobio longidorsalis",
+      "group": "other",
+      "koreaObservationCount": 955,
+      "percentileInSource": 0.47457627118644063,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Anas platyrhynchos",
+      "group": "bird",
+      "koreaObservationCount": 42823,
+      "percentileInSource": 0.9542857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Paratlanticus ussuriensis",
+      "group": "insect",
+      "koreaObservationCount": 1404,
+      "percentileInSource": 0.6822742474916388,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ambrosia artemisiifolia",
+      "group": "plant",
+      "koreaObservationCount": 3407,
+      "percentileInSource": 0.9364548494983278,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Parus major",
+      "group": "bird",
+      "koreaObservationCount": 33323,
+      "percentileInSource": 0.9142857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Amanita gymnopus",
+      "group": "fungus",
+      "koreaObservationCount": 19,
+      "percentileInSource": 0.3548387096774194,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Sphaerophoria scripta",
+      "group": "insect",
+      "koreaObservationCount": 3274,
+      "percentileInSource": 0.9331103678929766,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Nordstromia japonica",
+      "group": "insect",
+      "koreaObservationCount": 1096,
+      "percentileInSource": 0.5284280936454849,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Trametes hirsuta",
+      "group": "fungus",
+      "koreaObservationCount": 22,
+      "percentileInSource": 0.4767025089605734,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Egretta garzetta",
+      "group": "bird",
+      "koreaObservationCount": 24619,
+      "percentileInSource": 0.8742857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Acheilognathus macropterus",
+      "group": "other",
+      "koreaObservationCount": 623,
+      "percentileInSource": 0.3220338983050848,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Smilax nipponica",
+      "group": "plant",
+      "koreaObservationCount": 1961,
+      "percentileInSource": 0.6354515050167224,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Quercus serrata",
+      "group": "plant",
+      "koreaObservationCount": 2793,
+      "percentileInSource": 0.8528428093645485,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Argiope minuta",
+      "group": "other",
+      "koreaObservationCount": 317,
+      "percentileInSource": 0.927536231884058,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Crepidiastrum denticulatum",
+      "group": "plant",
+      "koreaObservationCount": 2513,
+      "percentileInSource": 0.782608695652174,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Epeorus pellucidus",
+      "group": "insect",
+      "koreaObservationCount": 3942,
+      "percentileInSource": 0.959866220735786,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Orthetrum albistylum",
+      "group": "insect",
+      "koreaObservationCount": 4643,
+      "percentileInSource": 0.979933110367893,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Turdus pallidus",
+      "group": "bird",
+      "koreaObservationCount": 13194,
+      "percentileInSource": 0.76,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lespedeza bicolor",
+      "group": "plant",
+      "koreaObservationCount": 2750,
+      "percentileInSource": 0.8394648829431438,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Liobagrus somjinensis",
+      "group": "other",
+      "koreaObservationCount": 109,
+      "percentileInSource": 0.46153846153846156,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rana huanrenensis",
+      "group": "amphibian",
+      "koreaObservationCount": 3037,
+      "percentileInSource": 0.5263157894736843,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Actitis hypoleucos",
+      "group": "bird",
+      "koreaObservationCount": 7894,
+      "percentileInSource": 0.6342857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Clavulina coralloides",
+      "group": "fungus",
+      "koreaObservationCount": 37,
+      "percentileInSource": 0.7670250896057348,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Veronica persica",
+      "group": "plant",
+      "koreaObservationCount": 2867,
+      "percentileInSource": 0.8662207357859532,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pseudozizeeria maha",
+      "group": "insect",
+      "koreaObservationCount": 1626,
+      "percentileInSource": 0.745819397993311,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Armadillidium vulgare",
+      "group": "other",
+      "koreaObservationCount": 275,
+      "percentileInSource": 0.8717948717948718,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rhopalus sapporensis",
+      "group": "insect",
+      "koreaObservationCount": 2332,
+      "percentileInSource": 0.8762541806020067,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Takifugu niphobles",
+      "group": "other",
+      "koreaObservationCount": 186,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Auricularia auricula-judae",
+      "group": "fungus",
+      "koreaObservationCount": 52,
+      "percentileInSource": 0.8602150537634409,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Tridentiger obscurus",
+      "group": "other",
+      "koreaObservationCount": 342,
+      "percentileInSource": 0.717948717948718,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Meles leucurus",
+      "group": "mammal",
+      "koreaObservationCount": 10373,
+      "percentileInSource": 0.7931034482758621,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ampelopsis glandulosa",
+      "group": "plant",
+      "koreaObservationCount": 2062,
+      "percentileInSource": 0.6655518394648829,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cuculus canorus",
+      "group": "bird",
+      "koreaObservationCount": 16968,
+      "percentileInSource": 0.8057142857142857,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Semisulcospira forticosta",
+      "group": "other",
+      "koreaObservationCount": 1159,
+      "percentileInSource": 0.9183673469387755,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lycoperdon perlatum",
+      "group": "fungus",
+      "koreaObservationCount": 123,
+      "percentileInSource": 0.974910394265233,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Persicaria thunbergii",
+      "group": "plant",
+      "koreaObservationCount": 3341,
+      "percentileInSource": 0.9297658862876255,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cantharellus cinnabarinus",
+      "group": "fungus",
+      "koreaObservationCount": 42,
+      "percentileInSource": 0.8100358422939068,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Nipponocypris koreanus",
+      "group": "other",
+      "koreaObservationCount": 9513,
+      "percentileInSource": 0.9491525423728814,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Erigeron annuus",
+      "group": "plant",
+      "koreaObservationCount": 5526,
+      "percentileInSource": 0.9966555183946488,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Russula compacta",
+      "group": "fungus",
+      "koreaObservationCount": 29,
+      "percentileInSource": 0.6630824372759856,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Gymnogobius urotaenia",
+      "group": "other",
+      "koreaObservationCount": 1220,
+      "percentileInSource": 0.8205128205128205,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Viola albida",
+      "group": "plant",
+      "koreaObservationCount": 3138,
+      "percentileInSource": 0.8996655518394648,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phallus luteus",
+      "group": "fungus",
+      "koreaObservationCount": 118,
+      "percentileInSource": 0.9713261648745519,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pireneitega spinivulva",
+      "group": "other",
+      "koreaObservationCount": 59,
+      "percentileInSource": 0.5942028985507246,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Gyraulus convexiusculus",
+      "group": "other",
+      "koreaObservationCount": 249,
+      "percentileInSource": 0.7142857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pieris rapae",
+      "group": "insect",
+      "koreaObservationCount": 5614,
+      "percentileInSource": 0.9933110367892977,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Papilio xuthus",
+      "group": "insect",
+      "koreaObservationCount": 4476,
+      "percentileInSource": 0.9732441471571907,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Emberiza elegans",
+      "group": "bird",
+      "koreaObservationCount": 31190,
+      "percentileInSource": 0.9085714285714286,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Styrax japonicus",
+      "group": "plant",
+      "koreaObservationCount": 3057,
+      "percentileInSource": 0.8963210702341137,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phalacrocorax carbo",
+      "group": "bird",
+      "koreaObservationCount": 27526,
+      "percentileInSource": 0.8914285714285715,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pleurotus ostreatus",
+      "group": "fungus",
+      "koreaObservationCount": 63,
+      "percentileInSource": 0.8960573476702509,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pica serica",
+      "group": "bird",
+      "koreaObservationCount": 50400,
+      "percentileInSource": 0.9714285714285714,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Macrophthalmus japonicus",
+      "group": "other",
+      "koreaObservationCount": 69,
+      "percentileInSource": 0.5897435897435898,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Neoscona scylla",
+      "group": "other",
+      "koreaObservationCount": 65,
+      "percentileInSource": 0.6521739130434783,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Trifolium repens",
+      "group": "plant",
+      "koreaObservationCount": 3718,
+      "percentileInSource": 0.9632107023411371,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Anas acuta",
+      "group": "bird",
+      "koreaObservationCount": 7535,
+      "percentileInSource": 0.6171428571428572,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rhododendron schlippenbachii",
+      "group": "plant",
+      "koreaObservationCount": 2661,
+      "percentileInSource": 0.8160535117056856,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cyprinus carpio",
+      "group": "other",
+      "koreaObservationCount": 2647,
+      "percentileInSource": 0.7627118644067796,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Suillus bovinus",
+      "group": "fungus",
+      "koreaObservationCount": 95,
+      "percentileInSource": 0.9605734767025089,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Neocaridina denticulata",
+      "group": "other",
+      "koreaObservationCount": 1353,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Misgurnus mizolepis",
+      "group": "other",
+      "koreaObservationCount": 1094,
+      "percentileInSource": 0.5254237288135593,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Dendrocopos major",
+      "group": "bird",
+      "koreaObservationCount": 21677,
+      "percentileInSource": 0.8457142857142858,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Arundinella hirta",
+      "group": "plant",
+      "koreaObservationCount": 1668,
+      "percentileInSource": 0.5217391304347826,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ganoderma applanatum",
+      "group": "fungus",
+      "koreaObservationCount": 83,
+      "percentileInSource": 0.946236559139785,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rubus parvifolius",
+      "group": "plant",
+      "koreaObservationCount": 2505,
+      "percentileInSource": 0.7792642140468228,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pinus densiflora",
+      "group": "plant",
+      "koreaObservationCount": 4802,
+      "percentileInSource": 0.9899665551839465,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Gloydius ussuriensis",
+      "group": "reptile",
+      "koreaObservationCount": 3366,
+      "percentileInSource": 0.9285714285714286,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Tenodera sinensis",
+      "group": "insect",
+      "koreaObservationCount": 1858,
+      "percentileInSource": 0.8060200668896321,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ephemera orientalis",
+      "group": "insect",
+      "koreaObservationCount": 2675,
+      "percentileInSource": 0.903010033444816,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Coprinopsis atramentaria",
+      "group": "fungus",
+      "koreaObservationCount": 30,
+      "percentileInSource": 0.6774193548387097,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Larus crassirostris",
+      "group": "bird",
+      "koreaObservationCount": 45282,
+      "percentileInSource": 0.96,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Polygonia c-aureum",
+      "group": "insect",
+      "koreaObservationCount": 6825,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Marasmius siccus",
+      "group": "fungus",
+      "koreaObservationCount": 55,
+      "percentileInSource": 0.8888888888888888,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Coccinella septempunctata",
+      "group": "insect",
+      "koreaObservationCount": 4374,
+      "percentileInSource": 0.9698996655518395,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phoenicurus auroreus",
+      "group": "bird",
+      "koreaObservationCount": 49337,
+      "percentileInSource": 0.9657142857142857,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cletus punctiger",
+      "group": "insect",
+      "koreaObservationCount": 2145,
+      "percentileInSource": 0.8528428093645485,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Boehmeria japonica",
+      "group": "plant",
+      "koreaObservationCount": 3620,
+      "percentileInSource": 0.9565217391304348,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lindera obtusiloba",
+      "group": "plant",
+      "koreaObservationCount": 5603,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Odontobutis platycephala",
+      "group": "other",
+      "koreaObservationCount": 5088,
+      "percentileInSource": 0.9743589743589743,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Baetis fuscatus",
+      "group": "insect",
+      "koreaObservationCount": 4672,
+      "percentileInSource": 0.9832775919732442,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Evarcha albaria",
+      "group": "other",
+      "koreaObservationCount": 124,
+      "percentileInSource": 0.8115942028985508,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Formica japonica",
+      "group": "insect",
+      "koreaObservationCount": 2225,
+      "percentileInSource": 0.8595317725752508,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cincticostella levanidovae",
+      "group": "insect",
+      "koreaObservationCount": 1936,
+      "percentileInSource": 0.822742474916388,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rumex crispus",
+      "group": "plant",
+      "koreaObservationCount": 3223,
+      "percentileInSource": 0.9163879598662208,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ligustrum obtusifolium",
+      "group": "plant",
+      "koreaObservationCount": 3192,
+      "percentileInSource": 0.9096989966555185,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Acer pictum",
+      "group": "plant",
+      "koreaObservationCount": 2035,
+      "percentileInSource": 0.6488294314381271,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rhodeus notatus",
+      "group": "other",
+      "koreaObservationCount": 1246,
+      "percentileInSource": 0.5932203389830508,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Eristalis tenax",
+      "group": "insect",
+      "koreaObservationCount": 1882,
+      "percentileInSource": 0.8127090301003345,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Dolomedes sulfureus",
+      "group": "other",
+      "koreaObservationCount": 237,
+      "percentileInSource": 0.8840579710144928,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Calopteryx japonica",
+      "group": "insect",
+      "koreaObservationCount": 2023,
+      "percentileInSource": 0.8294314381270903,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lactarius hatsudake",
+      "group": "fungus",
+      "koreaObservationCount": 49,
+      "percentileInSource": 0.8422939068100359,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Dolycoris baccarum",
+      "group": "insect",
+      "koreaObservationCount": 2578,
+      "percentileInSource": 0.8963210702341137,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Felis catus",
+      "group": "mammal",
+      "koreaObservationCount": 7626,
+      "percentileInSource": 0.7241379310344828,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ypthima multistriata",
+      "group": "insect",
+      "koreaObservationCount": 1315,
+      "percentileInSource": 0.6588628762541806,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Bothrogonia ferruginea",
+      "group": "insect",
+      "koreaObservationCount": 4757,
+      "percentileInSource": 0.9866220735785953,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cipangopaludina malleata",
+      "group": "other",
+      "koreaObservationCount": 1099,
+      "percentileInSource": 0.8979591836734694,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Motacilla alba",
+      "group": "bird",
+      "koreaObservationCount": 29502,
+      "percentileInSource": 0.8971428571428571,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Carex siderosticta",
+      "group": "plant",
+      "koreaObservationCount": 3140,
+      "percentileInSource": 0.903010033444816,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Aegypius monachus",
+      "group": "bird",
+      "koreaObservationCount": 42354,
+      "percentileInSource": 0.9485714285714286,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Trachemys scripta",
+      "group": "reptile",
+      "koreaObservationCount": 620,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Strobilomyces confusus",
+      "group": "fungus",
+      "koreaObservationCount": 30,
+      "percentileInSource": 0.6810035842293907,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Oryzias sinensis",
+      "group": "other",
+      "koreaObservationCount": 1463,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Potentilla fragarioides",
+      "group": "plant",
+      "koreaObservationCount": 2381,
+      "percentileInSource": 0.7625418060200668,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Falco tinnunculus",
+      "group": "bird",
+      "koreaObservationCount": 19192,
+      "percentileInSource": 0.8114285714285714,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Numenius arquata",
+      "group": "bird",
+      "koreaObservationCount": 3874,
+      "percentileInSource": 0.39428571428571424,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Coreoperca herzi",
+      "group": "other",
+      "koreaObservationCount": 3878,
+      "percentileInSource": 0.9487179487179487,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Aythya fuligula",
+      "group": "bird",
+      "koreaObservationCount": 7489,
+      "percentileInSource": 0.6114285714285714,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Irpex lacteus",
+      "group": "fungus",
+      "koreaObservationCount": 50,
+      "percentileInSource": 0.8566308243727598,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Taraxacum officinale",
+      "group": "plant",
+      "koreaObservationCount": 3866,
+      "percentileInSource": 0.9698996655518395,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Robinia pseudoacacia",
+      "group": "plant",
+      "koreaObservationCount": 2464,
+      "percentileInSource": 0.7692307692307692,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Tamias sibiricus",
+      "group": "mammal",
+      "koreaObservationCount": 10850,
+      "percentileInSource": 0.8275862068965517,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phaneroptera nigroantennata",
+      "group": "insect",
+      "koreaObservationCount": 2301,
+      "percentileInSource": 0.8729096989966555,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Streptopelia orientalis",
+      "group": "bird",
+      "koreaObservationCount": 76645,
+      "percentileInSource": 0.9885714285714285,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Laetiporus sulphureus",
+      "group": "fungus",
+      "koreaObservationCount": 39,
+      "percentileInSource": 0.7921146953405018,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hydropotes inermis",
+      "group": "mammal",
+      "koreaObservationCount": 49172,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Capsella bursa-pastoris",
+      "group": "plant",
+      "koreaObservationCount": 2062,
+      "percentileInSource": 0.6688963210702341,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Tanakia koreensis",
+      "group": "other",
+      "koreaObservationCount": 1314,
+      "percentileInSource": 0.6101694915254237,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Oncorhynchus keta",
+      "group": "other",
+      "koreaObservationCount": 83,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Passer montanus",
+      "group": "bird",
+      "koreaObservationCount": 90909,
+      "percentileInSource": 0.9942857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Homoeocerus dilatatus",
+      "group": "insect",
+      "koreaObservationCount": 1924,
+      "percentileInSource": 0.8193979933110368,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Celastrina argiolus",
+      "group": "insect",
+      "koreaObservationCount": 3488,
+      "percentileInSource": 0.9431438127090301,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Laccaria laccata",
+      "group": "fungus",
+      "koreaObservationCount": 68,
+      "percentileInSource": 0.910394265232975,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Platichthys stellatus",
+      "group": "other",
+      "koreaObservationCount": 12,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Sus scrofa",
+      "group": "mammal",
+      "koreaObservationCount": 16840,
+      "percentileInSource": 0.9310344827586207,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Anser albifrons",
+      "group": "bird",
+      "koreaObservationCount": 12030,
+      "percentileInSource": 0.7371428571428571,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Neptis sappho",
+      "group": "insect",
+      "koreaObservationCount": 3625,
+      "percentileInSource": 0.9498327759197325,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cheumatopsyche brevilineata",
+      "group": "insect",
+      "koreaObservationCount": 3329,
+      "percentileInSource": 0.9364548494983278,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Persicaria longiseta",
+      "group": "plant",
+      "koreaObservationCount": 2717,
+      "percentileInSource": 0.8294314381270903,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Scolopendra mutilans",
+      "group": "other",
+      "koreaObservationCount": 266,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Clematis apiifolia",
+      "group": "plant",
+      "koreaObservationCount": 3184,
+      "percentileInSource": 0.9063545150501673,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pseudocolus fusiformis",
+      "group": "fungus",
+      "koreaObservationCount": 132,
+      "percentileInSource": 0.982078853046595,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Davidius lunatus",
+      "group": "insect",
+      "koreaObservationCount": 2503,
+      "percentileInSource": 0.8896321070234113,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Artemisia keiskeana",
+      "group": "plant",
+      "koreaObservationCount": 2500,
+      "percentileInSource": 0.7759197324414716,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hypsipetes amaurotis",
+      "group": "bird",
+      "koreaObservationCount": 92362,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Spoladea recurvalis",
+      "group": "insect",
+      "koreaObservationCount": 1515,
+      "percentileInSource": 0.7224080267558528,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Stellaria aquatica",
+      "group": "plant",
+      "koreaObservationCount": 2414,
+      "percentileInSource": 0.765886287625418,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Mogera wogura",
+      "group": "mammal",
+      "koreaObservationCount": 19715,
+      "percentileInSource": 0.9655172413793104,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Orientogalba ollula",
+      "group": "other",
+      "koreaObservationCount": 426,
+      "percentileInSource": 0.8163265306122449,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Takydromus amurensis",
+      "group": "reptile",
+      "koreaObservationCount": 1795,
+      "percentileInSource": 0.7142857142857143,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pteridium aquilinum",
+      "group": "plant",
+      "koreaObservationCount": 2528,
+      "percentileInSource": 0.7892976588628763,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Zanthoxylum schinifolium",
+      "group": "plant",
+      "koreaObservationCount": 3897,
+      "percentileInSource": 0.9732441471571907,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Chelidonium majus",
+      "group": "plant",
+      "koreaObservationCount": 3538,
+      "percentileInSource": 0.9531772575250836,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Oenothera biennis",
+      "group": "plant",
+      "koreaObservationCount": 2804,
+      "percentileInSource": 0.8561872909698997,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phasianus colchicus",
+      "group": "bird",
+      "koreaObservationCount": 24254,
+      "percentileInSource": 0.8685714285714285,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cirsium maackii",
+      "group": "plant",
+      "koreaObservationCount": 2357,
+      "percentileInSource": 0.745819397993311,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Menida violacea",
+      "group": "insect",
+      "koreaObservationCount": 1466,
+      "percentileInSource": 0.705685618729097,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Anas zonorhyncha",
+      "group": "bird",
+      "koreaObservationCount": 30689,
+      "percentileInSource": 0.9028571428571428,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hemibarbus labeo",
+      "group": "other",
+      "koreaObservationCount": 1856,
+      "percentileInSource": 0.711864406779661,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Xylocopa appendiculata",
+      "group": "insect",
+      "koreaObservationCount": 1744,
+      "percentileInSource": 0.7759197324414716,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hemigrapsus sanguineus",
+      "group": "other",
+      "koreaObservationCount": 123,
+      "percentileInSource": 0.717948717948718,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Agaricus arvensis",
+      "group": "fungus",
+      "koreaObservationCount": 32,
+      "percentileInSource": 0.7168458781362007,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Ecdyonurus levis",
+      "group": "insect",
+      "koreaObservationCount": 3644,
+      "percentileInSource": 0.9531772575250836,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Amanita vaginata",
+      "group": "fungus",
+      "koreaObservationCount": 65,
+      "percentileInSource": 0.9032258064516129,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Parasteatoda tepidariorum",
+      "group": "other",
+      "koreaObservationCount": 342,
+      "percentileInSource": 0.9565217391304348,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Agrimonia pilosa",
+      "group": "plant",
+      "koreaObservationCount": 2779,
+      "percentileInSource": 0.8494983277591973,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Dacrymyces spathularius",
+      "group": "fungus",
+      "koreaObservationCount": 52,
+      "percentileInSource": 0.8637992831541219,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Geastrum mirabile",
+      "group": "fungus",
+      "koreaObservationCount": 31,
+      "percentileInSource": 0.7025089605734767,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Setaria viridis",
+      "group": "plant",
+      "koreaObservationCount": 2624,
+      "percentileInSource": 0.8060200668896321,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phylloscopus coronatus",
+      "group": "bird",
+      "koreaObservationCount": 6400,
+      "percentileInSource": 0.5657142857142857,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Stereum ostrea",
+      "group": "fungus",
+      "koreaObservationCount": 73,
+      "percentileInSource": 0.9247311827956989,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Daedalea dickinsii",
+      "group": "fungus",
+      "koreaObservationCount": 76,
+      "percentileInSource": 0.935483870967742,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Telamonia vlijmi",
+      "group": "other",
+      "koreaObservationCount": 406,
+      "percentileInSource": 0.9710144927536232,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pueraria montana",
+      "group": "plant",
+      "koreaObservationCount": 3630,
+      "percentileInSource": 0.959866220735786,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Commelina communis",
+      "group": "plant",
+      "koreaObservationCount": 4335,
+      "percentileInSource": 0.9866220735785953,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Acusta redfieldi",
+      "group": "other",
+      "koreaObservationCount": 175,
+      "percentileInSource": 0.6734693877551021,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Brucea javanica",
+      "group": "plant",
+      "koreaObservationCount": 2976,
+      "percentileInSource": 0.882943143812709,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Neillia incisa",
+      "group": "plant",
+      "koreaObservationCount": 3816,
+      "percentileInSource": 0.9665551839464883,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Phytolacca americana",
+      "group": "plant",
+      "koreaObservationCount": 4142,
+      "percentileInSource": 0.979933110367893,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Macrolepiota procera",
+      "group": "fungus",
+      "koreaObservationCount": 152,
+      "percentileInSource": 0.985663082437276,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Zacco platypus",
+      "group": "other",
+      "koreaObservationCount": 15378,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Cyrtarachne inaequalis",
+      "group": "other",
+      "koreaObservationCount": 127,
+      "percentileInSource": 0.8405797101449275,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Amanita hemibapha",
+      "group": "fungus",
+      "koreaObservationCount": 107,
+      "percentileInSource": 0.967741935483871,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Propylea japonica",
+      "group": "insect",
+      "koreaObservationCount": 4511,
+      "percentileInSource": 0.9765886287625418,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Hirundo rustica",
+      "group": "bird",
+      "koreaObservationCount": 24895,
+      "percentileInSource": 0.88,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Clerodendrum trichotomum",
+      "group": "plant",
+      "koreaObservationCount": 2675,
+      "percentileInSource": 0.8193979933110368,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Vanderbylia fraxinea",
+      "group": "fungus",
+      "koreaObservationCount": 76,
+      "percentileInSource": 0.931899641577061,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Paederia foetida",
+      "group": "plant",
+      "koreaObservationCount": 2943,
+      "percentileInSource": 0.8795986622073578,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Chiromantes haematocheir",
+      "group": "other",
+      "koreaObservationCount": 178,
+      "percentileInSource": 0.8205128205128205,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Mycena pura",
+      "group": "fungus",
+      "koreaObservationCount": 30,
+      "percentileInSource": 0.6881720430107527,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Sympetrum infuscatum",
+      "group": "insect",
+      "koreaObservationCount": 2076,
+      "percentileInSource": 0.8394648829431438,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lycorma delicatula",
+      "group": "insect",
+      "koreaObservationCount": 1617,
+      "percentileInSource": 0.7424749163879598,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Pristomyrmex punctatus",
+      "group": "insect",
+      "koreaObservationCount": 1224,
+      "percentileInSource": 0.6153846153846154,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Lanius bucephalus",
+      "group": "bird",
+      "koreaObservationCount": 23295,
+      "percentileInSource": 0.8628571428571429,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Garrulus glandarius",
+      "group": "bird",
+      "koreaObservationCount": 20050,
+      "percentileInSource": 0.8285714285714285,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Dactylis glomerata",
+      "group": "plant",
+      "koreaObservationCount": 2761,
+      "percentileInSource": 0.842809364548495,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Rosa multiflora",
+      "group": "plant",
+      "koreaObservationCount": 2876,
+      "percentileInSource": 0.8695652173913043,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Humulus scandens",
+      "group": "plant",
+      "koreaObservationCount": 4173,
+      "percentileInSource": 0.9832775919732442,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Meghimatium fruhstorferi",
+      "group": "other",
+      "koreaObservationCount": 131,
+      "percentileInSource": 0.6122448979591837,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Papilio macilentus",
+      "group": "insect",
+      "koreaObservationCount": 1866,
+      "percentileInSource": 0.8093645484949833,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Sarcodon imbricatus",
+      "group": "fungus",
+      "koreaObservationCount": 37,
+      "percentileInSource": 0.7706093189964158,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Oriolus chinensis",
+      "group": "bird",
+      "koreaObservationCount": 21901,
+      "percentileInSource": 0.8514285714285714,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Akebia quinata",
+      "group": "plant",
+      "koreaObservationCount": 2684,
+      "percentileInSource": 0.822742474916388,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Teleogryllus emma",
+      "group": "insect",
+      "koreaObservationCount": 1518,
+      "percentileInSource": 0.725752508361204,
+      "mustInclude": false,
+      "isolationRescue": false
+    },
+    {
+      "sciName": "Eurystomus orientalis",
+      "group": "bird",
+      "koreaObservationCount": 15854,
+      "percentileInSource": 0.7828571428571429,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Sedum sarmentosum",
+      "group": "plant",
+      "koreaObservationCount": 2073,
+      "percentileInSource": 0.6722408026755853,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Nicrophorus quadripunctatus",
+      "group": "insect",
+      "koreaObservationCount": 1217,
+      "percentileInSource": 0.6053511705685619,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Chlorociboria aeruginosa",
+      "group": "fungus",
+      "koreaObservationCount": 25,
+      "percentileInSource": 0.5483870967741935,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Axylia putris",
+      "group": "insect",
+      "koreaObservationCount": 1110,
+      "percentileInSource": 0.5384615384615384,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Arisaema amurense",
+      "group": "plant",
+      "koreaObservationCount": 1664,
+      "percentileInSource": 0.5183946488294314,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Troglodytes troglodytes",
+      "group": "bird",
+      "koreaObservationCount": 4133,
+      "percentileInSource": 0.4114285714285715,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Micromys minutus",
+      "group": "mammal",
+      "koreaObservationCount": 663,
+      "percentileInSource": 0.3793103448275862,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Luzula capitata",
+      "group": "plant",
+      "koreaObservationCount": 1474,
+      "percentileInSource": 0.37792642140468224,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Alauda arvensis",
+      "group": "bird",
+      "koreaObservationCount": 3340,
+      "percentileInSource": 0.34285714285714286,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Patania chlorophanta",
+      "group": "insect",
+      "koreaObservationCount": 839,
+      "percentileInSource": 0.3177257525083612,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Dryopteris chinensis",
+      "group": "plant",
+      "koreaObservationCount": 1374,
+      "percentileInSource": 0.31438127090301005,
+      "mustInclude": false,
+      "isolationRescue": true
+    },
+    {
+      "sciName": "Mythimna turca",
+      "group": "insect",
+      "koreaObservationCount": 838,
+      "percentileInSource": 0.31438127090301005,
+      "mustInclude": false,
+      "isolationRescue": true
+    }
+  ]
+}

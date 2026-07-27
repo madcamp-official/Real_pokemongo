@@ -40,6 +40,7 @@ CREATE TYPE taxon_rank       AS ENUM ('species','genus','family','order','class'
 CREATE TYPE season           AS ENUM ('spring','summer','autumn','winter');
 CREATE TYPE habitat          AS ENUM ('neighborhood','park','mountain','waterside','garden','field');
 CREATE TYPE rarity           AS ENUM ('common','uncommon','rare');
+CREATE TYPE active_time      AS ENUM ('day','both','night'); -- F6 종 카드 활동시간대
 CREATE TYPE risk_tag         AS ENUM ('toxic_if_eaten','sting_or_bite','contact_dermatitis','allergen','protected_species');
 CREATE TYPE subscription_plan AS ENUM ('free','family');
 CREATE TYPE quest_type       AS ENUM ('seasonal','theme','habitat','daily','family','story');
@@ -68,6 +69,10 @@ CREATE TABLE taxon (
     "group"     taxon_group NOT NULL,
     rarity      rarity      NOT NULL,
     media_ref   TEXT,                                  -- 대표 이미지(도감 카드용), 없으면 NULL
+    -- F6 종 카드 표시용(선택). 자유 텍스트인 이유: 곤충은 mm, 나무는 m 등 종마다 단위가 달라
+    -- 단일 숫자 컬럼으로는 정직하게 표현 불가 — mappers.ts "지어내지 않는다" 원칙과 동일.
+    size_description TEXT,
+    active_time active_time,
     created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at  TIMESTAMPTZ NOT NULL DEFAULT now()
 );

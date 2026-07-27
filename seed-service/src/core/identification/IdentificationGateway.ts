@@ -26,6 +26,15 @@ import type { Taxon, TaxonRank } from "../domain/types.js";
 import type { TaxonRepository } from "../repositories/ports.js";
 import { NameMapper } from "../taxonomy/nameMapping.js";
 import { SafetyFilter, type SafetyNotice } from "../safety/SafetyFilter.js";
+import { isConfusablePair } from "./confusionPairs.js";
+
+/**
+ * "high"인데도 top1/top2 확신도 차이가 이 값 미만이면 medium으로 강등한다(단, top1/top2가
+ * confusionPairs.ts의 알려진 혼동 쌍일 때만 -- 무관한 두 종이 우연히 둘 다 확신도가 높은
+ * 것까지 강등하면 오히려 UX만 나빠짐). 실측 데이터 없는 최초값 -- confidencePolicy.ts의
+ * DEFAULT_THRESHOLDS와 같은 성격의 TODO(튜닝) 대상.
+ */
+const CONFUSION_MARGIN_THRESHOLD = 0.05;
 
 /** 아이에게 보여줄, 국명이 붙은 후보. */
 export interface ResolvedCandidate {
@@ -87,7 +96,22 @@ export class IdentificationGateway {
     resolved.sort((a, b) => b.confidence - a.confidence);
     const top = resolved[0] ?? null;
     const topConfidence = top?.confidence ?? 0;
-    const tier = classifyConfidence(topConfidence, this.thresholds);
+    let tier = classifyConfidence(topConfidence, this.thresholds);
+
+    // 조건 2(혼동 종): top1이 확신도는 높아도, 알려진 혼동 쌍인 top2와 차이가 근소하면
+    // 단정하지 않고 medium으로 물러나 아이가 직접 고르게 한다(§7 "틀릴 땐 안전하게").
+    // resolveCandidates가 이미 raw.candidates 순서를 taxon으로 매핑했을 뿐 정렬은 안 해서,
+    // 여기서 sort 이후의 resolved[1]을 봐야 진짜 2위 후보다.
+    const second = resolved[1];
+    if (
+      tier === "high" &&
+      top &&
+      second &&
+      isConfusablePair(top.scientificName, second.scientificName) &&
+      top.confidence - second.confidence < CONFUSION_MARGIN_THRESHOLD
+    ) {
+      tier = "medium";
+    }
 
     if (tier === "high" && top) {
       const safety = top.taxon ? this.safety.evaluate(top.taxon) : null;

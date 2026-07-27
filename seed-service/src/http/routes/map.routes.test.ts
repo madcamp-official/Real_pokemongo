@@ -74,7 +74,7 @@ async function observeDandelionAt(
   coord?: { lat: number; lng: number },
 ) {
   app.mock.enqueue([
-    { scientificName: "Taraxacum officinale", vernacularName: "민들레", rank: "species", confidence: 0.92 },
+    { scientificName: "Taraxacum officinale", vernacularName: "서양민들레", rank: "species", confidence: 0.92 },
   ]);
   const { body, contentType } = await buildMultipartUpload([makeCleanJpeg()], coord);
   const upload = await server.inject({
@@ -139,7 +139,7 @@ test("GET /map/pins: 정밀 좌표와 함께 확정한 관찰은 핀으로 반�
   const pins = res.json();
   assert.equal(pins.length, 1);
   assert.equal(pins[0].species_id, "taxon-dandelion");
-  assert.equal(pins[0].species_name, "민들레");
+  assert.equal(pins[0].species_name, "서양민들레");
   assert.equal(pins[0].group, "식물");
   assert.equal(pins[0].lat, 37.5);
   assert.equal(pins[0].lng, 127.0);

@@ -4,7 +4,7 @@ import type { TaxonGroup } from '@/types/api';
 
 export type DexFilter = '전체' | TaxonGroup;
 
-const FILTERS: DexFilter[] = ['전체', '곤충', '양서류', '식물'];
+const FILTERS: DexFilter[] = ['전체', '곤충', '식물', '조류', '기타'];
 
 /**
  * 도감 분류 필터 칩 (F5). 활성 칩은 코랄 배경, 비활성은 흰 배경.

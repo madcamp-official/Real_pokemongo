@@ -213,13 +213,17 @@ export class PgTaxonRepo implements TaxonRepository {
       await client.query("BEGIN");
       for (const t of taxa) {
         await client.query(
-          `INSERT INTO taxon (id, sci_name, kor_name, rank, parent_id, "group", rarity, media_ref)
-           VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
+          `INSERT INTO taxon (id, sci_name, kor_name, rank, parent_id, "group", rarity, media_ref, size_description, active_time)
+           VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
            ON CONFLICT (id) DO UPDATE SET
              sci_name = EXCLUDED.sci_name, kor_name = EXCLUDED.kor_name, rank = EXCLUDED.rank,
              parent_id = EXCLUDED.parent_id, "group" = EXCLUDED."group", rarity = EXCLUDED.rarity,
-             media_ref = EXCLUDED.media_ref, updated_at = now()`,
-          [t.id, t.sciName, t.korName, t.rank, t.parentId ?? null, t.group, t.rarity, t.mediaRef ?? null],
+             media_ref = EXCLUDED.media_ref, size_description = EXCLUDED.size_description,
+             active_time = EXCLUDED.active_time, updated_at = now()`,
+          [
+            t.id, t.sciName, t.korName, t.rank, t.parentId ?? null, t.group, t.rarity, t.mediaRef ?? null,
+            t.sizeDescription ?? null, t.activeTime ?? null,
+          ],
         );
         await client.query(`DELETE FROM taxon_season WHERE taxon_id = $1`, [t.id]);
         for (const s of t.seasonTags) {
@@ -288,6 +292,8 @@ async function fetchTaxonRows(db: Queryable, where: string, params: unknown[]): 
       riskTags: (byRisk.get(row.id) ?? []).map((x) => x.risk_tag),
       rarity: row.rarity,
       mediaRef: row.media_ref ?? undefined,
+      sizeDescription: row.size_description ?? undefined,
+      activeTime: row.active_time ?? undefined,
     } satisfies Taxon;
   });
 }

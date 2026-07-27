@@ -1,0 +1,1473 @@
+{
+  "methodology": "MVP v1: facility-location(coverage) 미사용. 곤충/식물/조류 3개 그룹만 percentileInSource>=0.8 순수 흔함 랭킹 컷오프 + 그룹 내 mustInclude 강제 포함. 균류/어류(무척추동물 포함)/포유류/양서류/파충류는 그룹 스키마만 유지한 채 비움 (단, 광대버섯/유혈목이 2종은 안전상 예외로 강제 포함).",
+  "pctThreshold": 0.8,
+  "focusGroups": [
+    "insect",
+    "plant",
+    "bird"
+  ],
+  "emptyGroups": [
+    "fungus",
+    "other",
+    "mammal",
+    "amphibian",
+    "reptile"
+  ],
+  "safetyExceptions": [
+    "Amanita muscaria",
+    "Rhabdophis tigrinus"
+  ],
+  "finalPoolSize": 160,
+  "byGroup": {
+    "insect": 61,
+    "plant": 61,
+    "bird": 36,
+    "fungus": 1,
+    "reptile": 1,
+    "other": 0,
+    "mammal": 0,
+    "amphibian": 0
+  },
+  "pool": [
+    {
+      "sciName": "Polygonia c-aureum",
+      "group": "insect",
+      "koreaObservationCount": 6825,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Apis mellifera",
+      "group": "insect",
+      "koreaObservationCount": 6055,
+      "percentileInSource": 0.9966555183946488,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pieris rapae",
+      "group": "insect",
+      "koreaObservationCount": 5614,
+      "percentileInSource": 0.9933110367892977,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Harmonia axyridis",
+      "group": "insect",
+      "koreaObservationCount": 5503,
+      "percentileInSource": 0.9899665551839465,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Bothrogonia ferruginea",
+      "group": "insect",
+      "koreaObservationCount": 4757,
+      "percentileInSource": 0.9866220735785953,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Baetis fuscatus",
+      "group": "insect",
+      "koreaObservationCount": 4672,
+      "percentileInSource": 0.9832775919732442,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Orthetrum albistylum",
+      "group": "insect",
+      "koreaObservationCount": 4643,
+      "percentileInSource": 0.979933110367893,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Propylea japonica",
+      "group": "insect",
+      "koreaObservationCount": 4511,
+      "percentileInSource": 0.9765886287625418,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Papilio xuthus",
+      "group": "insect",
+      "koreaObservationCount": 4476,
+      "percentileInSource": 0.9732441471571907,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Coccinella septempunctata",
+      "group": "insect",
+      "koreaObservationCount": 4374,
+      "percentileInSource": 0.9698996655518395,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Episyrphus balteatus",
+      "group": "insect",
+      "koreaObservationCount": 4166,
+      "percentileInSource": 0.9665551839464883,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pieris melete",
+      "group": "insect",
+      "koreaObservationCount": 4020,
+      "percentileInSource": 0.9632107023411371,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Epeorus pellucidus",
+      "group": "insect",
+      "koreaObservationCount": 3942,
+      "percentileInSource": 0.959866220735786,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ischnura asiatica",
+      "group": "insect",
+      "koreaObservationCount": 3848,
+      "percentileInSource": 0.9565217391304348,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ecdyonurus levis",
+      "group": "insect",
+      "koreaObservationCount": 3644,
+      "percentileInSource": 0.9531772575250836,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Neptis sappho",
+      "group": "insect",
+      "koreaObservationCount": 3625,
+      "percentileInSource": 0.9498327759197325,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Riptortus pedestris",
+      "group": "insect",
+      "koreaObservationCount": 3559,
+      "percentileInSource": 0.9464882943143813,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Celastrina argiolus",
+      "group": "insect",
+      "koreaObservationCount": 3488,
+      "percentileInSource": 0.9431438127090301,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Elkalyce argiades",
+      "group": "insect",
+      "koreaObservationCount": 3432,
+      "percentileInSource": 0.939799331103679,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cheumatopsyche brevilineata",
+      "group": "insect",
+      "koreaObservationCount": 3329,
+      "percentileInSource": 0.9364548494983278,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Sphaerophoria scripta",
+      "group": "insect",
+      "koreaObservationCount": 3274,
+      "percentileInSource": 0.9331103678929766,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ecdyonurus kibunensis",
+      "group": "insect",
+      "koreaObservationCount": 3195,
+      "percentileInSource": 0.9297658862876255,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pachygrontha antennata",
+      "group": "insect",
+      "koreaObservationCount": 3093,
+      "percentileInSource": 0.9264214046822743,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cletus schmidti",
+      "group": "insect",
+      "koreaObservationCount": 3067,
+      "percentileInSource": 0.9230769230769231,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Acrida cinerea",
+      "group": "insect",
+      "koreaObservationCount": 2935,
+      "percentileInSource": 0.919732441471572,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Atractomorpha lata",
+      "group": "insect",
+      "koreaObservationCount": 2879,
+      "percentileInSource": 0.9163879598662208,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Carbula putoni",
+      "group": "insect",
+      "koreaObservationCount": 2844,
+      "percentileInSource": 0.9130434782608696,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Eurema mandarina",
+      "group": "insect",
+      "koreaObservationCount": 2841,
+      "percentileInSource": 0.9096989966555185,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Oedaleus infernalis",
+      "group": "insect",
+      "koreaObservationCount": 2778,
+      "percentileInSource": 0.9063545150501673,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ephemera orientalis",
+      "group": "insect",
+      "koreaObservationCount": 2675,
+      "percentileInSource": 0.903010033444816,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Colias erate",
+      "group": "insect",
+      "koreaObservationCount": 2585,
+      "percentileInSource": 0.8996655518394648,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Dolycoris baccarum",
+      "group": "insect",
+      "koreaObservationCount": 2578,
+      "percentileInSource": 0.8963210702341137,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ephemera strigata",
+      "group": "insect",
+      "koreaObservationCount": 2545,
+      "percentileInSource": 0.8929765886287625,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Davidius lunatus",
+      "group": "insect",
+      "koreaObservationCount": 2503,
+      "percentileInSource": 0.8896321070234113,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Teloganopsis punctisetae",
+      "group": "insect",
+      "koreaObservationCount": 2408,
+      "percentileInSource": 0.8862876254180602,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Libythea lepita",
+      "group": "insect",
+      "koreaObservationCount": 2388,
+      "percentileInSource": 0.882943143812709,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Platycnemis phyllopoda",
+      "group": "insect",
+      "koreaObservationCount": 2376,
+      "percentileInSource": 0.8795986622073578,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rhopalus sapporensis",
+      "group": "insect",
+      "koreaObservationCount": 2332,
+      "percentileInSource": 0.8762541806020067,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Phaneroptera nigroantennata",
+      "group": "insect",
+      "koreaObservationCount": 2301,
+      "percentileInSource": 0.8729096989966555,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Camponotus japonicus",
+      "group": "insect",
+      "koreaObservationCount": 2298,
+      "percentileInSource": 0.8695652173913043,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pantala flavescens",
+      "group": "insect",
+      "koreaObservationCount": 2239,
+      "percentileInSource": 0.8662207357859532,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cloeon dipterum",
+      "group": "insect",
+      "koreaObservationCount": 2231,
+      "percentileInSource": 0.862876254180602,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Formica japonica",
+      "group": "insect",
+      "koreaObservationCount": 2225,
+      "percentileInSource": 0.8595317725752508,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Sphedanolestes impressicollis",
+      "group": "insect",
+      "koreaObservationCount": 2176,
+      "percentileInSource": 0.8561872909698997,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cletus punctiger",
+      "group": "insect",
+      "koreaObservationCount": 2145,
+      "percentileInSource": 0.8528428093645485,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Tetrix japonica",
+      "group": "insect",
+      "koreaObservationCount": 2144,
+      "percentileInSource": 0.8494983277591973,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Papilio bianor",
+      "group": "insect",
+      "koreaObservationCount": 2136,
+      "percentileInSource": 0.8461538461538461,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Plautia stali",
+      "group": "insect",
+      "koreaObservationCount": 2118,
+      "percentileInSource": 0.842809364548495,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Sympetrum infuscatum",
+      "group": "insect",
+      "koreaObservationCount": 2076,
+      "percentileInSource": 0.8394648829431438,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rhyacophila nigrocephala",
+      "group": "insect",
+      "koreaObservationCount": 2066,
+      "percentileInSource": 0.8361204013377926,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Geocoris varius",
+      "group": "insect",
+      "koreaObservationCount": 2051,
+      "percentileInSource": 0.8327759197324415,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Calopteryx japonica",
+      "group": "insect",
+      "koreaObservationCount": 2023,
+      "percentileInSource": 0.8294314381270903,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Baetiella tuberculata",
+      "group": "insect",
+      "koreaObservationCount": 2020,
+      "percentileInSource": 0.8260869565217391,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cincticostella levanidovae",
+      "group": "insect",
+      "koreaObservationCount": 1936,
+      "percentileInSource": 0.822742474916388,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Homoeocerus dilatatus",
+      "group": "insect",
+      "koreaObservationCount": 1924,
+      "percentileInSource": 0.8193979933110368,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Daimio tethys",
+      "group": "insect",
+      "koreaObservationCount": 1908,
+      "percentileInSource": 0.8160535117056856,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Eristalis tenax",
+      "group": "insect",
+      "koreaObservationCount": 1882,
+      "percentileInSource": 0.8127090301003345,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Papilio macilentus",
+      "group": "insect",
+      "koreaObservationCount": 1866,
+      "percentileInSource": 0.8093645484949833,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Tenodera sinensis",
+      "group": "insect",
+      "koreaObservationCount": 1858,
+      "percentileInSource": 0.8060200668896321,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Sympetrum eroticum",
+      "group": "insect",
+      "koreaObservationCount": 1838,
+      "percentileInSource": 0.802675585284281,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Vespa mandarinia",
+      "group": "insect",
+      "koreaObservationCount": 903,
+      "percentileInSource": 0.3946488294314381,
+      "mustInclude": true,
+      "mustIncludeReason": "안전 필수 — 최대형 말벌, 쏘임 위험",
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Toxicodendron vernicifluum",
+      "group": "plant",
+      "koreaObservationCount": 228,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "mustIncludeReason": "안전 필수 — 접촉성 피부염(옻)",
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Lindera obtusiloba",
+      "group": "plant",
+      "koreaObservationCount": 5603,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Erigeron annuus",
+      "group": "plant",
+      "koreaObservationCount": 5526,
+      "percentileInSource": 0.9966555183946488,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Quercus mongolica",
+      "group": "plant",
+      "koreaObservationCount": 5065,
+      "percentileInSource": 0.9933110367892977,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pinus densiflora",
+      "group": "plant",
+      "koreaObservationCount": 4802,
+      "percentileInSource": 0.9899665551839465,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Commelina communis",
+      "group": "plant",
+      "koreaObservationCount": 4335,
+      "percentileInSource": 0.9866220735785953,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Humulus scandens",
+      "group": "plant",
+      "koreaObservationCount": 4173,
+      "percentileInSource": 0.9832775919732442,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Phytolacca americana",
+      "group": "plant",
+      "koreaObservationCount": 4142,
+      "percentileInSource": 0.979933110367893,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rhododendron mucronulatum",
+      "group": "plant",
+      "koreaObservationCount": 4062,
+      "percentileInSource": 0.9765886287625418,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Zanthoxylum schinifolium",
+      "group": "plant",
+      "koreaObservationCount": 3897,
+      "percentileInSource": 0.9732441471571907,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Taraxacum officinale",
+      "group": "plant",
+      "koreaObservationCount": 3866,
+      "percentileInSource": 0.9698996655518395,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Neillia incisa",
+      "group": "plant",
+      "koreaObservationCount": 3816,
+      "percentileInSource": 0.9665551839464883,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Trifolium repens",
+      "group": "plant",
+      "koreaObservationCount": 3718,
+      "percentileInSource": 0.9632107023411371,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pueraria montana",
+      "group": "plant",
+      "koreaObservationCount": 3630,
+      "percentileInSource": 0.959866220735786,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Boehmeria japonica",
+      "group": "plant",
+      "koreaObservationCount": 3620,
+      "percentileInSource": 0.9565217391304348,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Chelidonium majus",
+      "group": "plant",
+      "koreaObservationCount": 3538,
+      "percentileInSource": 0.9531772575250836,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rubus crataegifolius",
+      "group": "plant",
+      "koreaObservationCount": 3532,
+      "percentileInSource": 0.9498327759197325,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Erigeron canadensis",
+      "group": "plant",
+      "koreaObservationCount": 3471,
+      "percentileInSource": 0.9464882943143813,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Quercus variabilis",
+      "group": "plant",
+      "koreaObservationCount": 3453,
+      "percentileInSource": 0.9431438127090301,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Oxalis corniculata",
+      "group": "plant",
+      "koreaObservationCount": 3443,
+      "percentileInSource": 0.939799331103679,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ambrosia artemisiifolia",
+      "group": "plant",
+      "koreaObservationCount": 3407,
+      "percentileInSource": 0.9364548494983278,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Smilax china",
+      "group": "plant",
+      "koreaObservationCount": 3358,
+      "percentileInSource": 0.9331103678929766,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Persicaria thunbergii",
+      "group": "plant",
+      "koreaObservationCount": 3341,
+      "percentileInSource": 0.9297658862876255,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Lespedeza maximowiczii",
+      "group": "plant",
+      "koreaObservationCount": 3330,
+      "percentileInSource": 0.9264214046822743,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Bidens frondosa",
+      "group": "plant",
+      "koreaObservationCount": 3232,
+      "percentileInSource": 0.9230769230769231,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Lysimachia clethroides",
+      "group": "plant",
+      "koreaObservationCount": 3227,
+      "percentileInSource": 0.919732441471572,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rumex crispus",
+      "group": "plant",
+      "koreaObservationCount": 3223,
+      "percentileInSource": 0.9163879598662208,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Callicarpa japonica",
+      "group": "plant",
+      "koreaObservationCount": 3201,
+      "percentileInSource": 0.9130434782608696,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ligustrum obtusifolium",
+      "group": "plant",
+      "koreaObservationCount": 3192,
+      "percentileInSource": 0.9096989966555185,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Clematis apiifolia",
+      "group": "plant",
+      "koreaObservationCount": 3184,
+      "percentileInSource": 0.9063545150501673,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Carex siderosticta",
+      "group": "plant",
+      "koreaObservationCount": 3140,
+      "percentileInSource": 0.903010033444816,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Viola albida",
+      "group": "plant",
+      "koreaObservationCount": 3138,
+      "percentileInSource": 0.8996655518394648,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Styrax japonicus",
+      "group": "plant",
+      "koreaObservationCount": 3057,
+      "percentileInSource": 0.8963210702341137,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Acer pseudosieboldianum",
+      "group": "plant",
+      "koreaObservationCount": 3057,
+      "percentileInSource": 0.8929765886287625,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cocculus orbiculatus",
+      "group": "plant",
+      "koreaObservationCount": 3052,
+      "percentileInSource": 0.8896321070234113,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Toxicodendron trichocarpum",
+      "group": "plant",
+      "koreaObservationCount": 2992,
+      "percentileInSource": 0.8862876254180602,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Brucea javanica",
+      "group": "plant",
+      "koreaObservationCount": 2976,
+      "percentileInSource": 0.882943143812709,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Paederia foetida",
+      "group": "plant",
+      "koreaObservationCount": 2943,
+      "percentileInSource": 0.8795986622073578,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Symplocos sawafutagi",
+      "group": "plant",
+      "koreaObservationCount": 2919,
+      "percentileInSource": 0.8762541806020067,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Fraxinus chinensis",
+      "group": "plant",
+      "koreaObservationCount": 2898,
+      "percentileInSource": 0.8729096989966555,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rosa multiflora",
+      "group": "plant",
+      "koreaObservationCount": 2876,
+      "percentileInSource": 0.8695652173913043,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Veronica persica",
+      "group": "plant",
+      "koreaObservationCount": 2867,
+      "percentileInSource": 0.8662207357859532,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ambrosia trifida",
+      "group": "plant",
+      "koreaObservationCount": 2846,
+      "percentileInSource": 0.862876254180602,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Parthenocissus tricuspidata",
+      "group": "plant",
+      "koreaObservationCount": 2813,
+      "percentileInSource": 0.8595317725752508,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Oenothera biennis",
+      "group": "plant",
+      "koreaObservationCount": 2804,
+      "percentileInSource": 0.8561872909698997,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Quercus serrata",
+      "group": "plant",
+      "koreaObservationCount": 2793,
+      "percentileInSource": 0.8528428093645485,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Agrimonia pilosa",
+      "group": "plant",
+      "koreaObservationCount": 2779,
+      "percentileInSource": 0.8494983277591973,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Euonymus alatus",
+      "group": "plant",
+      "koreaObservationCount": 2768,
+      "percentileInSource": 0.8461538461538461,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Dactylis glomerata",
+      "group": "plant",
+      "koreaObservationCount": 2761,
+      "percentileInSource": 0.842809364548495,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Lespedeza bicolor",
+      "group": "plant",
+      "koreaObservationCount": 2750,
+      "percentileInSource": 0.8394648829431438,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Symphyotrichum pilosum",
+      "group": "plant",
+      "koreaObservationCount": 2750,
+      "percentileInSource": 0.8361204013377926,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Disporum smilacinum",
+      "group": "plant",
+      "koreaObservationCount": 2737,
+      "percentileInSource": 0.8327759197324415,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Persicaria longiseta",
+      "group": "plant",
+      "koreaObservationCount": 2717,
+      "percentileInSource": 0.8294314381270903,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Plantago asiatica",
+      "group": "plant",
+      "koreaObservationCount": 2690,
+      "percentileInSource": 0.8260869565217391,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Akebia quinata",
+      "group": "plant",
+      "koreaObservationCount": 2684,
+      "percentileInSource": 0.822742474916388,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Clerodendrum trichotomum",
+      "group": "plant",
+      "koreaObservationCount": 2675,
+      "percentileInSource": 0.8193979933110368,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Rhododendron schlippenbachii",
+      "group": "plant",
+      "koreaObservationCount": 2661,
+      "percentileInSource": 0.8160535117056856,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Weigela subsessilis",
+      "group": "plant",
+      "koreaObservationCount": 2643,
+      "percentileInSource": 0.8127090301003345,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Styrax obassia",
+      "group": "plant",
+      "koreaObservationCount": 2626,
+      "percentileInSource": 0.8093645484949833,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Setaria viridis",
+      "group": "plant",
+      "koreaObservationCount": 2624,
+      "percentileInSource": 0.8060200668896321,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Galinsoga quadriradiata",
+      "group": "plant",
+      "koreaObservationCount": 2614,
+      "percentileInSource": 0.802675585284281,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Hypsipetes amaurotis",
+      "group": "bird",
+      "koreaObservationCount": 92362,
+      "percentileInSource": 1,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Passer montanus",
+      "group": "bird",
+      "koreaObservationCount": 90909,
+      "percentileInSource": 0.9942857142857143,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Streptopelia orientalis",
+      "group": "bird",
+      "koreaObservationCount": 76645,
+      "percentileInSource": 0.9885714285714285,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ardea cinerea",
+      "group": "bird",
+      "koreaObservationCount": 64929,
+      "percentileInSource": 0.9828571428571429,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Corvus macrorhynchos",
+      "group": "bird",
+      "koreaObservationCount": 56376,
+      "percentileInSource": 0.9771428571428571,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Pica serica",
+      "group": "bird",
+      "koreaObservationCount": 50400,
+      "percentileInSource": 0.9714285714285714,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Phoenicurus auroreus",
+      "group": "bird",
+      "koreaObservationCount": 49337,
+      "percentileInSource": 0.9657142857142857,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Larus crassirostris",
+      "group": "bird",
+      "koreaObservationCount": 45282,
+      "percentileInSource": 0.96,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Anas platyrhynchos",
+      "group": "bird",
+      "koreaObservationCount": 42823,
+      "percentileInSource": 0.9542857142857143,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Aegypius monachus",
+      "group": "bird",
+      "koreaObservationCount": 42354,
+      "percentileInSource": 0.9485714285714286,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Ardea alba",
+      "group": "bird",
+      "koreaObservationCount": 41854,
+      "percentileInSource": 0.9428571428571428,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Sinosuthora webbiana",
+      "group": "bird",
+      "koreaObservationCount": 38648,
+      "percentileInSource": 0.9371428571428572,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Parus cinereus",
+      "group": "bird",
+      "koreaObservationCount": 36178,
+      "percentileInSource": 0.9314285714285714,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Anas poecilorhyncha",
+      "group": "bird",
+      "koreaObservationCount": 35710,
+      "percentileInSource": 0.9257142857142857,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Poecile palustris",
+      "group": "bird",
+      "koreaObservationCount": 33759,
+      "percentileInSource": 0.92,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Parus major",
+      "group": "bird",
+      "koreaObservationCount": 33323,
+      "percentileInSource": 0.9142857142857143,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Emberiza elegans",
+      "group": "bird",
+      "koreaObservationCount": 31190,
+      "percentileInSource": 0.9085714285714286,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Anas zonorhyncha",
+      "group": "bird",
+      "koreaObservationCount": 30689,
+      "percentileInSource": 0.9028571428571428,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Motacilla alba",
+      "group": "bird",
+      "koreaObservationCount": 29502,
+      "percentileInSource": 0.8971428571428571,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Phalacrocorax carbo",
+      "group": "bird",
+      "koreaObservationCount": 27526,
+      "percentileInSource": 0.8914285714285715,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cyanopica cyanus",
+      "group": "bird",
+      "koreaObservationCount": 26191,
+      "percentileInSource": 0.8857142857142857,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Hirundo rustica",
+      "group": "bird",
+      "koreaObservationCount": 24895,
+      "percentileInSource": 0.88,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Egretta garzetta",
+      "group": "bird",
+      "koreaObservationCount": 24619,
+      "percentileInSource": 0.8742857142857143,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Phasianus colchicus",
+      "group": "bird",
+      "koreaObservationCount": 24254,
+      "percentileInSource": 0.8685714285714285,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Lanius bucephalus",
+      "group": "bird",
+      "koreaObservationCount": 23295,
+      "percentileInSource": 0.8628571428571429,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Chloris sinica",
+      "group": "bird",
+      "koreaObservationCount": 22727,
+      "percentileInSource": 0.8571428571428572,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Oriolus chinensis",
+      "group": "bird",
+      "koreaObservationCount": 21901,
+      "percentileInSource": 0.8514285714285714,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Dendrocopos major",
+      "group": "bird",
+      "koreaObservationCount": 21677,
+      "percentileInSource": 0.8457142857142858,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Aegithalos caudatus",
+      "group": "bird",
+      "koreaObservationCount": 21481,
+      "percentileInSource": 0.84,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Anas crecca",
+      "group": "bird",
+      "koreaObservationCount": 20908,
+      "percentileInSource": 0.8342857142857143,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Garrulus glandarius",
+      "group": "bird",
+      "koreaObservationCount": 20050,
+      "percentileInSource": 0.8285714285714285,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Yungipicus kizuki",
+      "group": "bird",
+      "koreaObservationCount": 19853,
+      "percentileInSource": 0.8228571428571428,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Picus canus",
+      "group": "bird",
+      "koreaObservationCount": 19211,
+      "percentileInSource": 0.8171428571428572,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Falco tinnunculus",
+      "group": "bird",
+      "koreaObservationCount": 19192,
+      "percentileInSource": 0.8114285714285714,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Cuculus canorus",
+      "group": "bird",
+      "koreaObservationCount": 16968,
+      "percentileInSource": 0.8057142857142857,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Fulica atra",
+      "group": "bird",
+      "koreaObservationCount": 16676,
+      "percentileInSource": 0.8,
+      "mustInclude": false,
+      "mustIncludeReason": null,
+      "selectionMethod": "mvp_pure_commonness_rank"
+    },
+    {
+      "sciName": "Amanita muscaria",
+      "group": "fungus",
+      "koreaObservationCount": 5,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "mustIncludeReason": "상징종 — 아이들에게 가장 널리 알려진 독버섯",
+      "selectionMethod": "safety_exception_despite_empty_group"
+    },
+    {
+      "sciName": "Rhabdophis tigrinus",
+      "group": "reptile",
+      "koreaObservationCount": 4709,
+      "percentileInSource": 1,
+      "mustInclude": true,
+      "mustIncludeReason": "안전 필수 — 국내 서식 독사(유혈목이)",
+      "selectionMethod": "safety_exception_despite_empty_group"
+    }
+  ]
+}

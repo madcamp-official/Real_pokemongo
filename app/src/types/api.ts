@@ -7,8 +7,8 @@
 // ─── 공통 ────────────────────────────────────────────────
 export type ID = string;
 
-/** 분류 그룹(도감 필터). '기타'는 위 3종에 속하지 않는 종. */
-export type TaxonGroup = '곤충' | '양서류' | '식물' | '기타';
+/** 분류 그룹(도감 필터). '기타'는 앞의 4종에 속하지 않는 종(균류·파충류 등). */
+export type TaxonGroup = '곤충' | '양서류' | '식물' | '조류' | '기타';
 
 // ─── F1. 온보딩 & 인증 (단일 사용자 계정) ─────────────────
 /** 계정 생성 전에는 인증 토큰이 없어 동의를 따로 제출할 수 없다 — 가입 요청에 함께 담는다. */
@@ -85,6 +85,11 @@ export interface SimilarSpecies {
   species_id: ID;
   name: string;
 }
+export interface QuizQuestion {
+  q: string;
+  options: string[];
+  answerIndex: number;
+}
 export interface SpeciesCard {
   species_id: ID;
   name: string;
@@ -95,6 +100,8 @@ export interface SpeciesCard {
   active_time: string; // 예: "낮", "밤"
   rarity: string; // 예: "흔해요", "가끔 보여요", "귀해요"
   fun_fact: string;
+  observe_points: string[];
+  quiz: QuizQuestion[];
   similar_species: SimilarSpecies[];
   is_dangerous: boolean;
   safety_notes?: string; // 위험 생물일 때 최상단 고정 노출 (F6)

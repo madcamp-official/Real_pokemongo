@@ -12,6 +12,7 @@ import type {
   TaxonGroup,
   Rarity,
   Habitat,
+  ActiveTime,
   CollectionEntry,
   User,
   Creature,
@@ -27,21 +28,21 @@ import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
 import { BOND_MAX } from "../core/garden/bondRules.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
-/** `app/src/types/api.ts`의 TaxonGroup — 우리 8종보다 좁은 4종 분류. */
-export type ApiTaxonGroup = "곤충" | "양서류" | "식물" | "기타";
+/** `app/src/types/api.ts`의 TaxonGroup — 도감 필터 UI가 쓰는 5종 분류. */
+export type ApiTaxonGroup = "곤충" | "양서류" | "식물" | "조류" | "기타";
 
 const GROUP_KOREAN: Record<TaxonGroup, ApiTaxonGroup> = {
   insect: "곤충",
   amphibian: "양서류",
   plant: "식물",
+  bird: "조류",
   fungus: "기타",
-  bird: "기타",
   reptile: "기타",
   mammal: "기타",
   other: "기타",
 };
 
-/** 우리 8종 TaxonGroup → app의 4종 한글 분류. 매핑 안 되는 값은 전부 "기타"로 수렴. */
+/** 도메인 TaxonGroup(8종) → app의 5종 한글 분류. 매핑 안 되는 값은 "기타"로 수렴. */
 export function taxonGroupToKorean(group: TaxonGroup): ApiTaxonGroup {
   return GROUP_KOREAN[group];
 }
@@ -71,10 +72,26 @@ export function habitatTagsToDisplay(tags: Habitat[]): string {
   return tags.map((t) => HABITAT_KOREAN[t]).join("·");
 }
 
+const ACTIVE_TIME_KOREAN: Record<ActiveTime, string> = {
+  day: "낮",
+  night: "밤",
+  both: "낮·밤",
+};
+
+/** app/src/screens/dex/SpeciesCardScreen.tsx의 ACTIVE_TIME_ICON 키와 동일한 문구여야 함. */
+export function activeTimeToKorean(activeTime: ActiveTime | undefined): string {
+  return activeTime ? ACTIVE_TIME_KOREAN[activeTime] : "";
+}
+
 // ── F6. 종 카드 ────────────────────────────────────────────────────────
 export interface ApiSimilarSpecies {
   species_id: string;
   name: string;
+}
+export interface ApiQuizQuestion {
+  q: string;
+  options: string[];
+  answerIndex: number;
 }
 export interface ApiSpeciesCard {
   species_id: string;
@@ -86,6 +103,8 @@ export interface ApiSpeciesCard {
   active_time: string;
   rarity: string;
   fun_fact: string;
+  observe_points: string[];
+  quiz: ApiQuizQuestion[];
   similar_species: ApiSimilarSpecies[];
   is_dangerous: boolean;
   safety_notes?: string;
@@ -95,6 +114,9 @@ export function taxonToSpeciesCard(
   taxon: Taxon,
   content: SpeciesContent | null,
   safety: SafetyNotice | null,
+  // confusionPairs.ts 기반으로 라우트가 미리 조회해둔 혼동 종(Taxon). DB 조회는 라우트가
+  // 하고 이 함수는 순수 함수로 유지한다(파일 상단 원칙). 없으면 빈 배열.
+  similarTaxa: Taxon[] = [],
 ): ApiSpeciesCard {
   return {
     species_id: taxon.id as string,
@@ -102,17 +124,16 @@ export function taxonToSpeciesCard(
     scientific_name: taxon.sciName,
     group: taxonGroupToKorean(taxon.group),
     habitat: habitatTagsToDisplay(taxon.habitatTags),
-    // size/active_time: 지금 도메인(Taxon)에 아예 없는 필드. 없는 데이터를 지어내지 않고
-    // 빈 문자열로 정직하게 남긴다 — 종 목록 확장 작업(국가생물종지식정보시스템 연동)에서 채울 것.
-    size: "",
-    active_time: "",
+    // 값이 없으면(콘텐츠 미비 종) 지어내지 않고 빈 문자열로 정직하게 남긴다.
+    size: taxon.sizeDescription ?? "",
+    active_time: activeTimeToKorean(taxon.activeTime),
     rarity: rarityToKorean(taxon.rarity),
     fun_fact: content?.funFact ?? "",
-    // SpeciesContent.similarSpecies 는 이름 문자열뿐 실제 taxonId 연결이 없다.
-    // 임시로 이름 자체를 species_id 로 사용(추후 실제 Taxon 연결 필요).
-    similar_species: (content?.similarSpecies ?? []).map((name) => ({
-      species_id: name,
-      name,
+    observe_points: content?.observePoints ?? [],
+    quiz: content?.quiz ?? [],
+    similar_species: similarTaxa.map((t) => ({
+      species_id: t.id as string,
+      name: t.korName || t.sciName,
     })),
     is_dangerous: safety !== null,
     safety_notes: safety?.message,
