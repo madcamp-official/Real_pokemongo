@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -12,10 +12,11 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { useQuery } from '@tanstack/react-query';
 import { ScreenHeader } from '@/components/nav/ScreenHeader';
 import { useAuthStore, GUEST_SIGHTING_LIMIT } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
-import { fetchRestoreBundle, deleteAccount } from '@/api/account';
+import { fetchRestoreBundle, deleteAccount, fetchPrivacySettings, updatePrivacySettings } from '@/api/account';
 import { colors } from '@/theme/colors';
 import type { RootStackParamList } from '@/navigation/types';
 
@@ -40,6 +41,39 @@ export default function SettingsScreen() {
 
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [savingPrivacy, setSavingPrivacy] = useState(false);
+
+  // 로컬 저장소(zustand)는 오프라인 폴백/즉각 표시용일 뿐, 진짜 값은 서버(User.
+  // locationStorageEnabled, ConsentRecord.photo)에 있다 — 화면 진입 시 서버 값으로
+  // 맞춰서 "기기를 바꾸거나 재설치해도 설정이 그대로"가 실제로 보장되게 한다.
+  const privacyQuery = useQuery({
+    queryKey: ['account', 'privacy-settings'],
+    queryFn: fetchPrivacySettings,
+  });
+  useEffect(() => {
+    if (!privacyQuery.data) return;
+    setLocationCollectionEnabled(privacyQuery.data.location);
+    setPhotoCollectionEnabled(privacyQuery.data.photo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [privacyQuery.data]);
+
+  const onChangePrivacy = async (next: { location: boolean; photo: boolean }) => {
+    if (savingPrivacy) return;
+    const prev = { location: locationCollectionEnabled, photo: photoCollectionEnabled };
+    // 낙관적 갱신 — 토글은 누르자마자 바뀌어야 자연스럽고, 실패는 드물다(실패 시 아래서 되돌림).
+    setLocationCollectionEnabled(next.location);
+    setPhotoCollectionEnabled(next.photo);
+    setSavingPrivacy(true);
+    try {
+      await updatePrivacySettings(next);
+    } catch {
+      setLocationCollectionEnabled(prev.location);
+      setPhotoCollectionEnabled(prev.photo);
+      Alert.alert('설정 저장 실패', '잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSavingPrivacy(false);
+    }
+  };
 
   const navigation = useNavigation();
   const goToConvert = () =>
@@ -138,13 +172,15 @@ export default function SettingsScreen() {
           label="위치정보 수집"
           desc="촬영 시 위치를 함께 기록해요 (흐릿하게 처리)"
           value={locationCollectionEnabled}
-          onChange={setLocationCollectionEnabled}
+          onChange={(v) => void onChangePrivacy({ location: v, photo: photoCollectionEnabled })}
+          disabled={savingPrivacy || privacyQuery.isLoading}
         />
         <ToggleRow
           label="사진 수집·이용"
-          desc="생물 동정을 위해 서버로 사진을 전송해요"
+          desc="저품질 사진을 촬영 품질 개선 학습에 사용해요"
           value={photoCollectionEnabled}
-          onChange={setPhotoCollectionEnabled}
+          onChange={(v) => void onChangePrivacy({ location: locationCollectionEnabled, photo: v })}
+          disabled={savingPrivacy || privacyQuery.isLoading}
         />
       </Section>
 
@@ -206,11 +242,13 @@ function ToggleRow({
   desc,
   value,
   onChange,
+  disabled,
 }: {
   label: string;
   desc?: string;
   value: boolean;
   onChange: (v: boolean) => void;
+  disabled?: boolean;
 }) {
   return (
     <View style={styles.toggleRow}>
@@ -221,6 +259,7 @@ function ToggleRow({
       <Switch
         value={value}
         onValueChange={onChange}
+        disabled={disabled}
         trackColor={{ true: colors.primary, false: colors.border }}
         thumbColor="#fff"
       />

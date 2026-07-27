@@ -4,6 +4,7 @@ import { persistPhoto } from '@/services/photoStorage';
 import { requestLocationAndGet } from '@/services/location';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { useAuthStore } from '@/store/authStore';
+import { useSettingsStore } from '@/store/settingsStore';
 
 /** 연속 촬영 간격. 너무 짧으면 카메라가 못 따라오고 같은 장면만 쌓인다. */
 const BURST_INTERVAL_MS = 260;
@@ -16,7 +17,8 @@ const MAX_FRAMES = 8;
  * 셔터를 누르는 동안 계속 찍고 떼면 끝난다 — 짧게 톡 누르면 1장(단일),
  * 꾹 누르고 있으면 여러 장(연속)이 자연스럽게 이어진다. 별도 모드 토글이 없다.
  * 담긴 프레임들은 한 건의 sighting 으로 묶여 업로드 큐에 올라간다.
- * 위치는 항상 첨부한다(발견 장소가 없으면 탐험 지도에 핀이 남지 않는다).
+ * 위치는 설정(F18) "위치정보 수집"이 켜져 있을 때만 첨부한다 — 꺼져 있으면 지도에
+ * 핀이 안 남을 뿐 촬영·동정 자체는 그대로 된다(위치 실패와 동일하게 취급).
  */
 export function useCapture(cameraRef: RefObject<CameraView | null>) {
   /** 셔터를 누르고 있는 동안 true. */
@@ -32,6 +34,7 @@ export function useCapture(cameraRef: RefObject<CameraView | null>) {
   const enqueue = useUploadQueue((s) => s.enqueue);
   const isGuest = useAuthStore((s) => s.isGuest);
   const incrementGuestSighting = useAuthStore((s) => s.incrementGuestSighting);
+  const locationCollectionEnabled = useSettingsStore((s) => s.locationCollectionEnabled);
 
   const runLoop = useCallback(async () => {
     while (holdingRef.current && framesRef.current.length < MAX_FRAMES) {
@@ -78,8 +81,11 @@ export function useCapture(cameraRef: RefObject<CameraView | null>) {
       setFrameCount(0);
       if (frames.length === 0) return null;
 
-      // 위치 실패는 무시하고 촬영은 살린다(핀만 안 남는다).
-      const coord = await requestLocationAndGet().catch(() => null);
+      // 위치정보 수집이 꺼져 있으면 권한 요청조차 하지 않는다. 실패해도(권한 거부 등)
+      // 무시하고 촬영은 살린다 — 어느 쪽이든 핀만 안 남을 뿐이다.
+      const coord = locationCollectionEnabled
+        ? await requestLocationAndGet().catch(() => null)
+        : null;
       const uploadId = enqueue({
         frameUris: frames,
         hasLocation: !!coord,
@@ -91,7 +97,7 @@ export function useCapture(cameraRef: RefObject<CameraView | null>) {
     } finally {
       setIsFinishing(false);
     }
-  }, [enqueue, isGuest, incrementGuestSighting]);
+  }, [enqueue, isGuest, incrementGuestSighting, locationCollectionEnabled]);
 
   return { isHolding, isFinishing, frameCount, startCapture, endCapture };
 }
