@@ -15,6 +15,7 @@ import { QuizQuestion } from '@/components/species/QuizQuestion';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
 import { CreatureArt } from '@/components/species/CreatureArt';
+import { PhotoGalleryBlock } from '@/components/species/PhotoGalleryBlock';
 import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SpeciesCard'>;
@@ -142,6 +143,9 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             </View>
           )}
         </View>
+
+        <View style={styles.gallerySpacer} />
+        <PhotoGalleryBlock speciesId={card.species_id} />
       </ScrollView>
     </View>
   );
@@ -181,6 +185,7 @@ const styles = StyleSheet.create({
   heroEmoji: { fontSize: 84 },
 
   body: { paddingHorizontal: 20, paddingTop: 20, gap: 16 },
+  gallerySpacer: { height: 20 },
   safetyBanner: {
     backgroundColor: colors.dangerBg,
     borderRadius: 16,

@@ -107,6 +107,14 @@ export interface SpeciesCard {
   safety_notes?: string; // 위험 생물일 때 최상단 고정 노출 (F6)
 }
 
+/** F6 종 카드 하단 "지금까지 찍은 사진" 갤러리 항목. */
+export interface SpeciesPhoto {
+  observation_id: ID;
+  /** API base URL을 붙여야 하는 상대 경로(`/media/:observationId`). */
+  url: string;
+  taken_at: string; // ISO8601
+}
+
 // ─── F16. 홈 가든 ───────────────────────────────────────
 export type TileType = '잔디' | '물웅덩이' | '흙' | '돌' | '꽃밭';
 

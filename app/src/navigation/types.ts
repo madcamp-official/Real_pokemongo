@@ -27,4 +27,5 @@ export type RootStackParamList = {
   // ── 상세 (F4/F6) ─────────────────────────────────────
   SpeciesCard: { speciesId: string };
   IdentifyResult: { uploadId: string };
+  PhotoViewer: { speciesId: string; initialIndex: number };
 };

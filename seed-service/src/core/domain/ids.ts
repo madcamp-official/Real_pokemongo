@@ -13,6 +13,7 @@ import type {
 
 export const newUserId = () => randomUUID() as UserId;
 export const newObservationId = () => randomUUID() as ObservationId;
+export const asObservationId = (s: string) => s as ObservationId;
 export const newTaxonId = () => randomUUID() as TaxonId;
 export const newQuestId = () => randomUUID() as QuestId;
 export const newBadgeId = () => randomUUID() as BadgeId;

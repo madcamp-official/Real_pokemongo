@@ -9,12 +9,14 @@
  * 정화(sanitizeImage)를 거친 바이트만 받는다 — 호출부가 SanitizedImage 타입을 넘기게
  * 강제해서, 원본(EXIF 포함) 바이트가 실수로 저장되는 걸 타입 수준에서 막는다.
  */
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { asMediaRef } from "../domain/ids.js";
 import type { MediaRef } from "../domain/types.js";
 import type { SanitizedImage } from "./MediaSanitizer.js";
+
+const LOCAL_PREFIX = "local://";
 
 export class LocalDiskMediaStore {
   constructor(private readonly baseDir: string) {}
@@ -26,6 +28,21 @@ export class LocalDiskMediaStore {
     await writeFile(join(this.baseDir, filename), image);
     // 이 참조는 서버 내부에서만 의미 있는 불투명 문자열이다(클라이언트는 해석하지 않음).
     return asMediaRef(`local://${filename}`);
+  }
+
+  /**
+   * F6 도감 상세의 "지금까지 찍은 사진" 갤러리용 — save()가 돌려준 불투명 참조로
+   * 저장된 바이트를 다시 읽어온다. training_samples/ 등 save()가 만들지 않은 경로는
+   * 애초에 이 참조 형식(local://)으로 가리킬 수 없다.
+   */
+  async read(ref: MediaRef): Promise<Uint8Array | null> {
+    if (!ref.startsWith(LOCAL_PREFIX)) return null;
+    const filename = ref.slice(LOCAL_PREFIX.length);
+    try {
+      return await readFile(join(this.baseDir, filename));
+    } catch {
+      return null;
+    }
   }
 
   /**

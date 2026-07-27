@@ -54,6 +54,18 @@ export function sanitizeImage(bytes: Uint8Array): SanitizeResult {
   throw new UnsupportedImageFormatError();
 }
 
+/**
+ * 저장된 이미지의 실제 포맷을 매직 바이트로 판별한다(Content-Type 응답용).
+ * LocalDiskMediaStore가 확장자를 구분하지 않고 전부 `.bin`으로 저장하기 때문에,
+ * 서빙 시점에 이 함수로 다시 판별해야 한다 — sanitizeImage()가 이미 JPEG/PNG만
+ * 통과시키므로 저장된 바이트는 항상 둘 중 하나다.
+ */
+export function sniffImageFormat(bytes: Uint8Array): "jpeg" | "png" | null {
+  if (isJpeg(bytes)) return "jpeg";
+  if (isPng(bytes)) return "png";
+  return null;
+}
+
 /** 여러 장 일괄 정화. 하나라도 미지 포맷이면 전체 거부(부분 통과 없음). */
 export function sanitizeImages(images: Uint8Array[]): {
   images: SanitizedImage[];

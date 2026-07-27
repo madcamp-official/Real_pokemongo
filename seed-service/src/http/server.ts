@@ -22,6 +22,7 @@ import { registerCreatureRoutes } from "./routes/creatures.routes.js";
 import { registerGardenRoutes } from "./routes/garden.routes.js";
 import { registerVisionRoutes, RateLimitedError } from "./routes/vision.routes.js";
 import { registerMapRoutes } from "./routes/map.routes.js";
+import { registerPhotoRoutes } from "./routes/photos.routes.js";
 
 /**
  * `config.auth.jwtSecret`이 비어있으면(개발 환경) 부팅 시 임의 시크릿을 생성한다.
@@ -48,7 +49,11 @@ function resolveJwtSecret(app: App): string {
 export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   const server = Fastify({ logger: false });
 
-  await server.register(fastifyJwt, { secret: resolveJwtSecret(app) });
+  // 한 번만 계산해서 fastify-jwt 등록과 사진 단기 토큰(mediaToken.ts) 서명에 동일하게
+  // 쓴다 — jwtSecret이 비어있어 여기서 임의 시크릿을 생성한 경우, app.config를 다시
+  // 읽으면 이 값을 못 찾으므로 반드시 이 변수를 그대로 넘겨야 한다.
+  const jwtSecret = resolveJwtSecret(app);
+  await server.register(fastifyJwt, { secret: jwtSecret });
   // limits.fileSize를 안 주면 Fastify 기본 bodyLimit(1MB)을 그대로 물려받는다 — 실제
   // 폰 카메라 사진(quality 0.7로 압축해도 보통 1MB 초과)이 전부 413으로 거부되는 걸
   // 실기기 테스트에서 발견했다. 버스트(최대 3장) 중 가장 큰 프레임도 넉넉히 통과하도록
@@ -71,6 +76,7 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   registerGardenRoutes(server, app, authenticate);
   registerVisionRoutes(server, app);
   registerMapRoutes(server, app, authenticate);
+  registerPhotoRoutes(server, app, authenticate, jwtSecret);
 
   // 전역 에러 매핑 — core/auth/Authorization.ts의 원칙("소유권 없음/미존재는 같은 404,
   // 자원 존재 여부를 누설하지 않는다")을 HTTP 계층에서도 그대로 지킨다. 이걸 안 걸면

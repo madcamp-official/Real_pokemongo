@@ -12,6 +12,7 @@ import LoginScreen from '@/screens/onboarding/LoginScreen';
 import ConsentScreen from '@/screens/onboarding/ConsentScreen';
 import SignupScreen from '@/screens/onboarding/SignupScreen';
 import SpeciesCardScreen from '@/screens/dex/SpeciesCardScreen';
+import PhotoViewerScreen from '@/screens/dex/PhotoViewerScreen';
 import IdentifyResultScreen from '@/screens/identify/IdentifyResultScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -97,6 +98,11 @@ export function RootNavigator() {
         <Stack.Screen
           name="IdentifyResult"
           component={IdentifyResultScreen}
+          options={{ headerShown: false, presentation: 'fullScreenModal' }}
+        />
+        <Stack.Screen
+          name="PhotoViewer"
+          component={PhotoViewerScreen}
           options={{ headerShown: false, presentation: 'fullScreenModal' }}
         />
       </Stack.Navigator>
