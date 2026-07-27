@@ -14,6 +14,7 @@ import { queryClient } from '@/api/queryClient';
 import { useGardenStore } from '@/store/gardenStore';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
+import { CreatureArt } from '@/components/species/CreatureArt';
 import { BondGauge } from '@/components/garden/BondGauge';
 import type { CreatureStatus } from '@/types/api';
 
@@ -138,7 +139,7 @@ export function CreatureStatusSheet({
               {visual && (
                 <View style={styles.thumbWrap}>
                   <View style={[styles.thumb, { backgroundColor: getPastel(visual.pastel) }]}>
-                    <Text style={styles.thumbEmoji}>{visual.emoji}</Text>
+                    <CreatureArt speciesId={speciesId as string} size={48} />
                   </View>
                   {isBestFriend && (
                     <View style={styles.bestFriendBadge}>

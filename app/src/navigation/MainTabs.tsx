@@ -1,4 +1,6 @@
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { useEffect } from 'react';
+import * as ScreenOrientation from 'expo-screen-orientation';
 import type { RootTabParamList } from '@/navigation/types';
 import CameraScreen from '@/screens/CameraScreen';
 import DexScreen from '@/screens/DexScreen';
@@ -18,6 +20,10 @@ const Tab = createBottomTabNavigator<RootTabParamList>();
  * 배치 등)가 보존되고, 하드웨어 뒤로가기가 항상 지도로 돌아오게 만들 수 있다.
  */
 export function MainTabs() {
+  useEffect(() => {
+    void ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
+  }, []);
+
   return (
     <Tab.Navigator
       initialRouteName="Map"
