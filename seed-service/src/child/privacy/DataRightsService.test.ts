@@ -40,7 +40,7 @@ async function observe(app: App, ctx: AuthContext, sci: string, kor: string) {
 
 async function seedUserWithData(app: App, ctx: AuthContext) {
   await observe(app, ctx, "Taraxacum officinale", "민들레");
-  await observe(app, ctx, "Forsythia koreana", "개나리");
+  await observe(app, ctx, "Commelina communis", "닭의장풀");
   // F16 홈가든: 개체가 이미 생겼으니(위 관찰들로 자동 생성) 정원에도 배치해 저장소를 채운다.
   const creatures = await app.repos.creatures.listByUser(ctx.userId);
   await app.repos.garden.saveLayout(ctx.userId, {

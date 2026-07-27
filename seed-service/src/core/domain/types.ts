@@ -30,12 +30,17 @@ export type CreatureId = Brand<string, "CreatureId">;
 // 공통 열거형
 // ---------------------------------------------------------------------------
 
-/** 동정 대상 생물군. MVP는 식물·곤충 중심(명세서 §12: 새/양서류/음성동정 제외). */
+/**
+ * 동정 대상 생물군. 2026-07-27 species-pool 2단계 MVP(82종)부터 plant/insect/fungus/
+ * bird/reptile을 실제로 다룬다(BioClipProvider.supports와 동기화 유지). amphibian/
+ * mammal/other는 스키마상 존재하되 아직 종 데이터가 비어 있어 라우팅돼도 결과가 없다
+ * (research/species-pool/step2-embedding-selection/README.md 참고).
+ */
 export type TaxonGroup =
   | "plant"
   | "insect"
   | "fungus"
-  | "bird" // 스키마상 존재하되 MVP 파이프라인에서는 라우팅 제외
+  | "bird"
   | "amphibian"
   | "reptile"
   | "mammal"

@@ -133,6 +133,48 @@ test("unknown 확신: 좌절 없이 재촬영을 안내하고, 도감/퀘스트 
   assert.match(out.childMessage, /다시|모르겠/);
 });
 
+test("조건 2(혼동 종): high 확신이어도 알려진 혼동 쌍이고 margin이 작으면 medium으로 물러난다", async () => {
+  // Pieris rapae/Pieris melete(배추흰나비/큰배추흰나비)는 confusionPairs.ts에 등록된 실제 혼동 쌍.
+  const { gateway, mock } = await makeGateway([
+    taxon({ id: "a", sciName: "Pieris rapae", korName: "배추흰나비", group: "insect" }),
+    taxon({ id: "b", sciName: "Pieris melete", korName: "큰배추흰나비", group: "insect" }),
+  ]);
+  mock.enqueue([
+    { scientificName: "Pieris rapae", rank: "species", confidence: 0.9 },
+    { scientificName: "Pieris melete", rank: "species", confidence: 0.87 }, // margin=0.03 < 0.05
+  ]);
+  const out = await gateway.identify({ images: IMG, groupHint: "insect" });
+  assert.equal(out.tier, "medium", "top1/top2가 근소한 혼동 쌍이면 단정하면 안 됨");
+  assert.ok(out.candidates.length >= 2);
+});
+
+test("조건 2(혼동 종): 혼동 쌍이어도 top1이 압도적이면(margin 충분) 그대로 high 유지", async () => {
+  const { gateway, mock } = await makeGateway([
+    taxon({ id: "a", sciName: "Pieris rapae", korName: "배추흰나비", group: "insect" }),
+    taxon({ id: "b", sciName: "Pieris melete", korName: "큰배추흰나비", group: "insect" }),
+  ]);
+  mock.enqueue([
+    { scientificName: "Pieris rapae", rank: "species", confidence: 0.98 },
+    { scientificName: "Pieris melete", rank: "species", confidence: 0.86 }, // margin=0.12 >= 0.05
+  ]);
+  const out = await gateway.identify({ images: IMG, groupHint: "insect" });
+  assert.equal(out.tier, "high", "margin이 충분히 크면 혼동 쌍이어도 단정해야 함");
+  assert.equal(out.top?.displayName, "배추흰나비");
+});
+
+test("조건 2(혼동 종): 알려지지 않은 쌍은 margin이 작아도 강등되지 않는다(오탐 방지)", async () => {
+  const { gateway, mock } = await makeGateway([
+    taxon({ id: "a", sciName: "Taraxacum officinale", korName: "서양민들레" }),
+    taxon({ id: "b", sciName: "Apis mellifera", korName: "양봉꿀벌", group: "insect" }),
+  ]);
+  mock.enqueue([
+    { scientificName: "Taraxacum officinale", rank: "species", confidence: 0.9 },
+    { scientificName: "Apis mellifera", rank: "species", confidence: 0.87 }, // margin=0.03, 혼동 쌍 아님
+  ]);
+  const out = await gateway.identify({ images: IMG, groupHint: "plant" });
+  assert.equal(out.tier, "high", "혼동 쌍 목록에 없는 종끼리는 margin이 작아도 강등하면 안 됨");
+});
+
 test("프로바이더가 예외를 던져도 안전하게 unknown으로 마무리한다", async () => {
   const repo = new InMemoryTaxonRepo();
   const throwing = new MockProvider();

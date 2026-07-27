@@ -1,0 +1,669 @@
+{
+  "plant::Toxicodendron": [
+    "Toxicodendron vernicifluum",
+    "Toxicodendron trichocarpum"
+  ],
+  "fungus::Amanita": [
+    "Amanita muscaria",
+    "Amanita hemibapha",
+    "Amanita virgineoides",
+    "Amanita pantherina",
+    "Amanita pseudoporphyria",
+    "Amanita vaginata",
+    "Amanita rubescens",
+    "Amanita virosa",
+    "Amanita spissacea",
+    "Amanita volvata",
+    "Amanita fulva",
+    "Amanita longistriata",
+    "Amanita rufoferruginea",
+    "Amanita farinosa",
+    "Amanita citrina",
+    "Amanita javanica",
+    "Amanita abrupta",
+    "Amanita gymnopus"
+  ],
+  "insect::Vespa": [
+    "Vespa mandarinia",
+    "Vespa crabro"
+  ],
+  "plant::Lindera": [
+    "Lindera obtusiloba",
+    "Lindera erythrocarpa"
+  ],
+  "fungus::Trametes": [
+    "Trametes versicolor",
+    "Trametes coccinea",
+    "Trametes vernicipes",
+    "Trametes hirsuta",
+    "Trametes cinnabarina"
+  ],
+  "other::Semisulcospira": [
+    "Semisulcospira libertina",
+    "Semisulcospira forticosta",
+    "Semisulcospira gottschei",
+    "Semisulcospira coreana"
+  ],
+  "other::Neocaridina": [
+    "Neocaridina denticulata",
+    "Neocaridina davidi"
+  ],
+  "other::Rhinogobius": [
+    "Rhinogobius brunneus",
+    "Rhinogobius giurinus"
+  ],
+  "other::Oryzias": [
+    "Oryzias sinensis",
+    "Oryzias latipes"
+  ],
+  "other::Liobagrus": [
+    "Liobagrus mediadiposalis",
+    "Liobagrus andersoni",
+    "Liobagrus somjinensis"
+  ],
+  "other::Oncorhynchus": [
+    "Oncorhynchus keta",
+    "Oncorhynchus masou"
+  ],
+  "other::Takifugu": [
+    "Takifugu niphobles",
+    "Takifugu alboplumbeus",
+    "Takifugu obscurus"
+  ],
+  "plant::Erigeron": [
+    "Erigeron annuus",
+    "Erigeron canadensis"
+  ],
+  "plant::Quercus": [
+    "Quercus mongolica",
+    "Quercus variabilis",
+    "Quercus serrata",
+    "Quercus aliena",
+    "Quercus dentata",
+    "Quercus acutissima"
+  ],
+  "insect::Pieris": [
+    "Pieris rapae",
+    "Pieris melete",
+    "Pieris canidia"
+  ],
+  "plant::Pinus": [
+    "Pinus densiflora",
+    "Pinus thunbergii"
+  ],
+  "fungus::Ganoderma": [
+    "Ganoderma lucidum",
+    "Ganoderma applanatum"
+  ],
+  "other::Argiope": [
+    "Argiope bruennichi",
+    "Argiope minuta",
+    "Argiope amoena"
+  ],
+  "insect::Baetis": [
+    "Baetis fuscatus",
+    "Baetis thermicus",
+    "Baetis ursinus"
+  ],
+  "bird::Ardea": [
+    "Ardea cinerea",
+    "Ardea alba",
+    "Ardea modesta"
+  ],
+  "fungus::Hypholoma": [
+    "Hypholoma fasciculare",
+    "Hypholoma lateritium"
+  ],
+  "plant::Rhododendron": [
+    "Rhododendron mucronulatum",
+    "Rhododendron schlippenbachii"
+  ],
+  "other::Odontobutis": [
+    "Odontobutis platycephala",
+    "Odontobutis interrupta"
+  ],
+  "insect::Papilio": [
+    "Papilio xuthus",
+    "Papilio bianor",
+    "Papilio macilentus"
+  ],
+  "fungus::Phallus": [
+    "Phallus luteus",
+    "Phallus rugulosus",
+    "Phallus impudicus",
+    "Phallus indusiatus"
+  ],
+  "other::Carassius": [
+    "Carassius auratus",
+    "Carassius cuvieri"
+  ],
+  "plant::Trifolium": [
+    "Trifolium repens",
+    "Trifolium pratense"
+  ],
+  "fungus::Suillus": [
+    "Suillus bovinus",
+    "Suillus granulatus"
+  ],
+  "bird::Larus": [
+    "Larus crassirostris",
+    "Larus vegae"
+  ],
+  "insect::Epeorus": [
+    "Epeorus pellucidus",
+    "Epeorus nipponicus",
+    "Epeorus curvatulus"
+  ],
+  "bird::Anas": [
+    "Anas platyrhynchos",
+    "Anas poecilorhyncha",
+    "Anas zonorhyncha",
+    "Anas crecca",
+    "Anas acuta"
+  ],
+  "insect::Ecdyonurus": [
+    "Ecdyonurus levis",
+    "Ecdyonurus kibunensis"
+  ],
+  "plant::Rubus": [
+    "Rubus crataegifolius",
+    "Rubus parvifolius",
+    "Rubus pungens"
+  ],
+  "insect::Neptis": [
+    "Neptis sappho",
+    "Neptis pryeri"
+  ],
+  "other::Nipponocypris": [
+    "Nipponocypris koreanus",
+    "Nipponocypris temminckii"
+  ],
+  "other::Coreoperca": [
+    "Coreoperca herzi",
+    "Coreoperca kawamebari"
+  ],
+  "plant::Ambrosia": [
+    "Ambrosia artemisiifolia",
+    "Ambrosia trifida"
+  ],
+  "plant::Smilax": [
+    "Smilax china",
+    "Smilax sieboldii",
+    "Smilax nipponica"
+  ],
+  "bird::Parus": [
+    "Parus cinereus",
+    "Parus major",
+    "Parus varius"
+  ],
+  "plant::Persicaria": [
+    "Persicaria thunbergii",
+    "Persicaria longiseta",
+    "Persicaria senticosa",
+    "Persicaria filiformis",
+    "Persicaria sagittata",
+    "Persicaria perfoliata"
+  ],
+  "reptile::Gloydius": [
+    "Gloydius ussuriensis",
+    "Gloydius intermedius"
+  ],
+  "fungus::Cantharellus": [
+    "Cantharellus cibarius",
+    "Cantharellus cinnabarinus",
+    "Cantharellus minor"
+  ],
+  "plant::Lespedeza": [
+    "Lespedeza maximowiczii",
+    "Lespedeza bicolor",
+    "Lespedeza cuneata",
+    "Lespedeza cyrtobotrya"
+  ],
+  "fungus::Stereum": [
+    "Stereum ostrea",
+    "Stereum hirsutum",
+    "Stereum subtomentosum"
+  ],
+  "plant::Bidens": [
+    "Bidens frondosa",
+    "Bidens bipinnata"
+  ],
+  "insect::Cletus": [
+    "Cletus schmidti",
+    "Cletus punctiger"
+  ],
+  "fungus::Auricularia": [
+    "Auricularia nigricans",
+    "Auricularia auricula-judae"
+  ],
+  "bird::Poecile": [
+    "Poecile palustris",
+    "Poecile varius"
+  ],
+  "plant::Rumex": [
+    "Rumex crispus",
+    "Rumex acetosella"
+  ],
+  "other::Misgurnus": [
+    "Misgurnus anguillicaudatus",
+    "Misgurnus mizolepis"
+  ],
+  "other::Neoscona": [
+    "Neoscona scylloides",
+    "Neoscona mellotteei",
+    "Neoscona scylla",
+    "Neoscona adianta",
+    "Neoscona nautica"
+  ],
+  "fungus::Laccaria": [
+    "Laccaria laccata",
+    "Laccaria vinaceoavellanea"
+  ],
+  "bird::Emberiza": [
+    "Emberiza elegans",
+    "Emberiza rustica",
+    "Emberiza cioides",
+    "Emberiza spodocephala"
+  ],
+  "plant::Clematis": [
+    "Clematis apiifolia",
+    "Clematis terniflora"
+  ],
+  "plant::Carex": [
+    "Carex siderosticta",
+    "Carex lanceolata"
+  ],
+  "insect::Ephemera": [
+    "Ephemera orientalis",
+    "Ephemera strigata"
+  ],
+  "plant::Viola": [
+    "Viola albida",
+    "Viola mandshurica",
+    "Viola acuminata",
+    "Viola rossii"
+  ],
+  "other::Cipangopaludina": [
+    "Cipangopaludina malleata",
+    "Cipangopaludina japonica"
+  ],
+  "bird::Motacilla": [
+    "Motacilla alba",
+    "Motacilla cinerea",
+    "Motacilla grandis"
+  ],
+  "plant::Styrax": [
+    "Styrax japonicus",
+    "Styrax obassia"
+  ],
+  "fungus::Pleurotus": [
+    "Pleurotus ostreatus",
+    "Pleurotus pulmonarius"
+  ],
+  "plant::Acer": [
+    "Acer pseudosieboldianum",
+    "Acer tataricum",
+    "Acer pictum"
+  ],
+  "bird::Phalacrocorax": [
+    "Phalacrocorax carbo",
+    "Phalacrocorax capillatus"
+  ],
+  "fungus::Marasmius": [
+    "Marasmius siccus",
+    "Marasmius pulcherripes",
+    "Marasmius maximus"
+  ],
+  "other::Dolomedes": [
+    "Dolomedes sulfureus",
+    "Dolomedes raptor",
+    "Dolomedes nigrimaculatus"
+  ],
+  "other::Gyraulus": [
+    "Gyraulus chinensis",
+    "Gyraulus convexiusculus"
+  ],
+  "insect::Rhopalus": [
+    "Rhopalus sapporensis",
+    "Rhopalus maculatus"
+  ],
+  "fungus::Coprinellus": [
+    "Coprinellus micaceus",
+    "Coprinellus disseminatus"
+  ],
+  "bird::Egretta": [
+    "Egretta garzetta",
+    "Egretta intermedia"
+  ],
+  "insect::Phaneroptera": [
+    "Phaneroptera nigroantennata",
+    "Phaneroptera falcata"
+  ],
+  "other::Armadillidium": [
+    "Armadillidium vulgare",
+    "Armadillidium nasatum"
+  ],
+  "other::Tridentiger": [
+    "Tridentiger brevispinis",
+    "Tridentiger obscurus",
+    "Tridentiger bifasciatus",
+    "Tridentiger trigonocephalus"
+  ],
+  "plant::Veronica": [
+    "Veronica persica",
+    "Veronica arvensis"
+  ],
+  "fungus::Irpex": [
+    "Irpex lacteus",
+    "Irpex consors"
+  ],
+  "plant::Oenothera": [
+    "Oenothera biennis",
+    "Oenothera odorata"
+  ],
+  "fungus::Lactifluus": [
+    "Lactifluus volemus",
+    "Lactifluus piperatus"
+  ],
+  "fungus::Daedaleopsis": [
+    "Daedaleopsis tricolor",
+    "Daedaleopsis confragosa"
+  ],
+  "bird::Dendrocopos": [
+    "Dendrocopos major",
+    "Dendrocopos leucotos"
+  ],
+  "fungus::Lactarius": [
+    "Lactarius hatsudake",
+    "Lactarius subzonarius",
+    "Lactarius chrysorrheus",
+    "Lactarius subplinthogalus",
+    "Lactarius quietus",
+    "Lactarius gerardii"
+  ],
+  "insect::Sympetrum": [
+    "Sympetrum infuscatum",
+    "Sympetrum eroticum",
+    "Sympetrum frequens",
+    "Sympetrum pedemontanum"
+  ],
+  "other::Microphysogobio": [
+    "Microphysogobio yaluensis",
+    "Microphysogobio longidorsalis"
+  ],
+  "fungus::Collybiopsis": [
+    "Collybiopsis confluens",
+    "Collybiopsis peronata"
+  ],
+  "fungus::Trichaptum": [
+    "Trichaptum biforme",
+    "Trichaptum abietinum"
+  ],
+  "other::Gymnogobius": [
+    "Gymnogobius urotaenia",
+    "Gymnogobius breunigii"
+  ],
+  "insect::Homoeocerus": [
+    "Homoeocerus dilatatus",
+    "Homoeocerus unipunctatus"
+  ],
+  "other::Iksookimia": [
+    "Iksookimia koreensis",
+    "Iksookimia longicorpa"
+  ],
+  "insect::Eristalis": [
+    "Eristalis tenax",
+    "Eristalis cerealis"
+  ],
+  "bird::Falco": [
+    "Falco tinnunculus",
+    "Falco peregrinus",
+    "Falco subbuteo"
+  ],
+  "insect::Tenodera": [
+    "Tenodera sinensis",
+    "Tenodera angustipennis"
+  ],
+  "bird::Cuculus": [
+    "Cuculus canorus",
+    "Cuculus micropterus",
+    "Cuculus saturatus"
+  ],
+  "bird::Platalea": [
+    "Platalea minor",
+    "Platalea leucorodia"
+  ],
+  "fungus::Laetiporus": [
+    "Laetiporus sulphureus",
+    "Laetiporus miniatus"
+  ],
+  "amphibian::Rana": [
+    "Rana dybowskii",
+    "Rana uenoi",
+    "Rana huanrenensis",
+    "Rana coreana"
+  ],
+  "fungus::Gymnopilus": [
+    "Gymnopilus liquiritiae",
+    "Gymnopilus junonius"
+  ],
+  "plant::Crepidiastrum": [
+    "Crepidiastrum denticulatum",
+    "Crepidiastrum sonchifolium"
+  ],
+  "fungus::Mycena": [
+    "Mycena haematopus",
+    "Mycena pura",
+    "Mycena chlorophos"
+  ],
+  "other::Hemibarbus": [
+    "Hemibarbus longirostris",
+    "Hemibarbus labeo"
+  ],
+  "plant::Artemisia": [
+    "Artemisia keiskeana",
+    "Artemisia princeps"
+  ],
+  "fungus::Russula": [
+    "Russula senecis",
+    "Russula virescens",
+    "Russula compacta",
+    "Russula alboareolata",
+    "Russula adusta",
+    "Russula emetica",
+    "Russula flavida",
+    "Russula mariae"
+  ],
+  "other::Silurus": [
+    "Silurus asotus",
+    "Silurus microdorsalis"
+  ],
+  "plant::Stellaria": [
+    "Stellaria aquatica",
+    "Stellaria media"
+  ],
+  "bird::Turdus": [
+    "Turdus hortulorum",
+    "Turdus pallidus",
+    "Turdus eunomus",
+    "Turdus naumanni"
+  ],
+  "plant::Potentilla": [
+    "Potentilla fragarioides",
+    "Potentilla indica",
+    "Potentilla freyniana",
+    "Potentilla wallichiana"
+  ],
+  "fungus::Exidia": [
+    "Exidia uvapassa",
+    "Exidia glandulosa"
+  ],
+  "other::Rhodeus": [
+    "Rhodeus uyekii",
+    "Rhodeus ocellatus",
+    "Rhodeus notatus"
+  ],
+  "bird::Anser": [
+    "Anser albifrons",
+    "Anser fabalis",
+    "Anser serrirostris"
+  ],
+  "amphibian::Bufo": [
+    "Bufo gargarizans",
+    "Bufo stejnegeri"
+  ],
+  "fungus::Tyromyces": [
+    "Tyromyces sambuceus",
+    "Tyromyces chioneus"
+  ],
+  "fungus::Pluteus": [
+    "Pluteus cervinus",
+    "Pluteus leoninus"
+  ],
+  "bird::Aythya": [
+    "Aythya ferina",
+    "Aythya fuligula"
+  ],
+  "other::Hemigrapsus": [
+    "Hemigrapsus sanguineus",
+    "Hemigrapsus penicillatus"
+  ],
+  "fungus::Agaricus": [
+    "Agaricus arvensis",
+    "Agaricus subrutilescens",
+    "Agaricus dulcidulus",
+    "Agaricus campestris"
+  ],
+  "reptile::Takydromus": [
+    "Takydromus amurensis",
+    "Takydromus wolteri"
+  ],
+  "fungus::Geastrum": [
+    "Geastrum mirabile",
+    "Geastrum triplex",
+    "Geastrum fimbriatum"
+  ],
+  "fungus::Entoloma": [
+    "Entoloma murrayi",
+    "Entoloma album"
+  ],
+  "other::Tanakia": [
+    "Tanakia lanceolata",
+    "Tanakia koreensis"
+  ],
+  "bird::Mareca": [
+    "Mareca penelope",
+    "Mareca strepera",
+    "Mareca falcata"
+  ],
+  "fungus::Strobilomyces": [
+    "Strobilomyces confusus",
+    "Strobilomyces strobilaceus"
+  ],
+  "other::Acusta": [
+    "Acusta redfieldi",
+    "Acusta despecta"
+  ],
+  "other::Hexagrammos": [
+    "Hexagrammos otakii",
+    "Hexagrammos agrammus"
+  ],
+  "insect::Ypthima": [
+    "Ypthima multistriata",
+    "Ypthima argus"
+  ],
+  "fungus::Calocera": [
+    "Calocera viscosa",
+    "Calocera cornea"
+  ],
+  "other::Cobitis": [
+    "Cobitis hankugensis",
+    "Cobitis nalbanti"
+  ],
+  "other::Acanthogobius": [
+    "Acanthogobius flavimanus",
+    "Acanthogobius lactipes"
+  ],
+  "insect::Vanessa": [
+    "Vanessa cardui",
+    "Vanessa indica"
+  ],
+  "plant::Cardamine": [
+    "Cardamine flexuosa",
+    "Cardamine leucantha"
+  ],
+  "other::Periophthalmus": [
+    "Periophthalmus modestus",
+    "Periophthalmus magnuspinnatus"
+  ],
+  "other::Tachysurus": [
+    "Tachysurus fulvidraco",
+    "Tachysurus sinensis"
+  ],
+  "other::Meghimatium": [
+    "Meghimatium fruhstorferi",
+    "Meghimatium bilineatum"
+  ],
+  "other::Pisaura": [
+    "Pisaura ancora",
+    "Pisaura lama"
+  ],
+  "plant::Corydalis": [
+    "Corydalis turtschaninovii",
+    "Corydalis speciosa"
+  ],
+  "bird::Tringa": [
+    "Tringa nebularia",
+    "Tringa ochropus"
+  ],
+  "insect::Mycalesis": [
+    "Mycalesis francisca",
+    "Mycalesis gotama"
+  ],
+  "bird::Phylloscopus": [
+    "Phylloscopus coronatus",
+    "Phylloscopus inornatus"
+  ],
+  "other::Acheilognathus": [
+    "Acheilognathus rhombeus",
+    "Acheilognathus yamatsutae",
+    "Acheilognathus macropterus"
+  ],
+  "mammal::Apodemus": [
+    "Apodemus agrarius",
+    "Apodemus peninsulae"
+  ],
+  "insect::Adelphocoris": [
+    "Adelphocoris triannulatus",
+    "Adelphocoris suturalis"
+  ],
+  "other::Stenothyra": [
+    "Stenothyra glabra",
+    "Stenothyra glabrata"
+  ],
+  "fungus::Boletus": [
+    "Boletus subvelutipes",
+    "Boletus violaceofuscus"
+  ],
+  "bird::Numenius": [
+    "Numenius madagascariensis",
+    "Numenius phaeopus",
+    "Numenius arquata"
+  ],
+  "other::Sarcocheilichthys": [
+    "Sarcocheilichthys variegatus",
+    "Sarcocheilichthys nigripinnis"
+  ],
+  "other::Tetragnatha": [
+    "Tetragnatha praedonia",
+    "Tetragnatha squamata"
+  ],
+  "plant::Sonchus": [
+    "Sonchus asper",
+    "Sonchus oleraceus"
+  ],
+  "fungus::Lepista": [
+    "Lepista nuda",
+    "Lepista sordida"
+  ]
+}

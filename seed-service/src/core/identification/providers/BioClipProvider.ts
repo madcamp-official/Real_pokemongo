@@ -42,10 +42,11 @@ interface BioClipServerResponse {
 
 export class BioClipProvider implements IdentificationProvider {
   readonly name = "bioclip-hybrid";
-  // MVP taxa(seed_taxa_export.json, 8종)가 현재 plant/insect/fungus만 포함(명세서상
-  // bird/amphibian은 MVP 제외 -- domain/types.ts 주석과 일치). GPU 서버의 taxa 목록이
-  // 확장되면(예: 파충류 프로토타입 종 추가) 여기도 함께 갱신해야 한다(수동 동기화).
-  readonly supports: readonly TaxonGroup[] = ["plant", "insect", "fungus"];
+  // MVP taxa(seed_taxa_export.json)가 82종으로 확장되며 plant/insect/fungus/bird/reptile을
+  // 포함하게 됨(2026-07-27, species-pool 2단계 MVP — amphibian/mammal/other는 다음 라운드로
+  // 비워둠, research/species-pool/step2-embedding-selection/README.md 참고). GPU 서버의
+  // taxa 목록이 바뀔 때마다 여기도 함께 갱신해야 한다(수동 동기화).
+  readonly supports: readonly TaxonGroup[] = ["plant", "insect", "fungus", "bird", "reptile"];
 
   constructor(private readonly cfg: BioClipConfig) {}
 

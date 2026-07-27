@@ -1,0 +1,283 @@
+{
+  "n": 82,
+  "nearestSimPercentiles": {
+    "p50": 0.5616423487663269,
+    "p75": 0.6301922649145126,
+    "p90": 0.6977563500404358,
+    "p95": 0.753686785697937,
+    "p99": 0.7642511129379272,
+    "max": 0.7642511129379272
+  },
+  "topPairs": [
+    {
+      "sciA": "Episyrphus balteatus",
+      "korA": "호리꽃등에",
+      "sciB": "Sphaerophoria scripta",
+      "korB": "꼬마꽃등에",
+      "similarity": 0.7642511129379272,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Harmonia axyridis",
+      "korA": "무당벌레",
+      "sciB": "Coccinella septempunctata",
+      "korB": "칠성무당벌레",
+      "similarity": 0.7589064836502075,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Ecdyonurus levis",
+      "korA": "두점하루살이",
+      "sciB": "Ecdyonurus kibunensis",
+      "korB": "네점하루살이",
+      "similarity": 0.753686785697937,
+      "sameGenus": true,
+      "group": "insect"
+    },
+    {
+      "sciA": "Celastrina argiolus",
+      "korA": "푸른부전나비",
+      "sciB": "Elkalyce argiades",
+      "korB": "암먹부전나비",
+      "similarity": 0.7156221270561218,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Erigeron annuus",
+      "korA": "개망초",
+      "sciB": "Erigeron canadensis",
+      "korB": "망초",
+      "similarity": 0.6977563500404358,
+      "sameGenus": true,
+      "group": "plant"
+    },
+    {
+      "sciA": "Quercus mongolica",
+      "korA": "신갈나무",
+      "sciB": "Quercus variabilis",
+      "korB": "굴참나무",
+      "similarity": 0.6744730472564697,
+      "sameGenus": true,
+      "group": "plant"
+    },
+    {
+      "sciA": "Ardea cinerea",
+      "korA": "왜가리",
+      "sciB": "Ardea alba",
+      "korB": "대백로",
+      "similarity": 0.6703103184700012,
+      "sameGenus": true,
+      "group": "bird"
+    },
+    {
+      "sciA": "Pieris rapae",
+      "korA": "배추흰나비",
+      "sciB": "Pieris melete",
+      "korB": "큰배추흰나비",
+      "similarity": 0.6689255237579346,
+      "sameGenus": true,
+      "group": "insect"
+    },
+    {
+      "sciA": "Epeorus pellucidus",
+      "korA": "흰부채하루살이",
+      "sciB": "Ecdyonurus kibunensis",
+      "korB": "네점하루살이",
+      "similarity": 0.6404520273208618,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Acrida cinerea",
+      "korA": "방아깨비",
+      "sciB": "Atractomorpha lata",
+      "korB": "섬서구메뚜기",
+      "similarity": 0.6360785365104675,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Trifolium repens",
+      "korA": "토끼풀",
+      "sciB": "Oxalis corniculata",
+      "korB": "괭이밥",
+      "similarity": 0.6319173574447632,
+      "sameGenus": false,
+      "group": "plant"
+    },
+    {
+      "sciA": "Polygonia c-aureum",
+      "korA": "네발나비",
+      "sciB": "Eurema mandarina",
+      "korB": "남방노랑나비",
+      "similarity": 0.625016987323761,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Papilio xuthus",
+      "korA": "호랑나비",
+      "sciB": "Neptis sappho",
+      "korB": "애기세줄나비",
+      "similarity": 0.6204003691673279,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Epeorus pellucidus",
+      "korA": "흰부채하루살이",
+      "sciB": "Ecdyonurus levis",
+      "korB": "두점하루살이",
+      "similarity": 0.6131759881973267,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Anas platyrhynchos",
+      "korA": "청둥오리",
+      "sciB": "Anas zonorhyncha",
+      "korB": "흰뺨검둥오리",
+      "similarity": 0.6130849123001099,
+      "sameGenus": true,
+      "group": "bird"
+    },
+    {
+      "sciA": "Pieris rapae",
+      "korA": "배추흰나비",
+      "sciB": "Celastrina argiolus",
+      "korB": "푸른부전나비",
+      "similarity": 0.610508918762207,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Orthetrum albistylum",
+      "korA": "밀잠자리",
+      "sciB": "Ischnura asiatica",
+      "korB": "아시아실잠자리",
+      "similarity": 0.59745192527771,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Acrida cinerea",
+      "korA": "방아깨비",
+      "sciB": "Oedaleus infernalis",
+      "korB": "팥중이",
+      "similarity": 0.5884290337562561,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Boehmeria japonica",
+      "korA": "왜모시풀",
+      "sciB": "Callicarpa japonica",
+      "korB": "작살나무",
+      "similarity": 0.5845426321029663,
+      "sameGenus": false,
+      "group": "plant"
+    },
+    {
+      "sciA": "Ischnura asiatica",
+      "korA": "아시아실잠자리",
+      "sciB": "Acrida cinerea",
+      "korB": "방아깨비",
+      "similarity": 0.5842365622520447,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Pachygrontha antennata",
+      "korA": "십자무늬긴노린재",
+      "sciB": "Atractomorpha lata",
+      "korB": "섬서구메뚜기",
+      "similarity": 0.5822442770004272,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Parus cinereus",
+      "korA": "박새",
+      "sciB": "Poecile palustris",
+      "korB": "쇠박새",
+      "similarity": 0.5821739435195923,
+      "sameGenus": false,
+      "group": "bird"
+    },
+    {
+      "sciA": "Pachygrontha antennata",
+      "korA": "십자무늬긴노린재",
+      "sciB": "Oedaleus infernalis",
+      "korB": "팥중이",
+      "similarity": 0.5778224468231201,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Ambrosia artemisiifolia",
+      "korA": "돼지풀",
+      "sciB": "Bidens frondosa",
+      "korB": "미국가막사리",
+      "similarity": 0.576137363910675,
+      "sameGenus": false,
+      "group": "plant"
+    },
+    {
+      "sciA": "Corvus macrorhynchos",
+      "korA": "큰부리까마귀",
+      "sciB": "Pica serica",
+      "korB": "까치",
+      "similarity": 0.5707672834396362,
+      "sameGenus": false,
+      "group": "bird"
+    },
+    {
+      "sciA": "Phoenicurus auroreus",
+      "korA": "딱새",
+      "sciB": "Sinosuthora webbiana",
+      "korB": "붉은머리오목눈이",
+      "similarity": 0.5628397464752197,
+      "sameGenus": false,
+      "group": "bird"
+    },
+    {
+      "sciA": "Pica serica",
+      "korA": "까치",
+      "sciB": "Cyanopica cyanus",
+      "korB": "물까치",
+      "similarity": 0.5604449510574341,
+      "sameGenus": false,
+      "group": "bird"
+    },
+    {
+      "sciA": "Orthetrum albistylum",
+      "korA": "밀잠자리",
+      "sciB": "Acrida cinerea",
+      "korB": "방아깨비",
+      "similarity": 0.5602993965148926,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Pieris rapae",
+      "korA": "배추흰나비",
+      "sciB": "Eurema mandarina",
+      "korB": "남방노랑나비",
+      "similarity": 0.5577026009559631,
+      "sameGenus": false,
+      "group": "insect"
+    },
+    {
+      "sciA": "Riptortus pedestris",
+      "korA": "톱다리개미허리노린재",
+      "sciB": "Oedaleus infernalis",
+      "korB": "팥중이",
+      "similarity": 0.5546219944953918,
+      "sameGenus": false,
+      "group": "insect"
+    }
+  ]
+}
