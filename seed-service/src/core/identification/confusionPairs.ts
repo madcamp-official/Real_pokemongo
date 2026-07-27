@@ -60,3 +60,22 @@ export function isConfusablePair(sciA: string, sciB: string): boolean {
   if (sciA === sciB) return false;
   return PAIR_KEYS.has(pairKey(sciA, sciB));
 }
+
+/** 학명 → 그 학명과 짝지어진 상대 학명 목록(순서 무관, 역방향 인덱스 사전 계산). */
+const CONFUSABLE_INDEX: ReadonlyMap<string, readonly string[]> = (() => {
+  const m = new Map<string, string[]>();
+  for (const [a, b] of RAW_PAIRS) {
+    (m.get(a) ?? m.set(a, []).get(a)!).push(b);
+    (m.get(b) ?? m.set(b, []).get(b)!).push(a);
+  }
+  return m;
+})();
+
+/**
+ * F6 종 카드의 "비슷한 종" 노출용 — 이 학명과 혼동되는 상대 학명들.
+ * 없으면 빈 배열(지어내지 않음). IdentificationGateway의 조건 2 강등 로직과 동일한
+ * RAW_PAIRS를 원천으로 쓰므로 "혼동 종" 데이터를 이중 관리하지 않는다.
+ */
+export function getConfusableSciNames(sciName: string): readonly string[] {
+  return CONFUSABLE_INDEX.get(sciName) ?? [];
+}

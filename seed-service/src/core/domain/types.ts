@@ -71,6 +71,9 @@ export type Habitat =
 /** 희귀도 등급(명세서 F5). 확률형 사행성과 무관한 "관찰 난이도" 표시일 뿐. */
 export type Rarity = "common" | "uncommon" | "rare";
 
+/** 활동 시간대(F6 종 카드). "밤"만 활동하는 종은 드물어 낮/둘다/밤 3구간이면 충분. */
+export type ActiveTime = "day" | "both" | "night";
+
 /**
  * 위험 태그(명세서 F4) — 안전 필터의 단일 진실 원천.
  * "식용 가부(edibility)"는 의도적으로 존재하지 않는다(독버섯 오판 리스크 회피).
@@ -100,6 +103,10 @@ export interface Taxon {
   rarity: Rarity;
 
   mediaRef?: MediaRef; // 대표 이미지 (도감 카드용)
+
+  // F6 종 카드 표시용. 없으면 API가 빈 문자열로 정직하게 남긴다(지어내지 않음).
+  sizeDescription?: string; // 자유 텍스트 — 종마다 단위가 다름(곤충 mm, 나무 m 등)
+  activeTime?: ActiveTime;
 }
 
 // ---------------------------------------------------------------------------

@@ -38,13 +38,13 @@ function taxon(overrides: Partial<Taxon> = {}): Taxon {
   };
 }
 
-test("taxonGroupToKorean: 8종 전부 4종으로 정확히 매핑된다", () => {
+test("taxonGroupToKorean: 8종 전부 5종으로 정확히 매핑된다", () => {
   const expected: Record<TaxonGroup, string> = {
     insect: "곤충",
     amphibian: "양서류",
     plant: "식물",
+    bird: "조류",
     fungus: "기타",
-    bird: "기타",
     reptile: "기타",
     mammal: "기타",
     other: "기타",
@@ -68,11 +68,13 @@ test("habitatTagsToDisplay: 빈 배열은 빈 문자열, 여러 개는 · 로 jo
 
 test("taxonToSpeciesCard: 콘텐츠/안전정보 있을 때 정확히 반영, size/active_time은 빈 문자열", () => {
   const t = taxon({ habitatTags: ["park"], rarity: "rare" });
+  const similar = taxon({ id: asTaxonId("taxon-y"), sciName: "Aaa bbb", korName: "비슷한종" });
   const safety: SafetyNotice = { showFirst: true, level: "danger", message: "위험해요", riskTags: ["sting_or_bite"] };
   const card = taxonToSpeciesCard(
     t,
-    { taxonId: t.id, funFact: "재밌는 사실", observePoints: [], similarSpecies: ["비슷한종"], curriculumTags: [] },
+    { taxonId: t.id, funFact: "재밌는 사실", observePoints: [], curriculumTags: [] },
     safety,
+    [similar],
   );
   assert.equal(card.species_id, "taxon-x");
   assert.equal(card.name, "민들레");
@@ -83,7 +85,7 @@ test("taxonToSpeciesCard: 콘텐츠/안전정보 있을 때 정확히 반영, si
   assert.equal(card.active_time, "");
   assert.equal(card.rarity, "귀해요");
   assert.equal(card.fun_fact, "재밌는 사실");
-  assert.deepEqual(card.similar_species, [{ species_id: "비슷한종", name: "비슷한종" }]);
+  assert.deepEqual(card.similar_species, [{ species_id: "taxon-y", name: "비슷한종" }]);
   assert.equal(card.is_dangerous, true);
   assert.equal(card.safety_notes, "위험해요");
 });

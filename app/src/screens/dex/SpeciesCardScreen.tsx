@@ -11,6 +11,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSpeciesCard } from '@/api/species';
 import { InfoTile } from '@/components/species/InfoTile';
+import { QuizQuestion } from '@/components/species/QuizQuestion';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
 import { CreatureArt } from '@/components/species/CreatureArt';
@@ -18,7 +19,7 @@ import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SpeciesCard'>;
 
-const ACTIVE_TIME_ICON: Record<string, string> = { 낮: '☀️', 밤: '🌙' };
+const ACTIVE_TIME_ICON: Record<string, string> = { 낮: '☀️', 밤: '🌙', '낮·밤': '🌗' };
 
 /**
  * F6 종 카드 상세.
@@ -99,17 +100,45 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             <Text style={styles.funFactText}>{card.fun_fact}</Text>
           </View>
 
+          {card.observe_points.length > 0 && (
+            <View style={styles.observeSection}>
+              <Text style={styles.sectionTitle}>🔍 관찰 포인트</Text>
+              {card.observe_points.map((point) => (
+                <View key={point} style={styles.observeRow}>
+                  <Text style={styles.observeBullet}>•</Text>
+                  <Text style={styles.observeText}>{point}</Text>
+                </View>
+              ))}
+            </View>
+          )}
+
+          {card.quiz.length > 0 && (
+            <View style={styles.quizSection}>
+              <Text style={styles.sectionTitle}>🧠 퀴즈에 도전해봐요</Text>
+              {card.quiz.map((q) => (
+                <QuizQuestion key={q.q} question={q} />
+              ))}
+            </View>
+          )}
+
           <Pressable style={styles.cta} onPress={inviteToGarden}>
             <Text style={styles.ctaText}>우리집 정원에 초대하기</Text>
           </Pressable>
 
           {card.similar_species.length > 0 && (
-            <View style={styles.similarRow}>
-              {card.similar_species.map((s) => (
-                <View key={s.species_id} style={styles.similarChip}>
-                  <Text style={styles.similarText}>{s.name}</Text>
-                </View>
-              ))}
+            <View style={styles.similarSection}>
+              <Text style={styles.sectionTitle}>👀 헷갈리기 쉬운 친구들</Text>
+              <View style={styles.similarRow}>
+                {card.similar_species.map((s) => (
+                  <Pressable
+                    key={s.species_id}
+                    style={styles.similarChip}
+                    onPress={() => navigation.push('SpeciesCard', { speciesId: s.species_id })}
+                  >
+                    <Text style={styles.similarText}>{s.name}</Text>
+                  </Pressable>
+                ))}
+              </View>
             </View>
           )}
         </View>
@@ -171,6 +200,15 @@ const styles = StyleSheet.create({
   funFactTitle: { fontSize: 14, fontWeight: '800', color: colors.funFactAccent },
   funFactText: { fontSize: 15, color: colors.textPrimary, lineHeight: 22 },
 
+  sectionTitle: { fontSize: 15, fontWeight: '800', color: colors.textPrimary },
+
+  observeSection: { gap: 10 },
+  observeRow: { flexDirection: 'row', gap: 8, paddingRight: 8 },
+  observeBullet: { fontSize: 15, color: colors.primary, fontWeight: '800' },
+  observeText: { flex: 1, fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
+
+  quizSection: { gap: 10 },
+
   cta: {
     backgroundColor: colors.primary,
     borderRadius: 20,
@@ -179,7 +217,8 @@ const styles = StyleSheet.create({
   },
   ctaText: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
 
-  similarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10, justifyContent: 'center' },
+  similarSection: { gap: 10 },
+  similarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   similarChip: {
     backgroundColor: colors.surfaceMuted,
     paddingHorizontal: 16,

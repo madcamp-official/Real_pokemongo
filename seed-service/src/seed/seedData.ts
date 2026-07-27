@@ -22,6 +22,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 4~5cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-honeybee"),
@@ -34,6 +36,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["garden", "park", "field"],
     riskTags: ["sting_or_bite"],
     rarity: "common",
+    sizeDescription: "몸길이 1~1.5cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-cabbage-white"),
@@ -46,6 +50,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["field", "garden", "park"],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 4~5cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ladybug"),
@@ -58,6 +64,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["garden", "field", "neighborhood"],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 7~8mm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-bothrogonia-ferruginea"),
@@ -69,6 +77,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-baetis-fuscatus"),
@@ -80,6 +90,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 5~8mm 정도예요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-orthetrum-albistylum"),
@@ -91,6 +103,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 5cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-propylea-japonica"),
@@ -102,6 +116,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 4mm 정도로 아주 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-papilio-xuthus"),
@@ -113,6 +129,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 8~10cm 정도로 커요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-coccinella-septempunctata"),
@@ -124,6 +142,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 7~8mm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-episyrphus-balteatus"),
@@ -135,6 +155,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-pieris-melete"),
@@ -146,6 +168,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 5cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-epeorus-pellucidus"),
@@ -157,6 +181,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-ischnura-asiatica"),
@@ -168,6 +194,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 3cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ecdyonurus-levis"),
@@ -179,6 +207,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1~1.5cm 정도예요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-neptis-sappho"),
@@ -190,6 +220,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 5~6cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-riptortus-pedestris"),
@@ -201,6 +233,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1.5cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-celastrina-argiolus"),
@@ -212,6 +246,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 2~3cm로 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-elkalyce-argiades"),
@@ -223,6 +259,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 2cm 안팎으로 아주 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-cheumatopsyche-brevilineata"),
@@ -234,6 +272,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-sphaerophoria-scripta"),
@@ -245,6 +285,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ecdyonurus-kibunensis"),
@@ -256,6 +298,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1~1.5cm 정도예요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-pachygrontha-antennata"),
@@ -267,6 +311,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-cletus-schmidti"),
@@ -278,6 +324,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1.5cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-acrida-cinerea"),
@@ -289,6 +337,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 5~8cm로 커요(암컷 기준)",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-atractomorpha-lata"),
@@ -300,6 +350,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 3~4cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-carbula-putoni"),
@@ -311,6 +363,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-eurema-mandarina"),
@@ -322,6 +376,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "날개폭 3~4cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-oedaleus-infernalis"),
@@ -333,6 +389,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 2~3cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ephemera-orientalis"),
@@ -344,6 +402,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 1.5~2cm 정도예요",
+    activeTime: "both",
   },
   {
     id: asTaxonId("taxon-vespa-mandarinia"),
@@ -355,6 +415,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: ["sting_or_bite"],
     rarity: "uncommon",
+    sizeDescription: "몸길이 3.5~5cm로 말벌 중 가장 커요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-lacquer-tree"),
@@ -366,6 +428,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["mountain"],
     riskTags: ["contact_dermatitis"],
     rarity: "uncommon",
+    sizeDescription: "높이 7~8m까지 자라는 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-lindera-obtusiloba"),
@@ -377,6 +441,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 2~5m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-erigeron-annuus"),
@@ -388,6 +454,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 30~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-quercus-mongolica"),
@@ -399,6 +467,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 20~30m까지 자라는 큰 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-pinus-densiflora"),
@@ -410,6 +480,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 20~35m까지 자라는 큰 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-dayflower"),
@@ -422,6 +494,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["field", "waterside"],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 15~50cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-humulus-scandens"),
@@ -433,6 +507,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "줄기가 몇 미터씩 뻗어 자라는 덩굴이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-phytolacca-americana"),
@@ -444,6 +520,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 1~2m까지 크게 자라요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-rhododendron-mucronulatum"),
@@ -455,6 +533,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 2~3m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-zanthoxylum-schinifolium"),
@@ -466,6 +546,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 3m 안팎으로 자라요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-dandelion"),
@@ -478,6 +560,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["neighborhood", "park", "field"],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 10~25cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-neillia-incisa"),
@@ -489,6 +573,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 1~2m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-trifolium-repens"),
@@ -500,6 +586,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 10~30cm 정도로 낮게 자라요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-pueraria-montana"),
@@ -511,6 +599,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "줄기가 10m 넘게 뻗기도 하는 덩굴이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-boehmeria-japonica"),
@@ -522,6 +612,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 40~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-chelidonium-majus"),
@@ -533,6 +625,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 30~80cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-rubus-crataegifolius"),
@@ -544,6 +638,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 1~2m 정도 되는 가시나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-erigeron-canadensis"),
@@ -555,6 +651,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 1~1.5m까지 크게 자라요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-quercus-variabilis"),
@@ -566,6 +664,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 20~25m까지 자라는 큰 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-oxalis-corniculata"),
@@ -577,6 +677,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 10~30cm 정도로 낮게 자라요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ambrosia-artemisiifolia"),
@@ -588,6 +690,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 30~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-smilax-china"),
@@ -599,6 +703,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "줄기가 2~3m 정도 뻗는 덩굴이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-persicaria-thunbergii"),
@@ -610,6 +716,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 30~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-lespedeza-maximowiczii"),
@@ -621,6 +729,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 2~3m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-bidens-frondosa"),
@@ -632,6 +742,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 50~150cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-lysimachia-clethroides"),
@@ -643,6 +755,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 50~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-rumex-crispus"),
@@ -654,6 +768,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 50~100cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-callicarpa-japonica"),
@@ -665,6 +781,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 2~3m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ligustrum-obtusifolium"),
@@ -676,6 +794,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "높이 2~4m 정도 되는 작은 나무예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-clematis-apiifolia"),
@@ -687,6 +807,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "줄기가 3~4m 정도 뻗는 덩굴이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-carex-siderosticta"),
@@ -698,6 +820,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "키가 20~40cm 정도 돼요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-hypsipetes-amaurotis"),
@@ -709,6 +833,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 27~28cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-passer-montanus"),
@@ -720,6 +846,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 14cm 안팎으로 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-streptopelia-orientalis"),
@@ -731,6 +859,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 33cm 안팎이에요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ardea-cinerea"),
@@ -742,6 +872,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 90~100cm로 커요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-corvus-macrorhynchos"),
@@ -753,6 +885,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 55~60cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-pica-serica"),
@@ -764,6 +898,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 45cm 안팎이에요(꼬리 포함)",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-phoenicurus-auroreus"),
@@ -775,6 +911,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 14~15cm 정도로 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-larus-crassirostris"),
@@ -786,6 +924,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 45~47cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-anas-platyrhynchos"),
@@ -797,6 +937,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 55~65cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-ardea-alba"),
@@ -808,6 +950,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 85~100cm로 커요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-sinosuthora-webbiana"),
@@ -819,6 +963,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 12~13cm로 아주 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-parus-cinereus"),
@@ -830,6 +976,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 13~14cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-poecile-palustris"),
@@ -841,6 +989,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 12~13cm로 작아요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-emberiza-elegans"),
@@ -852,6 +1002,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 14~15cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-anas-zonorhyncha"),
@@ -863,6 +1015,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 55~63cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-motacilla-alba"),
@@ -874,6 +1028,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 17~20cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-phalacrocorax-carbo"),
@@ -885,6 +1041,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 80~100cm로 커요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-cyanopica-cyanus"),
@@ -896,6 +1054,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: [],
     rarity: "common",
+    sizeDescription: "몸길이 33~38cm 정도예요(꼬리 포함)",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-fly-agaric"),
@@ -907,6 +1067,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: ["mountain"],
     riskTags: ["toxic_if_eaten"],
     rarity: "uncommon",
+    sizeDescription: "갓 지름 8~20cm 정도예요",
+    activeTime: "day",
   },
   {
     id: asTaxonId("taxon-rhabdophis-tigrinus"),
@@ -918,6 +1080,8 @@ export const SEED_TAXA: Taxon[] = [
     habitatTags: [],
     riskTags: ["sting_or_bite"],
     rarity: "common",
+    sizeDescription: "몸길이 60~120cm 정도예요",
+    activeTime: "day",
   },
 ];
 
@@ -998,24 +1162,586 @@ export const SEED_BADGES: BadgeDefinition[] = [
 ];
 
 export const SEED_CONTENT: SpeciesContent[] = [
+  // ── 곤충 31종 ──────────────────────────────────────────────────────────
   {
-    taxonId: asTaxonId("taxon-dandelion"),
-    funFact: "민들레 씨앗은 바람을 타고 멀리 날아가요. 후~ 불어볼까요?",
-    observePoints: ["노란 꽃잎을 세어봐요", "솜털 씨앗을 살펴봐요"],
-    narrationRef: undefined, // TODO(제공 필요): 음성 파일
+    taxonId: asTaxonId("taxon-polygonia-c-aureum"),
+    funFact: "네발나비는 어른벌레로 겨울을 나요. 날개 뒷면이 낙엽처럼 갈색이라 겨울에 숨어있어도 잘 안 보여요.",
+    observePoints: ["날개를 접었을 때 색깔을 봐요", "다리가 4개인지 살펴보아요"],
     quiz: [
-      {
-        q: "민들레 씨앗은 무엇을 타고 날아갈까요?",
-        options: ["물", "바람", "자동차"],
-        answerIndex: 1,
-      },
+      { q: "네발나비는 무엇으로 겨울을 날까요?", options: ["알", "어른벌레", "번데기"], answerIndex: 1 },
     ],
-    curriculumTags: ["통합교과-봄"],
+    curriculumTags: ["과학-곤충의한살이"],
   },
   {
     taxonId: asTaxonId("taxon-honeybee"),
     funFact: "꿀벌은 꽃에서 꿀을 모아요. 하지만 쏘일 수 있으니 멀리서 봐요.",
     observePoints: ["노란 줄무늬를 봐요", "꽃 위에서 무엇을 하는지 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-cabbage-white"),
+    funFact: "배추흰나비 애벌레는 배추나 무 잎을 먹고 자라요. 그래서 텃밭에서 자주 보여요.",
+    observePoints: ["하얀 날개의 검은 점을 세어봐요", "꽃 주위를 팔랑팔랑 나는 모습을 봐요"],
+    quiz: [
+      { q: "배추흰나비 애벌레가 좋아하는 잎은?", options: ["소나무 잎", "배추 잎", "단풍잎"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ladybug"),
+    funFact: "무당벌레는 진딧물을 잡아먹어서 식물을 지켜주는 고마운 곤충이에요.",
+    observePoints: ["등딱지의 점 개수와 색깔을 세어봐요", "위험을 느끼면 다리를 오므리는 모습을 봐요"],
+    quiz: [
+      { q: "무당벌레가 즐겨 먹는 벌레는?", options: ["진딧물", "지렁이", "달팽이"], answerIndex: 0 },
+    ],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-bothrogonia-ferruginea"),
+    funFact: "끝검은말매미충은 위험을 느끼면 옆으로 폴짝 뛰어 도망가요. 나뭇잎 즙을 빨아 먹고 살아요.",
+    observePoints: ["몸 끝의 검은 무늬를 봐요", "잎사귀 위에서 옆으로 움직이는 모습을 봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-baetis-fuscatus"),
+    funFact: "꼬마하루살이는 물이 깨끗한 개울에서만 애벌레 시절을 보내요. 그래서 이 벌레가 있으면 물이 맑다는 뜻이에요.",
+    observePoints: ["개울가 돌 밑을 살펴봐요(애벌레)", "물 위를 낮게 나는 어른벌레를 봐요"],
+    quiz: [
+      { q: "꼬마하루살이가 많이 사는 곳은 어떤 물일까요?", options: ["더러운 물", "깨끗한 물", "짠 바닷물"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-orthetrum-albistylum"),
+    funFact: "성숙한 수컷은 몸에 하얀 가루가 생겨 연한 하늘색처럼 보여요.",
+    observePoints: ["배 색깔을 관찰해보아요", "물가 풀 위에 앉아 쉬는 모습을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-propylea-japonica"),
+    funFact: "꼬마무당벌레는 무당벌레보다 몸집이 작지만 똑같이 진딧물을 잡아먹어요.",
+    observePoints: ["무당벌레와 크기를 비교해봐요", "등딱지 무늬 모양을 봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-papilio-xuthus"),
+    funFact: "호랑나비는 이름처럼 호랑이 줄무늬 같은 노랑과 검정 무늬를 가지고 있어요.",
+    observePoints: ["날개의 줄무늬를 봐요", "뒷날개 끝의 꼬리 모양을 봐요"],
+    quiz: [
+      { q: "호랑나비 이름은 어떤 동물 무늬에서 왔을까요?", options: ["호랑이", "얼룩말", "표범"], answerIndex: 0 },
+    ],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-coccinella-septempunctata"),
+    funFact: "칠성무당벌레는 빨간 등딱지 위에 검은 점이 7개 있어서 이런 이름이 붙었어요.",
+    observePoints: ["점이 정말 7개인지 세어봐요", "머리 쪽 하얀 무늬도 살펴봐요"],
+    quiz: [
+      { q: "칠성무당벌레 등딱지의 점은 몇 개일까요?", options: ["5개", "7개", "10개"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-episyrphus-balteatus"),
+    funFact: "호리꽃등에는 벌처럼 보이지만 침이 없는 파리 친구예요. 헬리콥터처럼 공중에 멈춰있을 수 있어요.",
+    observePoints: ["꽃 앞에서 멈춰 떠 있는 모습을 봐요", "배의 줄무늬를 봐요"],
+    quiz: [
+      { q: "호리꽃등에는 실제로 무엇에 더 가까울까요?", options: ["벌", "파리", "나비"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-pieris-melete"),
+    funFact: "큰배추흰나비는 배추흰나비와 닮았지만 몸집이 조금 더 크고 산이나 숲 근처에서 자주 보여요.",
+    observePoints: ["배추흰나비와 크기를 비교해봐요", "날개 아랫면의 초록빛 무늬를 봐요"],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-epeorus-pellucidus"),
+    funFact: "흰부채하루살이 애벌레는 부채처럼 납작한 몸으로 물살이 빠른 돌 표면에 딱 붙어살아요.",
+    observePoints: ["개울 돌 표면을 살펴봐요(애벌레)", "투명한 날개를 가진 어른벌레를 봐요"],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ischnura-asiatica"),
+    funFact: "아시아실잠자리는 잠자리보다 몸이 실처럼 가늘어요. 쉴 때 날개를 등 위로 접는 게 잠자리와 달라요.",
+    observePoints: ["쉴 때 날개를 접는지 펴는지 봐요", "가느다란 몸통을 봐요"],
+    quiz: [
+      { q: "실잠자리가 쉴 때 날개는 어떻게 될까요?", options: ["활짝 편다", "접어 세운다", "떼어낸다"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ecdyonurus-levis"),
+    funFact: "두점하루살이도 깨끗한 개울에 사는 하루살이예요. 어른벌레는 짝짓기를 마치면 금방 생을 마쳐요.",
+    observePoints: ["날개의 점무늬를 봐요", "물 위를 나풀나풀 나는 모습을 봐요"],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-neptis-sappho"),
+    funFact: "애기세줄나비는 검은 날개에 하얀 줄무늬 세 개가 있어서 이런 이름이 붙었어요.",
+    observePoints: ["날개의 하얀 줄무늬 개수를 세어봐요", "미끄러지듯 나는 모습을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-riptortus-pedestris"),
+    funFact: "톱다리개미허리노린재는 허리가 개미처럼 잘록해요. 다리에 톱니 같은 돌기가 있어요.",
+    observePoints: ["잘록한 허리를 봐요", "뒷다리의 울퉁불퉁한 돌기를 봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-celastrina-argiolus"),
+    funFact: "푸른부전나비는 아주 작지만 날개 안쪽이 파랗게 반짝여요.",
+    observePoints: ["날개 안쪽의 파란빛을 봐요", "꽃이나 젖은 땅에 앉는 모습을 봐요"],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-elkalyce-argiades"),
+    funFact: "암먹부전나비는 수컷과 암컷의 날개 색이 서로 달라요. 아주 작은 나비예요.",
+    observePoints: ["날개 색깔이 파란지 갈색인지 봐요", "풀밭 낮은 꽃 사이를 나는 모습을 봐요"],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-cheumatopsyche-brevilineata"),
+    funFact: "줄날도래 애벌레는 실을 뽑아 돌 사이에 그물집을 짓고, 물살에 떠내려오는 먹이를 걸러 먹어요.",
+    observePoints: ["개울 돌 사이의 작은 그물집을 찾아봐요", "지붕 모양으로 접은 날개를 봐요"],
+    quiz: [
+      { q: "줄날도래 애벌레가 먹이를 잡는 방법은?", options: ["그물집으로 거른다", "땅을 판다", "날아다니며 잡는다"], answerIndex: 0 },
+    ],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-sphaerophoria-scripta"),
+    funFact: "꼬마꽃등에는 몸이 가늘고 길어서 다른 꽃등에보다 날씬해 보여요.",
+    observePoints: ["가늘고 긴 배 모양을 봐요", "꽃 위에서 정지 비행하는 모습을 봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ecdyonurus-kibunensis"),
+    funFact: "네점하루살이는 날개에 점 무늬가 있는 하루살이예요. 맑은 계곡물에서 자라요.",
+    observePoints: ["날개의 점무늬 개수를 봐요", "계곡 바위 근처를 살펴봐요"],
+    curriculumTags: ["과학-물속생물"],
+  },
+  {
+    taxonId: asTaxonId("taxon-pachygrontha-antennata"),
+    funFact: "십자무늬긴노린재는 몸이 길쭉하고 날씬해서 풀줄기와 잘 구분되지 않아요.",
+    observePoints: ["몸의 십자 무늬를 찾아봐요", "벼과 풀밭에서 찾아봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-cletus-schmidti"),
+    funFact: "벼허리노린재는 허리가 잘록하고 뒷다리가 넓적해요. 벼나 풀의 즙을 빨아 먹어요.",
+    observePoints: ["잘록한 허리 모양을 봐요", "넓적한 뒷다리를 봐요"],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-acrida-cinerea"),
+    funFact: "방아깨비는 머리가 길쭉한 삼각형 모양이에요. 뒷다리를 잡으면 방아 찧듯 몸을 위아래로 움직여요.",
+    observePoints: ["길쭉한 머리 모양을 봐요", "긴 뒷다리로 멀리 뛰는 모습을 봐요"],
+    quiz: [
+      { q: "방아깨비의 머리 모양은 어떤 모양일까요?", options: ["동그란 모양", "길쭉한 세모 모양", "네모 모양"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-atractomorpha-lata"),
+    funFact: "섬서구메뚜기는 초록색이나 분홍색 등 색깔이 조금씩 달라요. 뒷다리로 멀리 뛸 수 있어요.",
+    observePoints: ["몸 색깔을 살펴봐요", "긴 뒷다리를 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-carbula-putoni"),
+    funFact: "가시노린재는 위험을 느끼면 고약한 냄새를 내뿜어서 스스로를 지켜요.",
+    observePoints: ["등의 방패 모양을 봐요", "몸 가장자리의 뾰족한 부분을 봐요"],
+    quiz: [
+      { q: "노린재가 위험할 때 하는 행동은?", options: ["냄새를 낸다", "소리를 낸다", "색이 변한다"], answerIndex: 0 },
+    ],
+    curriculumTags: ["과학-곤충의한살이"],
+  },
+  {
+    taxonId: asTaxonId("taxon-eurema-mandarina"),
+    funFact: "남방노랑나비는 작고 노란 날개를 가진 나비로, 낮은 풀꽃 사이를 즐겨 날아다녀요.",
+    observePoints: ["노란 날개 색을 봐요", "낮게 날아다니는 모습을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-oedaleus-infernalis"),
+    funFact: "팥중이는 날개를 펼치면 뒷날개에 예쁜 무늬가 숨어있어요. 평소엔 접혀서 잘 안 보여요.",
+    observePoints: ["날아오를 때 뒷날개 무늬를 봐요", "풀밭 색과 비슷한 몸 색을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ephemera-orientalis"),
+    funFact: "동양하루살이는 초여름 강가에서 떼를 지어 날아다녀요. 어른벌레는 입이 없어서 아무것도 먹지 않아요.",
+    observePoints: ["강가 가로등 주변에 모인 모습을 봐요", "얇고 큰 날개를 봐요"],
+    quiz: [
+      { q: "어른 하루살이는 입으로 무엇을 할까요?", options: ["많이 먹는다", "아무것도 먹지 않는다", "물만 마신다"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-vespa-mandarinia"),
+    funFact: "장수말벌은 우리나라에서 몸집이 가장 큰 말벌이에요. 멀리서 눈으로만 관찰해요.",
+    observePoints: ["멀리서 몸 크기를 가늠해봐요", "날아다니는 소리를 들어봐요(가까이 가지 않기)"],
+    curriculumTags: ["통합교과-여름"],
+  },
+
+  // ── 식물 31종 ──────────────────────────────────────────────────────────
+  {
+    taxonId: asTaxonId("taxon-lacquer-tree"),
+    funFact: "옻나무는 나무껍질에서 나오는 진(옻)이 옻칠 재료로 쓰여요. 하지만 만지면 피부가 가려울 수 있어요.",
+    observePoints: ["잎이 여러 장 붙은 모양을 멀리서 봐요", "나무껍질 색을 살펴봐요(만지지 않기)"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-lindera-obtusiloba"),
+    funFact: "생강나무는 가지를 꺾으면 생강 비슷한 향이 나서 이런 이름이 붙었어요. 이른 봄 노란 꽃이 먼저 펴요.",
+    observePoints: ["동그란 세 갈래 잎 모양을 봐요", "봄에 노란 꽃이 피는 모습을 봐요"],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-erigeron-annuus"),
+    funFact: "개망초는 하얀 꽃잎에 노란 가운데를 가진 작은 꽃을 아주 많이 피워요. 길가 어디서나 잘 자라요.",
+    observePoints: ["하얀 꽃잎 개수를 세어봐요", "여러 송이가 함께 핀 모습을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-quercus-mongolica"),
+    funFact: "신갈나무는 도토리가 열리는 참나무 중 하나예요. 잎이 나뭇가지 끝에 모여 달려요.",
+    observePoints: ["잎 가장자리의 물결 모양을 봐요", "가을에 열리는 도토리를 찾아봐요"],
+    quiz: [
+      { q: "신갈나무에서 가을에 열리는 열매는?", options: ["도토리", "밤", "감"], answerIndex: 0 },
+    ],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-pinus-densiflora"),
+    funFact: "소나무는 잎이 바늘처럼 뾰족하고, 겨울에도 잎이 지지 않는 늘푸른나무예요.",
+    observePoints: ["바늘 같은 잎 두 개가 한 쌍인지 봐요", "나무껍질의 갈라진 무늬를 봐요"],
+    quiz: [
+      { q: "소나무는 겨울에 잎이 어떻게 될까요?", options: ["다 떨어진다", "그대로 붙어있다", "색만 변한다"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-겨울"],
+  },
+  {
+    taxonId: asTaxonId("taxon-dayflower"),
+    funFact: "닭의장풀은 하늘색 꽃이 아침에 피었다가 오후엔 시들어요. 그래서 아침에 보면 가장 예뻐요.",
+    observePoints: ["파란 꽃잎 두 장을 봐요", "잎이 대나무 잎처럼 길쭉한지 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-humulus-scandens"),
+    funFact: "환삼덩굴은 줄기에 작은 가시가 있어서 다른 식물을 타고 올라가며 자라요.",
+    observePoints: ["줄기를 만지기 전에 까끌한 가시를 눈으로 확인해요", "손바닥 모양 잎을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-phytolacca-americana"),
+    funFact: "미국자리공은 가을에 까만 열매가 포도송이처럼 열려요. 열매는 먹을 수 없으니 눈으로만 봐요.",
+    observePoints: ["까만 열매가 줄지어 달린 모습을 봐요", "빨간 줄기 색을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-rhododendron-mucronulatum"),
+    funFact: "진달래는 잎보다 꽃이 먼저 피는 봄꽃이에요. 분홍빛 꽃이 산을 곱게 물들여요.",
+    observePoints: ["잎이 있는지 없는지 봐요", "분홍 꽃잎 개수를 세어봐요"],
+    quiz: [
+      { q: "진달래는 봄에 무엇이 먼저 필까요?", options: ["잎", "꽃", "열매"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-zanthoxylum-schinifolium"),
+    funFact: "산초나무는 잎을 만지면 향긋하면서도 알싸한 향이 나요. 열매는 향신료로도 쓰여요.",
+    observePoints: ["작은 잎이 여러 장 마주난 모습을 봐요", "가지에 있는 가시를 조심해서 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-dandelion"),
+    funFact: "민들레 씨앗은 바람을 타고 멀리 날아가요. 후~ 불어볼까요?",
+    observePoints: ["노란 꽃잎을 세어봐요", "솜털 씨앗을 살펴봐요"],
+    quiz: [
+      { q: "민들레 씨앗은 무엇을 타고 날아갈까요?", options: ["물", "바람", "자동차"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-neillia-incisa"),
+    funFact: "국수나무는 가느다란 줄기가 국수 가락처럼 늘어져서 이런 이름이 붙었어요.",
+    observePoints: ["가늘게 늘어진 줄기를 봐요", "작고 하얀 꽃송이를 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-trifolium-repens"),
+    funFact: "토끼풀은 잎이 보통 세 장이지만, 아주 가끔 네 잎짜리도 있어서 행운의 상징으로 불려요.",
+    observePoints: ["잎이 몇 장인지 세어봐요", "하얀 꽃송이의 모양을 봐요"],
+    quiz: [
+      { q: "토끼풀 잎은 보통 몇 장일까요?", options: ["2장", "3장", "5장"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-pueraria-montana"),
+    funFact: "칡은 줄기가 아주 길게 뻗으며 다른 나무를 감고 올라가요. 뿌리는 예로부터 음식 재료로도 쓰였어요.",
+    observePoints: ["줄기가 다른 나무를 감은 모습을 봐요", "세 장씩 붙은 잎을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-boehmeria-japonica"),
+    funFact: "왜모시풀은 잎 뒷면에 하얀 솜털이 있어서 앞면과 색이 다르게 보여요.",
+    observePoints: ["잎 앞면과 뒷면의 색 차이를 봐요", "잎 가장자리의 톱니 모양을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-chelidonium-majus"),
+    funFact: "애기똥풀은 줄기를 자르면 노란 즙이 나와요. 그 색이 아기 똥 같다고 해서 이런 이름이 붙었어요.",
+    observePoints: ["노란 꽃잎을 봐요", "줄기를 관찰해요(꺾지 않고 눈으로만)"],
+    quiz: [
+      { q: "애기똥풀 줄기를 자르면 어떤 색 즙이 나올까요?", options: ["빨간색", "노란색", "초록색"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-봄"],
+  },
+  {
+    taxonId: asTaxonId("taxon-rubus-crataegifolius"),
+    funFact: "산딸기는 여름에 빨갛고 달콤한 열매가 열리는 나무예요. 가지에 작은 가시가 있어요.",
+    observePoints: ["빨간 열매의 오돌토돌한 모양을 봐요", "가지의 가시를 조심해서 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-erigeron-canadensis"),
+    funFact: "망초는 키가 사람 허리춤까지 자라기도 하는 큰 풀이에요. 작은 흰 꽃이 줄기 위쪽에 잔뜩 피어요.",
+    observePoints: ["줄기의 키를 가늠해봐요", "작은 꽃이 모여 핀 모습을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-quercus-variabilis"),
+    funFact: "굴참나무는 나무껍질이 두껍고 코르크처럼 폭신폭신해요. 도토리가 열리는 참나무예요.",
+    observePoints: ["두꺼운 나무껍질을 살살 만져봐요", "잎 뒷면의 하얀빛을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-oxalis-corniculata"),
+    funFact: "괭이밥은 하트 모양 잎 세 장이 모여 있고, 밤이 되면 잎을 접고 잠을 자요.",
+    observePoints: ["하트 모양 잎 세 장을 봐요", "노란 작은 꽃을 찾아봐요"],
+    quiz: [
+      { q: "괭이밥 잎 모양은 무엇을 닮았을까요?", options: ["별 모양", "하트 모양", "네모 모양"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ambrosia-artemisiifolia"),
+    funFact: "돼지풀은 잎이 쑥처럼 가늘게 갈라져 있어요. 꽃가루가 알레르기를 일으킬 수 있어서 눈으로만 봐요.",
+    observePoints: ["가늘게 갈라진 잎 모양을 봐요", "줄기 끝의 작은 꽃 이삭을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-smilax-china"),
+    funFact: "청미래덩굴은 가을에 빨간 열매가 동그랗게 열려요. 줄기에는 갈고리 같은 가시가 있어요.",
+    observePoints: ["빨갛고 동그란 열매를 봐요", "줄기의 가시를 조심해서 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-persicaria-thunbergii"),
+    funFact: "고마리는 물가에서 무리 지어 자라며 분홍빛이 도는 작은 꽃송이를 피워요.",
+    observePoints: ["세모 모양 잎을 봐요", "여러 송이가 뭉쳐 핀 꽃을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-lespedeza-maximowiczii"),
+    funFact: "조록싸리는 가을에 자주색 나비 모양 꽃을 피우는 산속 작은 나무예요.",
+    observePoints: ["나비 모양 꽃을 봐요", "세 장씩 붙은 잎을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-bidens-frondosa"),
+    funFact: "미국가막사리 씨앗은 끝에 갈고리가 있어서 옷이나 동물 털에 잘 달라붙어요.",
+    observePoints: ["노란 꽃을 봐요", "씨앗 끝의 갈고리를 살펴봐요(만질 때 조심)"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-lysimachia-clethroides"),
+    funFact: "큰까치수염은 하얀 꽃이 강아지 꼬리처럼 길게 휘어져 피어요.",
+    observePoints: ["휘어진 꽃 이삭 모양을 봐요", "작은 흰 꽃송이들을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-rumex-crispus"),
+    funFact: "소리쟁이는 잎 가장자리가 파도처럼 구불구불해요. 씨앗이 익으면 갈색으로 변해 줄기에 잔뜩 매달려요.",
+    observePoints: ["구불구불한 잎 가장자리를 봐요", "줄기에 매달린 갈색 씨앗을 봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-callicarpa-japonica"),
+    funFact: "작살나무는 가을에 보라색 열매가 알알이 열려 아주 눈에 띄어요.",
+    observePoints: ["보라색 열매송이를 봐요", "마주난 잎 모양을 봐요"],
+    quiz: [
+      { q: "작살나무 열매는 가을에 무슨 색일까요?", options: ["빨간색", "보라색", "노란색"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ligustrum-obtusifolium"),
+    funFact: "쥐똥나무는 가을에 까맣고 동그란 열매가 열리는데, 그 모양이 쥐똥을 닮아서 이런 이름이 붙었어요.",
+    observePoints: ["까만 열매 모양을 봐요", "작고 도톰한 잎을 봐요"],
+    curriculumTags: ["통합교과-가을"],
+  },
+  {
+    taxonId: asTaxonId("taxon-clematis-apiifolia"),
+    funFact: "사위질빵은 줄기가 가늘어서 잘 끊어지지만, 다른 나무를 타고 올라가며 하얀 꽃을 잔뜩 피워요.",
+    observePoints: ["작고 하얀 꽃이 뭉쳐 핀 모습을 봐요", "덩굴 줄기를 살펴봐요"],
+    curriculumTags: ["통합교과-여름"],
+  },
+  {
+    taxonId: asTaxonId("taxon-carex-siderosticta"),
+    funFact: "대사초는 잎이 넓적하고 줄무늬가 있어서 다른 풀과 쉽게 구별돼요. 그늘진 숲 바닥에서 잘 자라요.",
+    observePoints: ["넓적한 잎의 줄무늬를 봐요", "그늘진 곳에 모여 자란 모습을 봐요"],
+    curriculumTags: ["통합교과-봄"],
+  },
+
+  // ── 조류 18종 ──────────────────────────────────────────────────────────
+  {
+    taxonId: asTaxonId("taxon-hypsipetes-amaurotis"),
+    funFact: "직박구리는 도시 공원에서도 흔히 보이는 새예요. \"삐이요\" 하는 크고 날카로운 소리로 울어요.",
+    observePoints: ["회색빛 몸과 볼의 갈색 무늬를 봐요", "나뭇가지에서 우는 소리를 들어봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-passer-montanus"),
+    funFact: "참새는 우리나라에서 가장 흔히 보이는 작은 새예요. 무리를 지어 다니는 걸 좋아해요.",
+    observePoints: ["갈색 몸과 검은 볼 점을 봐요", "여러 마리가 함께 있는 모습을 봐요"],
+    quiz: [
+      { q: "참새는 보통 혼자 다닐까요, 무리 지어 다닐까요?", options: ["혼자", "무리 지어", "짝을 지어서만"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-streptopelia-orientalis"),
+    funFact: "멧비둘기는 목에 검은 줄무늬가 있는 비둘기예요. \"구구구\" 낮은 소리로 울어요.",
+    observePoints: ["목 옆의 검은 줄무늬를 봐요", "낮게 우는 울음소리를 들어봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ardea-cinerea"),
+    funFact: "왜가리는 다리가 길고 목이 긴 큰 새로, 물가에서 가만히 서서 물고기를 기다려요.",
+    observePoints: ["긴 다리와 목을 봐요", "물가에서 가만히 서 있는 모습을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-corvus-macrorhynchos"),
+    funFact: "큰부리까마귀는 부리가 굵고 크며, 아주 머리가 좋아서 도구를 쓸 줄도 알아요.",
+    observePoints: ["굵고 큰 부리를 봐요", "온몸이 까만 깃털을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-pica-serica"),
+    funFact: "까치는 반가운 손님이 온다는 이야기가 전해지는 우리에게 친숙한 새예요. 어깨와 배는 하얗고 나머지는 까매요.",
+    observePoints: ["검은색과 흰색이 섞인 깃털을 봐요", "긴 꼬리를 봐요"],
+    quiz: [
+      { q: "까치의 배와 어깨 깃털 색깔은?", options: ["파란색", "하얀색", "노란색"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-phoenicurus-auroreus"),
+    funFact: "딱새 수컷은 가슴이 주황빛으로 예쁘게 물들어 있어요. 꼬리를 파르르 떠는 습관이 있어요.",
+    observePoints: ["주황빛 가슴을 봐요", "꼬리를 떠는 모습을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-larus-crassirostris"),
+    funFact: "괭이갈매기는 고양이 울음소리처럼 \"야옹\"하고 우는 갈매기예요. 그래서 이런 이름이 붙었어요.",
+    observePoints: ["부리 끝의 검은 무늬를 봐요", "울음소리를 들어봐요"],
+    quiz: [
+      { q: "괭이갈매기 이름은 어떤 동물 소리를 닮아서 붙었을까요?", options: ["개", "고양이", "새"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-anas-platyrhynchos"),
+    funFact: "청둥오리 수컷은 머리가 반짝이는 초록빛이에요. 암컷은 전체적으로 갈색이라 구별하기 쉬워요.",
+    observePoints: ["수컷의 초록빛 머리를 봐요", "암컷의 갈색 무늬를 봐요"],
+    quiz: [
+      { q: "청둥오리 수컷의 머리는 어떤 색일까요?", options: ["초록빛", "빨간빛", "하얀빛"], answerIndex: 0 },
+    ],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-ardea-alba"),
+    funFact: "대백로는 온몸이 새하얀 큰 새예요. 목을 S자로 접고 날아다녀요.",
+    observePoints: ["새하얀 깃털을 봐요", "날 때 목을 접은 모양을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-sinosuthora-webbiana"),
+    funFact: "붉은머리오목눈이는 몸집이 아주 작고 동그란 새예요. 여러 마리가 떼 지어 수풀 사이를 옮겨 다녀요.",
+    observePoints: ["동글동글한 몸매를 봐요", "여러 마리가 함께 움직이는 모습을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-parus-cinereus"),
+    funFact: "박새는 가슴 한가운데 검은 넥타이 같은 줄무늬가 있는 작은 새예요.",
+    observePoints: ["가슴의 검은 줄무늬를 봐요", "머리의 까만 색과 볼의 흰색을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-poecile-palustris"),
+    funFact: "쇠박새는 박새와 닮았지만 몸집이 더 작고, 목에 넥타이 무늬가 없어요.",
+    observePoints: ["박새와 크기를 비교해봐요", "검은 머리와 하얀 볼을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-emberiza-elegans"),
+    funFact: "노랑턱멧새 수컷은 턱과 눈썹이 노랗게 물들어 있어요.",
+    observePoints: ["노란 턱과 눈썹 무늬를 봐요", "머리의 검은 줄무늬를 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-anas-zonorhyncha"),
+    funFact: "흰뺨검둥오리는 이름처럼 뺨이 하얗고 몸은 진한 갈색이에요. 물가에서 사계절 내내 볼 수 있어요.",
+    observePoints: ["하얀 뺨을 봐요", "부리 끝의 노란 무늬를 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-motacilla-alba"),
+    funFact: "알락할미새는 검은색과 흰색이 섞인 무늬를 가지고, 걸을 때마다 꼬리를 위아래로 까딱까딱 흔들어요.",
+    observePoints: ["까딱거리는 꼬리를 봐요", "검고 흰 깃털 무늬를 봐요"],
+    quiz: [
+      { q: "알락할미새는 걸을 때 무엇을 까딱거릴까요?", options: ["머리", "꼬리", "날개"], answerIndex: 1 },
+    ],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-phalacrocorax-carbo"),
+    funFact: "민물가마우지는 물속에 잠수해서 물고기를 잡는 새예요. 물에서 나오면 날개를 활짝 펴고 말려요.",
+    observePoints: ["날개를 펼치고 말리는 모습을 봐요", "물속으로 잠수하는 모습을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+  {
+    taxonId: asTaxonId("taxon-cyanopica-cyanus"),
+    funFact: "물까치는 날개와 꼬리가 하늘빛으로 반짝이는 예쁜 새예요. 시끄럽게 울며 무리 지어 다녀요.",
+    observePoints: ["하늘빛 날개와 꼬리를 봐요", "무리 지어 나는 모습을 봐요"],
+    curriculumTags: ["과학-동물의생활"],
+  },
+
+  // ── 균류 1종 ──────────────────────────────────────────────────────────
+  {
+    taxonId: asTaxonId("taxon-fly-agaric"),
+    funFact: "광대버섯은 빨간 갓 위에 하얀 점이 콕콕 박혀있는 아주 눈에 띄는 버섯이에요. 독이 있어서 절대 먹으면 안 돼요.",
+    observePoints: ["빨간 갓과 하얀 점무늬를 눈으로만 봐요", "버섯 밑동의 볼록한 부분을 봐요(만지지 않기)"],
+    quiz: [
+      { q: "광대버섯을 발견하면 어떻게 해야 할까요?", options: ["먹어본다", "눈으로만 관찰한다", "집에 가져간다"], answerIndex: 1 },
+    ],
+    curriculumTags: ["통합교과-가을"],
+  },
+
+  // ── 파충류 1종 ──────────────────────────────────────────────────────────
+  {
+    taxonId: asTaxonId("taxon-rhabdophis-tigrinus"),
+    funFact: "유혈목이는 목 뒤에 노랑과 검정이 섞인 무늬가 있는 우리나라 뱀이에요. 독이 있으니 절대 가까이 가거나 만지면 안 돼요.",
+    observePoints: ["목 뒤의 노랑-검정 무늬를 멀리서 봐요", "몸의 얼룩덜룩한 무늬를 눈으로만 관찰해요"],
+    quiz: [
+      { q: "유혈목이를 만나면 어떻게 해야 할까요?", options: ["멀리서 지켜본다", "잡아본다", "쫓아간다"], answerIndex: 0 },
+    ],
     curriculumTags: ["과학-동물의생활"],
   },
 ];
@@ -1027,10 +1753,11 @@ export const SEED_CONTENT: SpeciesContent[] = [
  * 쓴다 — 이 파일이 도메인 코드가 아니라 순수 authored config라 앱 DTO 라벨을 직접 써도 괜찮다.
  * app/src/mocks/mockData.ts의 mockTileCompatibility와 동일한 값.
  */
-export type GardenTaxonGroupLabel = "곤충" | "양서류" | "식물" | "기타";
+export type GardenTaxonGroupLabel = "곤충" | "양서류" | "식물" | "조류" | "기타";
 export const TILE_COMPATIBILITY: Record<GardenTaxonGroupLabel, string[]> = {
   곤충: ["잔디", "꽃밭"],
   양서류: ["물웅덩이", "잔디"],
   식물: ["흙", "꽃밭"],
+  조류: ["잔디", "돌"],
   기타: ["흙", "잔디", "돌"],
 };

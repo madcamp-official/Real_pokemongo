@@ -198,11 +198,12 @@ test("PUT /garden/layout: 알 수 없는 타일 종류는 400", async () => {
   assert.equal(res.json().error, "invalid_tile_type");
 });
 
-test("GET /garden/tile-compatibility: 인증 없이도 조회되고 4개 그룹을 담는다", async () => {
+test("GET /garden/tile-compatibility: 인증 없이도 조회되고 5개 그룹을 담는다", async () => {
   const { server } = await testServer();
   const res = await server.inject({ method: "GET", url: "/garden/tile-compatibility" });
   assert.equal(res.statusCode, 200);
   const body = res.json();
-  assert.deepEqual(Object.keys(body).sort(), ["곤충", "기타", "식물", "양서류"]);
+  assert.deepEqual(Object.keys(body).sort(), ["곤충", "기타", "식물", "양서류", "조류"]);
   assert.ok(body["곤충"].includes("잔디"));
+  assert.ok(body["조류"].includes("잔디"));
 });

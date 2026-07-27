@@ -92,6 +92,10 @@ const SPECIES_CARDS: Record<string, SpeciesCard> = {
     active_time: '낮',
     rarity: '흔해요',
     fun_fact: '하루에 진딧물을 50마리도 넘게 잡아먹는 농부의 든든한 친구예요!',
+    observe_points: ['등딱지의 점 개수와 색깔을 세어봐요', '위험을 느끼면 다리를 오므리는 모습을 봐요'],
+    quiz: [
+      { q: '무당벌레가 즐겨 먹는 벌레는?', options: ['진딧물', '지렁이', '달팽이'], answerIndex: 0 },
+    ],
     similar_species: [
       { species_id: 'sp_sevenspot', name: '칠성무당벌레' },
       { species_id: 'sp_turtleladybug', name: '남생이무당벌레' },
@@ -108,6 +112,8 @@ const SPECIES_CARDS: Record<string, SpeciesCard> = {
     active_time: '밤',
     rarity: '가끔 보여요',
     fun_fact: '수컷의 큰 턱은 다른 수컷과 힘겨루기를 할 때 써요.',
+    observe_points: ['큰 턱의 모양을 봐요', '몸 색깔의 광택을 봐요'],
+    quiz: [],
     similar_species: [{ species_id: 'sp_beetle', name: '장수풍뎅이' }],
     is_dangerous: false,
   },
@@ -121,6 +127,8 @@ const SPECIES_CARDS: Record<string, SpeciesCard> = {
     active_time: '낮',
     rarity: '흔해요',
     fun_fact: '꽃가루를 옮겨 열매가 열리게 도와주는 고마운 곤충이에요.',
+    observe_points: ['노란 줄무늬를 봐요', '꽃 위에서 무엇을 하는지 봐요'],
+    quiz: [],
     similar_species: [{ species_id: 'sp_wasp', name: '말벌' }],
     is_dangerous: true,
     safety_notes:
@@ -207,6 +215,7 @@ export const mockTileCompatibility: TileCompatibility = {
   곤충: ['잔디', '꽃밭'],
   양서류: ['물웅덩이', '잔디'],
   식물: ['흙', '꽃밭'],
+  조류: ['잔디', '돌'],
   기타: ['흙', '잔디', '돌'],
 };
 

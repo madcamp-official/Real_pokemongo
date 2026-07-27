@@ -54,6 +54,48 @@ test("GET /dex: 시드 종 전체가 discovered=false로 나온다(관찰 전)",
   assert.ok(entries.every((e: { discovered: boolean; name: string }) => e.discovered === false && e.name === "???"));
 });
 
+test("GET /dex: ?group= 으로 서버사이드 필터링(곤충 31종)", async () => {
+  const { server } = await testServer();
+  const token = await signupAndGetToken(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/dex?group=곤충",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const entries = res.json();
+  const insectCount = SEED_TAXA.filter((t) => t.group === "insect").length;
+  assert.equal(entries.length, insectCount);
+  assert.ok(entries.every((e: { group: string }) => e.group === "곤충"));
+});
+
+test("GET /dex: 존재하지 않는 ?group= 값은 빈 배열(에러 아님)", async () => {
+  const { server } = await testServer();
+  const token = await signupAndGetToken(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/dex?group=우주생물",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.json(), []);
+});
+
+test("GET /dex: ?sort=name 이면 이름 가나다순으로 정렬된다(발견한 종만 의미 있음)", async () => {
+  const { server } = await testServer();
+  const token = await signupAndGetToken(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/dex?sort=name",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const entries = res.json() as { name: string }[];
+  const names = entries.map((e) => e.name);
+  const sorted = [...names].sort((a, b) => a.localeCompare(b, "ko"));
+  assert.deepEqual(names, sorted);
+});
+
 test("GET /dex: 계정 삭제 후에는 같은 토큰(서명은 여전히 유효)도 401", async () => {
   const { app, server } = await testServer();
   const token = await signupAndGetToken(server);
@@ -100,4 +142,42 @@ test("GET /species/:id/card: 존재하지 않는 종은 404", async () => {
   const { server } = await testServer();
   const res = await server.inject({ method: "GET", url: "/species/no-such-taxon/card" });
   assert.equal(res.statusCode, 404);
+});
+
+test("GET /species/:id/card: observe_points/quiz가 콘텐츠에서 채워진다", async () => {
+  const { server } = await testServer();
+  // 시드 콘텐츠(SEED_CONTENT)에 관찰포인트+퀴즈가 있는 종으로 확인(민들레).
+  const res = await server.inject({ method: "GET", url: "/species/taxon-dandelion/card" });
+  assert.equal(res.statusCode, 200);
+  const card = res.json();
+  assert.ok(Array.isArray(card.observe_points));
+  assert.ok(card.observe_points.length > 0);
+  assert.ok(Array.isArray(card.quiz));
+  assert.ok(card.quiz.length > 0);
+  assert.ok(typeof card.quiz[0].q === "string");
+  assert.ok(Array.isArray(card.quiz[0].options));
+  assert.ok(typeof card.quiz[0].answerIndex === "number");
+});
+
+test("GET /species/:id/card: similar_species가 confusionPairs 기반 실제 taxonId로 채워진다", async () => {
+  const { server } = await testServer();
+  // 배추흰나비(Pieris rapae)는 confusionPairs.ts에 큰배추흰나비/푸른부전나비 두 쌍으로 등록돼 있다.
+  const res = await server.inject({ method: "GET", url: "/species/taxon-cabbage-white/card" });
+  assert.equal(res.statusCode, 200);
+  const card = res.json();
+  const ids = card.similar_species.map((s: { species_id: string }) => s.species_id).sort();
+  assert.deepEqual(ids, ["taxon-celastrina-argiolus", "taxon-pieris-melete"]);
+  // 탭했을 때 실제 종 카드로 이동할 수 있어야 하므로 name도 실제 국명이어야 한다(문자열 placeholder 아님).
+  const melete = card.similar_species.find((s: { species_id: string }) => s.species_id === "taxon-pieris-melete");
+  assert.equal(melete.name, "큰배추흰나비");
+});
+
+test("GET /species/:id/card: observe_points/quiz는 항상 배열로 나온다(콘텐츠 없어도 404 아님)", async () => {
+  const { server } = await testServer();
+  const taxon = SEED_TAXA[0]!;
+  const res = await server.inject({ method: "GET", url: `/species/${taxon.id}/card` });
+  assert.equal(res.statusCode, 200);
+  const card = res.json();
+  assert.ok(Array.isArray(card.observe_points));
+  assert.ok(Array.isArray(card.quiz));
 });
