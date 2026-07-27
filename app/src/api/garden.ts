@@ -6,6 +6,7 @@ import type {
   InteractResponse,
 } from '@/types/api';
 
+
 /** F16 홈 가든 API. */
 
 export async function fetchGardenLayout(): Promise<GardenLayout> {

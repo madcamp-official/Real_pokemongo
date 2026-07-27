@@ -17,7 +17,10 @@ import {
 } from '@/components/garden/GardenScene2D';
 import { CreatureTray, type OwnedCreature } from '@/components/garden/CreatureTray';
 import { CreatureStatusSheet } from '@/components/garden/CreatureStatusSheet';
-import { CreatureArt, hasCreatureArt } from '@/components/species/CreatureArt';
+import {
+  GardenCreatureArt,
+  hasGardenCreatureArt,
+} from '@/components/garden/GardenCreatureArt';
 import {
   DECORATIONS,
   isDecorationUnlocked,
@@ -55,7 +58,6 @@ export default function GardenScreen() {
 
   const tiles = useGardenStore((s) => s.tiles);
   const placements = useGardenStore((s) => s.placements);
-  const nicknames = useGardenStore((s) => s.nicknames);
   const decorations = useGardenStore((s) => s.decorations);
   const loadFromServer = useGardenStore((s) => s.loadFromServer);
   const placeCreature = useGardenStore((s) => s.placeCreature);
@@ -69,34 +71,22 @@ export default function GardenScreen() {
     void loadFromServer();
   }, [loadFromServer]);
 
-  // 보유 개체(발견된 종의 creature) 목록 + 이름 매핑.
-  const dexNickname = useMemo(() => {
-    const m = new Map<string, string>();
-    for (const e of dexQuery.data ?? []) {
-      for (const cr of e.creatures) if (cr.nickname) m.set(cr.id, cr.nickname);
-    }
-    return m;
-  }, [dexQuery.data]);
-
-  const nicknameOf = (creatureId: string): string | null =>
-    nicknames[creatureId] ?? dexNickname.get(creatureId) ?? null;
-
   const owned: OwnedCreature[] = useMemo(() => {
     const list: OwnedCreature[] = [];
     for (const e of dexQuery.data ?? []) {
-      if (!e.discovered || !hasCreatureArt(e.species_id)) continue;
+      if (!e.discovered || !hasGardenCreatureArt(e.species_id)) continue;
       for (const cr of e.creatures) {
         list.push({
           id: cr.id,
           species_id: e.species_id,
           name: e.name,
           group: e.group,
-          displayName: nicknames[cr.id] ?? cr.nickname ?? e.name,
+          displayName: e.name,
         });
       }
     }
     return list;
-  }, [dexQuery.data, nicknames]);
+  }, [dexQuery.data]);
 
   const placedIds = useMemo(() => new Set(placements.map((p) => p.creature_id)), [placements]);
   const trayCreatures = owned.filter((c) => !placedIds.has(c.id));
@@ -110,7 +100,7 @@ export default function GardenScreen() {
     [owned]
   );
   const supportedPlacements = useMemo(
-    () => placements.filter((placement) => hasCreatureArt(placement.species_id)),
+    () => placements.filter((placement) => hasGardenCreatureArt(placement.species_id)),
     [placements]
   );
   const discoveredCount = useMemo(
@@ -131,17 +121,19 @@ export default function GardenScreen() {
   });
 
   const [draggingCreature, setDraggingCreature] = useState<OwnedCreature | null>(null);
+  const [movingCreature, setMovingCreature] = useState<OwnedCreature | null>(null);
   const [draggingDecoration, setDraggingDecoration] = useState<DecorationDefinition | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [warn, setWarn] = useState<string | null>(null);
 
   const compatibleTiles = useMemo(() => {
     const set = new Set<string>();
-    if (!draggingCreature) return set;
-    const allowed = compatQuery.data?.[draggingCreature.group] ?? [];
+    const creature = draggingCreature ?? movingCreature;
+    if (!creature) return set;
+    const allowed = compatQuery.data?.[creature.group] ?? [];
     for (const t of tiles) if (allowed.includes(t.type)) set.add(`${t.row},${t.col}`);
     return set;
-  }, [draggingCreature, compatQuery.data, tiles]);
+  }, [draggingCreature, movingCreature, compatQuery.data, tiles]);
 
   const flashWarn = (msg: string) => {
     setWarn(msg);
@@ -158,6 +150,7 @@ export default function GardenScreen() {
 
   const onCreatureDragStart = (creature: OwnedCreature) => {
     setDraggingCreature(creature);
+    setMovingCreature(null);
     setDraggingDecoration(null);
     measureGarden();
   };
@@ -165,6 +158,7 @@ export default function GardenScreen() {
   const onDecorationDragStart = (decoration: DecorationDefinition) => {
     setDraggingDecoration(decoration);
     setDraggingCreature(null);
+    setMovingCreature(null);
     measureGarden();
   };
 
@@ -214,24 +208,46 @@ export default function GardenScreen() {
     );
     if (!tile) return;
 
-    const tileObj = tiles.find((t) => t.row === tile.row && t.col === tile.col);
-    const allowed = compatQuery.data?.[creature!.group] ?? [];
+    placeCreatureAt(creature!, tile.row, tile.col);
+  };
+
+  const placeCreatureAt = (creature: OwnedCreature, row: number, col: number) => {
+    const tileObj = tiles.find((tile) => tile.row === row && tile.col === col);
+    const allowed = compatQuery.data?.[creature.group] ?? [];
     if (!tileObj || !allowed.includes(tileObj.type)) {
-      flashWarn(`${creature!.displayName}은(는) 이 장소에 갈 수 없어요`);
-      return;
+      flashWarn(`${creature.name}은(는) 이 장소에 갈 수 없어요`);
+      return false;
     }
     const ok = placeCreature({
-      creature_id: creature!.id,
-      species_id: creature!.species_id,
-      row: tile.row,
-      col: tile.col,
+      creature_id: creature.id,
+      species_id: creature.species_id,
+      row,
+      col,
     });
     if (!ok) flashWarn('이미 친구가 있는 자리예요');
+    return ok;
+  };
+
+  const startMovingPlacedCreature = (creatureId: string) => {
+    const creature = owned.find((item) => item.id === creatureId);
+    if (!creature) return;
+    setSelectedId(null);
+    setDraggingCreature(null);
+    setDraggingDecoration(null);
+    setMovingCreature(creature);
+  };
+
+  const moveToCompatibleTile = (row: number, col: number) => {
+    if (!movingCreature) return;
+    if (placeCreatureAt(movingCreature, row, col)) {
+      setMovingCreature(null);
+    }
   };
 
   // ── 상태 시트 ────────────────────────────────────────────────
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const selectedPlacement = placements.find((p) => p.creature_id === selectedId) ?? null;
+  const selectedCreature = owned.find((creature) => creature.id === selectedId) ?? null;
 
   const level = useRewardsStore((s) => s.level);
   const decorationInventory = useMemo(
@@ -254,9 +270,11 @@ export default function GardenScreen() {
             decorations={decorations}
             creatures={gardenCreatures}
             level={level}
-            isDragging={!!draggingCreature}
+            isDragging={!!draggingCreature || !!movingCreature}
             compatibleTiles={compatibleTiles}
             onCreaturePress={setSelectedId}
+            onCreatureMoveStart={startMovingPlacedCreature}
+            onCompatibleTilePress={movingCreature ? moveToCompatibleTile : undefined}
             onDecorationRemove={removeDecoration}
             onTransformChange={(transform) => {
               gardenTransform.current = transform;
@@ -310,19 +328,28 @@ export default function GardenScreen() {
       {(draggingCreature || draggingDecoration) && dragPos && (
         <View pointerEvents="none" style={[styles.ghost, { left: dragPos.x - 24, top: dragPos.y - 24 }]}>
           {draggingCreature ? (
-            <CreatureArt speciesId={draggingCreature.species_id} size={40} />
+            <GardenCreatureArt speciesId={draggingCreature.species_id} size={46} />
           ) : (
             <Text style={styles.ghostDecoration}>{draggingDecoration?.icon}</Text>
           )}
         </View>
       )}
 
+      {movingCreature && !warn && (
+        <Pressable style={styles.moveBanner} onPress={() => setMovingCreature(null)}>
+          <Text style={styles.moveText}>
+            {movingCreature.name}을(를) 옮길 자리를 눌러주세요 · 취소
+          </Text>
+        </Pressable>
+      )}
+
       <CreatureStatusSheet
         creatureId={selectedId}
         speciesId={selectedPlacement?.species_id ?? null}
-        currentName={selectedId ? nicknameOf(selectedId) : null}
+        speciesName={selectedCreature?.name ?? null}
         onClose={() => setSelectedId(null)}
         onRemove={removeCreature}
+        onMove={startMovingPlacedCreature}
       />
     </View>
   );
@@ -395,6 +422,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
   },
   warnText: { color: '#fff', fontSize: 13, fontWeight: '600' },
+  moveBanner: {
+    position: 'absolute',
+    bottom: 94,
+    alignSelf: 'center',
+    backgroundColor: 'rgba(57,92,45,0.88)',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 16,
+  },
+  moveText: { color: '#fff', fontSize: 12, fontWeight: '800' },
   ghost: { position: 'absolute', width: 48, height: 48, alignItems: 'center', justifyContent: 'center' },
   ghostDecoration: { fontSize: 35 },
 });

@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
 import type { DecorationDefinition } from '@/components/garden/gardenDecorations';
 import type { TaxonGroup } from '@/types/api';
 
@@ -70,7 +70,7 @@ function CreatureChip(props: {
   return (
     <View style={styles.chip} {...responder.panHandlers}>
       <View style={[styles.chipThumb, { backgroundColor: getPastel(visual.pastel) }]}>
-        <CreatureArt speciesId={props.creature.species_id} size={29} />
+        <GardenCreatureArt speciesId={props.creature.species_id} size={34} />
       </View>
       <Text style={styles.chipName} numberOfLines={1}>{props.creature.displayName}</Text>
     </View>
