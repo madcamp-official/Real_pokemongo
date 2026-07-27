@@ -471,6 +471,8 @@ export interface ApiMapPin {
   group: ApiTaxonGroup;
   lat: number;
   lng: number;
+  /** 지도 핀에 경고 배지를 띄울지. 위험 태그는 서버만 알고 있으므로 여기서 내려준다. */
+  is_dangerous: boolean;
 }
 
 export function buildMapPin(taxon: Taxon, lat: number, lng: number): ApiMapPin {
@@ -480,6 +482,7 @@ export function buildMapPin(taxon: Taxon, lat: number, lng: number): ApiMapPin {
     group: taxonGroupToKorean(taxon.group),
     lat,
     lng,
+    is_dangerous: taxon.riskTags.length > 0,
   };
 }
 

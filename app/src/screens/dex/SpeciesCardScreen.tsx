@@ -13,6 +13,7 @@ import { fetchSpeciesCard } from '@/api/species';
 import { InfoTile } from '@/components/species/InfoTile';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
+import { CreatureArt } from '@/components/species/CreatureArt';
 import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'SpeciesCard'>;
@@ -66,7 +67,7 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
           </View>
 
           <View style={styles.heroImageWrap}>
-            <Text style={styles.heroEmoji}>{visual.emoji}</Text>
+            <CreatureArt speciesId={card.species_id} size={132} />
           </View>
         </View>
 

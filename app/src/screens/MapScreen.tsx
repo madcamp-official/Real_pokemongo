@@ -1,5 +1,5 @@
-import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -7,35 +7,44 @@ import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useQuery } from '@tanstack/react-query';
 import { fetchMapPins, fetchExploredRegions } from '@/api/map';
 import { fetchDex } from '@/api/dex';
-import { ExploreMapCanvas } from '@/components/map/ExploreMapCanvas';
+import { KakaoMapView, type KakaoMapViewHandle } from '@/components/map/KakaoMapView';
 import { RadialMenu } from '@/components/nav/RadialMenu';
+import { PinDetailSheet } from '@/components/map/PinDetailSheet';
 import { requestLocationAndGet, type Coord } from '@/services/location';
-import { env } from '@/config/env';
 import { colors } from '@/theme/colors';
 import type { RootStackParamList, RootTabParamList } from '@/navigation/types';
+import type { MapPin } from '@/types/api';
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+/** "나만의 탐험 구역" 반지름(m). 아이 도보 반경 정도로 잡는다. */
+const HOME_ZONE_RADIUS_M = 300;
 
 /**
  * F11 지도 & 탐험 기록 — 앱의 홈 화면.
- * 일러스트 지도 위에 발견 핀·현재 위치를 얹고, 하단에 이번 주 탐험 요약을 보여준다.
- * 화면 이동은 하단 중앙 엠블럼(RadialMenu)이 담당한다.
+ *
+ * 실제 카카오맵(WebView) 위에 발견 핀·현재 위치를 얹고, 상단엔 이번 주 요약 칩을,
+ * 하단 중앙엔 방사형 메뉴 엠블럼을 둔다. 핀을 누르면 종 상세 시트가 올라온다.
  */
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
+  const mapRef = useRef<KakaoMapViewHandle>(null);
 
   const [deviceLocation, setDeviceLocation] = useState<Coord | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
+  const [mapError, setMapError] = useState<string | null>(null);
+  const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
+  const [unexploredMode, setUnexploredMode] = useState(false);
 
   const pinsQuery = useQuery({ queryKey: ['map', 'pins'], queryFn: fetchMapPins });
   const regionsQuery = useQuery({ queryKey: ['map', 'regions'], queryFn: fetchExploredRegions });
   const dexQuery = useQuery({ queryKey: ['dex'], queryFn: fetchDex });
 
-  // 현재 위치는 기기 GPS에서 직접 읽는다. 서버의 explored-regions.current_location 은
-  // "마지막 관찰이 있었던 곳"이라 지금 내가 서 있는 자리가 아니고, 관찰이 하나도 없으면
-  // 늘 null 이었다 — 그래서 지도에 내 위치가 영영 안 떴다.
-  // 이 좌표는 화면에 그리기만 하고 서버로 보내지 않는다(촬영 시 첨부하는 경로와 별개).
+  const pins = useMemo(() => pinsQuery.data ?? [], [pinsQuery.data]);
+
+  // 현재 위치는 기기 GPS 에서 직접 읽는다. 서버의 explored-regions.current_location 은
+  // "마지막 관찰이 있었던 곳"이라 지금 서 있는 자리가 아니다(관찰이 없으면 늘 null).
+  // 이 좌표는 지도에 그리기만 하고 서버로 보내지 않는다(촬영 시 첨부 경로와 별개).
   const readLocation = useCallback(() => {
     let cancelled = false;
     void requestLocationAndGet().then((coord) => {
@@ -52,190 +61,244 @@ export default function MapScreen() {
     };
   }, []);
 
-  // 지도로 돌아올 때마다 갱신한다(촬영하러 갔다 오면 위치가 달라져 있을 수 있다).
   useFocusEffect(readLocation);
 
-  // 기기 GPS가 우선, 못 얻으면 서버가 아는 마지막 관찰 위치로 폴백.
   const currentLocation = deviceLocation ?? regionsQuery.data?.current_location ?? null;
-  const pins = pinsQuery.data ?? [];
 
-  const stats = useMemo(() => {
-    const entries = dexQuery.data ?? [];
-    const discovered = entries.filter((e) => e.discovered);
+  // 지도 페이지로 데이터 주입 — WebView 가 ready 이전이면 내부에서 큐잉된다.
+  useEffect(() => {
+    mapRef.current?.setPins(pins);
+  }, [pins]);
+
+  useEffect(() => {
+    if (!currentLocation) return;
+    mapRef.current?.setMe(currentLocation.lat, currentLocation.lng, HOME_ZONE_RADIUS_M);
+    mapRef.current?.setCenter(currentLocation.lat, currentLocation.lng);
+  }, [currentLocation]);
+
+  const weekCount = useMemo(() => {
     const since = Date.now() - WEEK_MS;
-    const thisWeek = discovered.filter((e) =>
-      e.creatures.some((c) => {
-        const t = Date.parse(c.discovered_at);
-        return !Number.isNaN(t) && t >= since;
-      })
-    );
-    return { places: pins.length, newThisWeek: thisWeek.length, collected: discovered.length };
-  }, [dexQuery.data, pins.length]);
+    return (dexQuery.data ?? []).filter(
+      (e) =>
+        e.discovered &&
+        e.creatures.some((c) => {
+          const t = Date.parse(c.discovered_at);
+          return !Number.isNaN(t) && t >= since;
+        })
+    ).length;
+  }, [dexQuery.data]);
 
-  const openSpecies = (speciesId: string) => {
+  const openSpeciesCard = (speciesId: string) => {
     navigation
       .getParent<NativeStackNavigationProp<RootStackParamList>>()
       ?.navigate('SpeciesCard', { speciesId });
   };
 
-  const isLoading = pinsQuery.isLoading || regionsQuery.isLoading;
-  // 서버에 못 닿아도 지도는 그대로 보여준다 — 빈 지도가 에러 화면보다 덜 막막하다.
+  const onPinPress = useCallback(
+    (speciesId: string) => {
+      setSelectedPin(pins.find((p) => p.species_id === speciesId) ?? null);
+    },
+    [pins]
+  );
+
+  const recenter = () => {
+    if (currentLocation) {
+      mapRef.current?.setCenter(currentLocation.lat, currentLocation.lng);
+    } else {
+      readLocation();
+    }
+  };
+
   const isOffline = pinsQuery.isError || regionsQuery.isError;
 
   return (
     <View style={styles.root}>
-      <ExploreMapCanvas
-        pins={pins}
-        currentLocation={currentLocation}
-        onPinPress={openSpecies}
+      <KakaoMapView
+        ref={mapRef}
+        onPinPress={onPinPress}
+        onMapPress={() => setSelectedPin(null)}
+        onError={setMapError}
       />
 
-      {/* 상단: 타이틀 + 보상함 바로가기 */}
-      <View pointerEvents="box-none" style={[styles.topBar, { top: insets.top + 12 }]}>
+      {/* 좌상단: 타이틀 + 이번 주 요약 칩 */}
+      <View pointerEvents="box-none" style={[styles.topLeft, { top: insets.top + 10 }]}>
         <Text style={styles.title}>탐험 지도</Text>
+        <View style={styles.chip}>
+          <Text style={styles.chipText}>
+            이번 주 · <Text style={styles.chipAccent}>{weekCount}종</Text> 발견
+          </Text>
+        </View>
+      </View>
+
+      {/* 우상단: 참조 시안과 같은 탐험 필터 + 설정 진입점 */}
+      <View pointerEvents="box-none" style={[styles.topRight, { top: insets.top + 10 }]}>
         <Pressable
-          onPress={() => navigation.navigate('Rewards')}
+          onPress={() => setUnexploredMode((value) => !value)}
           accessibilityRole="button"
-          accessibilityLabel="보상함"
-          style={({ pressed }) => [styles.iconButton, pressed && styles.pressed]}
+          accessibilityLabel="안 가본 곳 보기"
+          accessibilityState={{ selected: unexploredMode }}
+          style={({ pressed }) => [
+            styles.unexploredButton,
+            unexploredMode && styles.unexploredButtonActive,
+            pressed && styles.pressed,
+          ]}
         >
-          <Text style={styles.iconButtonIcon}>🏆</Text>
+          <Text style={styles.unexploredIcon}>👣</Text>
+          <Text style={styles.unexploredText}>안 가본 곳</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => navigation.navigate('Settings')}
+          accessibilityRole="button"
+          accessibilityLabel="설정"
+          style={({ pressed }) => [styles.squareButton, pressed && styles.pressed]}
+        >
+          <Text style={styles.squareButtonIcon}>⚙︎</Text>
         </Pressable>
       </View>
 
-      {/* 상태 칩 */}
-      {(isLoading || isOffline || locationDenied) && (
-        <View pointerEvents="none" style={[styles.chips, { top: insets.top + 62 }]}>
-          {isLoading && (
-            <View style={styles.chip}>
-              <ActivityIndicator size="small" color={colors.primary} />
-              <Text style={styles.chipText}>탐험 기록을 불러오는 중...</Text>
-            </View>
-          )}
-          {isOffline && (
-            <View style={styles.chip}>
-              <Text style={styles.chipText}>
-                📡 서버에 연결하지 못했어요 · 기록은 안전해요
-                {/* 개발 빌드에서만: 실기기가 실제로 어느 주소를 보고 있는지 눈으로 확인 */}
-                {__DEV__ ? `\n${env.API_BASE_URL}` : ''}
+      {unexploredMode && (
+        <View pointerEvents="none" style={[styles.unexploredHint, { top: insets.top + 112 }]}>
+          <Text style={styles.unexploredHintText}>아직 가보지 않은 곳을 찾아볼까요?</Text>
+        </View>
+      )}
+
+      {/* 상태 안내 */}
+      {(mapError || isOffline || locationDenied) && (
+        <View pointerEvents="none" style={[styles.notices, { top: insets.top + 96 }]}>
+          {mapError && (
+            <View style={styles.notice}>
+              <Text style={styles.noticeText}>
+                🗺️ 지도를 불러오지 못했어요 · 카카오 개발자 콘솔에 이 주소가 Web 플랫폼으로
+                등록됐는지 확인해 주세요
               </Text>
             </View>
           )}
+          {isOffline && (
+            <View style={styles.notice}>
+              <Text style={styles.noticeText}>📡 서버에 연결하지 못했어요 · 기록은 안전해요</Text>
+            </View>
+          )}
           {locationDenied && (
-            <View style={styles.chip}>
-              <Text style={styles.chipText}>📍 위치 권한이 없어 현재 위치를 표시할 수 없어요</Text>
+            <View style={styles.notice}>
+              <Text style={styles.noticeText}>📍 위치 권한이 없어 현재 위치를 표시할 수 없어요</Text>
             </View>
           )}
         </View>
       )}
 
-      {/* 이번 주 탐험 요약 */}
-      <View pointerEvents="box-none" style={[styles.summaryWrap, { bottom: insets.bottom + 104 }]}>
-        <View style={styles.summaryCard}>
-          <Text style={styles.summaryTitle}>이번 주 탐험</Text>
-          <View style={styles.summaryRow}>
-            <Stat value={stats.places} unit="곳" label="발견 장소" color={colors.primary} />
-            <Stat value={stats.newThisWeek} unit="종" label="새 친구" color="#4FA3D9" />
-            <Stat value={stats.collected} unit="종" label="모은 친구" color="#6BAE5A" />
-          </View>
-          {pins.length === 0 && !isLoading && (
-            <Text style={styles.emptyNote}>
-              아직 기록된 발견 장소가 없어요 · 첫 친구를 찾아 떠나볼까요?
-            </Text>
-          )}
-        </View>
-      </View>
+      {/* 내 위치로 되돌리기 */}
+      <Pressable
+        onPress={recenter}
+        accessibilityRole="button"
+        accessibilityLabel="내 위치로 이동"
+        style={({ pressed }) => [
+          styles.recenter,
+          { bottom: insets.bottom + 116 },
+          pressed && styles.pressed,
+        ]}
+      >
+        <Text style={styles.recenterIcon}>◎</Text>
+      </Pressable>
 
       <RadialMenu />
+
+      <PinDetailSheet
+        pin={selectedPin}
+        onClose={() => setSelectedPin(null)}
+        onOpenCard={(speciesId) => {
+          setSelectedPin(null);
+          openSpeciesCard(speciesId);
+        }}
+      />
     </View>
   );
 }
 
-function Stat({
-  value,
-  unit,
-  label,
-  color,
-}: {
-  value: number;
-  unit: string;
-  label: string;
-  color: string;
-}) {
-  return (
-    <View style={styles.stat}>
-      <Text style={[styles.statValue, { color }]}>
-        {value}
-        <Text style={styles.statUnit}>{unit}</Text>
-      </Text>
-      <Text style={styles.statLabel}>{label}</Text>
-    </View>
-  );
-}
+const INK = '#201E1D';
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#EDF5E2' },
+  root: { flex: 1, backgroundColor: '#E4EBDA' },
 
-  topBar: {
-    position: 'absolute',
-    left: 20,
-    right: 20,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
+  topLeft: { position: 'absolute', left: 18, alignItems: 'flex-start', gap: 9 },
   title: {
-    fontSize: 27,
+    fontSize: 26,
     fontWeight: '900',
-    color: colors.textPrimary,
-    textShadowColor: 'rgba(255,255,255,0.85)',
+    letterSpacing: -0.5,
+    color: INK,
+    textShadowColor: 'rgba(255,255,255,0.9)',
     textShadowRadius: 6,
   },
-  iconButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 6,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 4,
-  },
-  iconButtonIcon: { fontSize: 22 },
-  pressed: { opacity: 0.75, transform: [{ scale: 0.94 }] },
-
-  chips: { position: 'absolute', left: 20, right: 20, alignItems: 'flex-start', gap: 6 },
   chip: {
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: INK,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+  },
+  chipText: { fontSize: 12, fontWeight: '700', color: INK },
+  chipAccent: { color: colors.primary, fontWeight: '900' },
+
+  topRight: { position: 'absolute', right: 14, alignItems: 'flex-end', gap: 9 },
+  unexploredButton: {
+    height: 42,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    paddingHorizontal: 12,
-    paddingVertical: 7,
-    borderRadius: 14,
-  },
-  chipText: { fontSize: 12, fontWeight: '600', color: colors.textSecondary },
-
-  summaryWrap: { position: 'absolute', left: 16, right: 16 },
-  summaryCard: {
-    backgroundColor: 'rgba(255,255,255,0.95)',
-    borderRadius: 24,
-    padding: 18,
-    gap: 12,
+    gap: 7,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: INK,
+    paddingHorizontal: 11,
     shadowColor: '#000',
-    shadowOpacity: 0.12,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 5,
+    shadowOpacity: 0.15,
+    shadowRadius: 5,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 3,
   },
-  summaryTitle: { fontSize: 16, fontWeight: '800', color: colors.textPrimary },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-around' },
-  stat: { alignItems: 'center', gap: 2 },
-  statValue: { fontSize: 26, fontWeight: '900' },
-  statUnit: { fontSize: 15, fontWeight: '800' },
-  statLabel: { fontSize: 12, color: colors.textSecondary, fontWeight: '600' },
-  emptyNote: { fontSize: 12, color: colors.textSecondary, textAlign: 'center' },
+  unexploredButtonActive: { backgroundColor: '#FBE0DA', borderColor: colors.primaryDark },
+  unexploredIcon: { fontSize: 16 },
+  unexploredText: { fontSize: 12, fontWeight: '800', color: INK },
+  squareButton: {
+    width: 46,
+    height: 46,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: INK,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  squareButtonIcon: { fontSize: 25, color: INK, fontWeight: '600' },
+  pressed: { opacity: 0.7 },
+
+  notices: { position: 'absolute', left: 14, right: 14, gap: 6 },
+  notice: {
+    backgroundColor: INK,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.primary,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+  },
+  noticeText: { color: '#fff', fontSize: 12, fontWeight: '600', lineHeight: 17 },
+  unexploredHint: {
+    position: 'absolute',
+    alignSelf: 'center',
+    backgroundColor: INK,
+    borderLeftWidth: 5,
+    borderLeftColor: colors.primary,
+    paddingHorizontal: 13,
+    paddingVertical: 8,
+  },
+  unexploredHintText: { color: '#fff', fontSize: 12, fontWeight: '700' },
+
+  recenter: {
+    position: 'absolute',
+    right: 16,
+    width: 50,
+    height: 50,
+    backgroundColor: '#fff',
+    borderWidth: 2,
+    borderColor: INK,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  recenterIcon: { fontSize: 24, color: '#2B6FE0', fontWeight: '900' },
 });
