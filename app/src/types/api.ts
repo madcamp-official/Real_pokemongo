@@ -191,6 +191,8 @@ export interface MapPin {
   group: TaxonGroup;
   lat: number;
   lng: number;
+  /** 핀에 경고 배지를 띄울지(위험 태그는 서버만 알고 있다). */
+  is_dangerous: boolean;
 }
 /** 방문 지역 시각화(blob/home_zone)는 실제 지도 전환과 함께 폐기 — 후속 과제. */
 export interface ExploredRegionsResponse {

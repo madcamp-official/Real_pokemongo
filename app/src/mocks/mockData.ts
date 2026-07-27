@@ -438,10 +438,10 @@ export function claimMockQuest(questId: string): XPProfile {
 // ─── F11. 지도 & 탐험 기록 ────────────────────────────────
 // v2: 실제 카카오맵 위경도(서울 시내 임의 좌표, 개발용 예시일 뿐 실제 관찰 위치 아님).
 export const mockMapPins: MapPin[] = [
-  { species_id: 'sp_frog', species_name: '개구리', group: '양서류', lat: 37.5665, lng: 126.978 },
-  { species_id: 'sp_ladybug', species_name: '무당벌레', group: '곤충', lat: 37.5651, lng: 126.9895 },
-  { species_id: 'sp_butterfly', species_name: '나비', group: '곤충', lat: 37.5633, lng: 126.9751 },
-  { species_id: 'sp_snail', species_name: '달팽이', group: '기타', lat: 37.5700, lng: 126.9820 },
+  { species_id: 'sp_frog', species_name: '개구리', group: '양서류', lat: 37.5665, lng: 126.978, is_dangerous: false },
+  { species_id: 'sp_ladybug', species_name: '무당벌레', group: '곤충', lat: 37.5651, lng: 126.9895, is_dangerous: false },
+  { species_id: 'sp_bee', species_name: '꿀벌', group: '곤충', lat: 37.5633, lng: 126.9751, is_dangerous: true },
+  { species_id: 'sp_snail', species_name: '달팽이', group: '기타', lat: 37.5700, lng: 126.9820, is_dangerous: false },
 ];
 
 export const mockExploredRegions: ExploredRegionsResponse = {
