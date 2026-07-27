@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GRID_WIDTH, GRID_HEIGHT, TILE_H, tileCenter } from '@/theme/garden';
-import { getSpeciesVisual } from '@/theme/species';
+import { CreatureArt } from '@/components/species/CreatureArt';
 import type { GardenTile, Placement } from '@/types/api';
 import { IsoTile } from '@/components/garden/IsoTile';
 
@@ -45,14 +45,16 @@ export const IsoGrid = forwardRef<View, Props>(function IsoGrid(
 
       {ordered.map((p) => {
         const { x, y } = tileCenter(p.row, p.col);
-        const visual = getSpeciesVisual(p.species_id);
         return (
           <Pressable
             key={p.creature_id}
             onPress={() => onCreaturePress(p.creature_id)}
-            style={[styles.marker, { left: x - MARKER / 2, top: y - MARKER + TILE_H / 2 }]}
+            style={[
+              styles.marker,
+              { left: x - MARKER / 2, top: y - MARKER + TILE_H / 2 },
+            ]}
           >
-            <Text style={styles.markerEmoji}>{visual.emoji}</Text>
+            <CreatureArt speciesId={p.species_id} size={MARKER * 0.86} />
           </Pressable>
         );
       })}

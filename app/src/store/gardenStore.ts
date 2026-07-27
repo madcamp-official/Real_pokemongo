@@ -3,6 +3,10 @@ import { persist, createJSONStorage } from 'zustand/middleware';
 import { zustandStorage } from '@/store/storage';
 import { fetchGardenLayout, saveGardenLayout } from '@/api/garden';
 import type { GardenTile, Placement } from '@/types/api';
+import type {
+  DecorationId,
+  DecorationPlacement,
+} from '@/components/garden/gardenDecorations';
 
 /**
  * 홈 가든 배치 상태 (F16). 로컬 우선 저장 후 서버 동기화.
@@ -15,6 +19,7 @@ interface GardenState {
   tiles: GardenTile[];
   placements: Placement[];
   nicknames: Record<string, string>;
+  decorations: DecorationPlacement[];
   hasLoaded: boolean;
   syncing: boolean;
 
@@ -22,6 +27,8 @@ interface GardenState {
   placeCreature: (p: Placement) => boolean;
   removeCreature: (creatureId: string) => void;
   setNickname: (creatureId: string, name: string) => void;
+  placeDecoration: (decorationId: DecorationId, x: number, y: number) => void;
+  removeDecoration: (id: string) => void;
   syncToServer: () => Promise<void>;
 }
 
@@ -31,6 +38,7 @@ export const useGardenStore = create<GardenState>()(
       tiles: [],
       placements: [],
       nicknames: {},
+      decorations: [],
       hasLoaded: false,
       syncing: false,
 
@@ -75,6 +83,22 @@ export const useGardenStore = create<GardenState>()(
       setNickname: (creatureId, name) =>
         set((s) => ({ nicknames: { ...s.nicknames, [creatureId]: name } })),
 
+      placeDecoration: (decorationId, x, y) =>
+        set((s) => ({
+          decorations: [
+            ...s.decorations,
+            {
+              id: `decor-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+              decorationId,
+              x,
+              y,
+            },
+          ],
+        })),
+
+      removeDecoration: (id) =>
+        set((s) => ({ decorations: s.decorations.filter((item) => item.id !== id) })),
+
       syncToServer: async () => {
         if (get().syncing) return;
         set({ syncing: true });
@@ -94,6 +118,7 @@ export const useGardenStore = create<GardenState>()(
         tiles: s.tiles,
         placements: s.placements,
         nicknames: s.nicknames,
+        decorations: s.decorations,
       }),
     }
   )

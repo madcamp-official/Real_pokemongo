@@ -1,6 +1,7 @@
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import {
   PanResponder,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -9,6 +10,8 @@ import {
 } from 'react-native';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
+import { CreatureArt } from '@/components/species/CreatureArt';
+import type { DecorationDefinition } from '@/components/garden/gardenDecorations';
 import type { TaxonGroup } from '@/types/api';
 
 export interface OwnedCreature {
@@ -19,113 +22,207 @@ export interface OwnedCreature {
   displayName: string;
 }
 
-interface DraggableProps {
-  creature: OwnedCreature;
-  onDragStart: (c: OwnedCreature) => void;
+type DragCallbacks<T> = {
+  item: T;
+  onDragStart: (item: T) => void;
   onDragMove: (pageX: number, pageY: number) => void;
   onDragEnd: (pageX: number, pageY: number) => void;
-}
+};
 
-function DraggableCreature({ creature, onDragStart, onDragMove, onDragEnd }: DraggableProps) {
-  // PanResponder.create()는 useRef 초기값이라 마운트 시 딱 한 번만 실행된다 — 그 안에서
-  // creature/onDragStart/onDragMove/onDragEnd를 직접 참조하면 "처음 렌더 때의 낡은 값"에
-  // 영원히 묶인다. 특히 onDragEnd가 그 시점의 dragging(=아직 null)을 계속 보게 돼,
-  // 실제 드래그 시 onDragEnd 맨 앞 `if (!c) return`에서 항상 조용히 끝나버려 배치가 전혀
-  // 동작하지 않았다(실기기 테스트로 발견). ref에 최신 값을 담아두고 그걸 통해서만
-  // 호출하면 PanResponder 자체는 그대로 유지하면서도 항상 최신 상태를 본다.
-  const latest = useRef({ creature, onDragStart, onDragMove, onDragEnd });
-  latest.current = { creature, onDragStart, onDragMove, onDragEnd };
-
-  const responder = useRef(
+function useDragResponder<T>(callbacks: DragCallbacks<T>, enabled = true) {
+  const latest = useRef({ callbacks, enabled });
+  latest.current = { callbacks, enabled };
+  return useRef(
     PanResponder.create({
-      onStartShouldSetPanResponder: () => true,
-      onMoveShouldSetPanResponder: () => true,
-      onPanResponderGrant: (e: GestureResponderEvent) => {
-        latest.current.onDragStart(latest.current.creature);
-        latest.current.onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
+      onStartShouldSetPanResponder: () => latest.current.enabled,
+      onMoveShouldSetPanResponder: () => latest.current.enabled,
+      onPanResponderGrant: (event: GestureResponderEvent) => {
+        const { callbacks: current } = latest.current;
+        current.onDragStart(current.item);
+        current.onDragMove(event.nativeEvent.pageX, event.nativeEvent.pageY);
       },
-      onPanResponderMove: (e: GestureResponderEvent) => {
-        latest.current.onDragMove(e.nativeEvent.pageX, e.nativeEvent.pageY);
+      onPanResponderMove: (event: GestureResponderEvent) => {
+        latest.current.callbacks.onDragMove(event.nativeEvent.pageX, event.nativeEvent.pageY);
       },
-      onPanResponderRelease: (e: GestureResponderEvent) => {
-        latest.current.onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
+      onPanResponderRelease: (event: GestureResponderEvent) => {
+        latest.current.callbacks.onDragEnd(event.nativeEvent.pageX, event.nativeEvent.pageY);
       },
-      onPanResponderTerminate: (e: GestureResponderEvent) => {
-        latest.current.onDragEnd(e.nativeEvent.pageX, e.nativeEvent.pageY);
+      onPanResponderTerminate: (event: GestureResponderEvent) => {
+        latest.current.callbacks.onDragEnd(event.nativeEvent.pageX, event.nativeEvent.pageY);
       },
     })
   ).current;
+}
 
-  const visual = getSpeciesVisual(creature.species_id);
-
+function CreatureChip(props: {
+  creature: OwnedCreature;
+  onDragStart: (item: OwnedCreature) => void;
+  onDragMove: (pageX: number, pageY: number) => void;
+  onDragEnd: (pageX: number, pageY: number) => void;
+}) {
+  const responder = useDragResponder({
+    item: props.creature,
+    onDragStart: props.onDragStart,
+    onDragMove: props.onDragMove,
+    onDragEnd: props.onDragEnd,
+  });
+  const visual = getSpeciesVisual(props.creature.species_id);
   return (
     <View style={styles.chip} {...responder.panHandlers}>
       <View style={[styles.chipThumb, { backgroundColor: getPastel(visual.pastel) }]}>
-        <Text style={styles.chipEmoji}>{visual.emoji}</Text>
+        <CreatureArt speciesId={props.creature.species_id} size={29} />
+      </View>
+      <Text style={styles.chipName} numberOfLines={1}>{props.creature.displayName}</Text>
+    </View>
+  );
+}
+
+function DecorationChip(props: {
+  decoration: DecorationDefinition;
+  unlocked: boolean;
+  onDragStart: (item: DecorationDefinition) => void;
+  onDragMove: (pageX: number, pageY: number) => void;
+  onDragEnd: (pageX: number, pageY: number) => void;
+}) {
+  const responder = useDragResponder(
+    {
+      item: props.decoration,
+      onDragStart: props.onDragStart,
+      onDragMove: props.onDragMove,
+      onDragEnd: props.onDragEnd,
+    },
+    props.unlocked
+  );
+  return (
+    <View style={[styles.chip, !props.unlocked && styles.lockedChip]} {...responder.panHandlers}>
+      <View style={[styles.chipThumb, styles.decorThumb]}>
+        <Text style={styles.decorIcon}>{props.unlocked ? props.decoration.icon : '🔒'}</Text>
       </View>
       <Text style={styles.chipName} numberOfLines={1}>
-        {creature.displayName}
+        {props.unlocked ? props.decoration.name : `도감 ${props.decoration.requiredSpecies}`}
       </Text>
     </View>
   );
 }
 
-interface TrayProps {
+interface Props {
   creatures: OwnedCreature[];
-  onDragStart: (c: OwnedCreature) => void;
+  decorations: Array<{ definition: DecorationDefinition; unlocked: boolean }>;
+  onCreatureDragStart: (item: OwnedCreature) => void;
+  onDecorationDragStart: (item: DecorationDefinition) => void;
   onDragMove: (pageX: number, pageY: number) => void;
   onDragEnd: (pageX: number, pageY: number) => void;
 }
 
-/**
- * 아직 배치하지 않은 보유 개체 트레이 (F16).
- * 칩을 드래그해 격자에 놓는다.
- */
-export function CreatureTray({ creatures, onDragStart, onDragMove, onDragEnd }: TrayProps) {
+export function CreatureTray({
+  creatures,
+  decorations,
+  onCreatureDragStart,
+  onDecorationDragStart,
+  onDragMove,
+  onDragEnd,
+}: Props) {
+  const [tab, setTab] = useState<'friends' | 'decorations'>('friends');
+  const message =
+    tab === 'friends'
+      ? creatures.length > 0
+        ? '친구를 끌어 정원에 놓아보세요'
+        : '모든 친구가 정원에서 쉬고 있어요'
+      : decorations.some((item) => item.unlocked)
+        ? '해금한 장식을 끌어 정원을 채워보세요'
+        : '도감을 채우면 첫 장식이 열려요';
+
   return (
     <View style={styles.tray}>
-      <Text style={styles.trayTitle}>친구들을 정원에 놓아보세요</Text>
-      {creatures.length === 0 ? (
-        <Text style={styles.empty}>모든 친구를 정원에 배치했어요 🌿</Text>
-      ) : (
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.trayRow}>
-          {creatures.map((c) => (
-            <DraggableCreature
-              key={c.id}
-              creature={c}
-              onDragStart={onDragStart}
-              onDragMove={onDragMove}
-              onDragEnd={onDragEnd}
-            />
-          ))}
+      <View style={styles.tabColumn}>
+        <Pressable
+          onPress={() => setTab('friends')}
+          style={[styles.tabButton, tab === 'friends' && styles.activeTab]}
+        >
+          <Text style={styles.tabIcon}>🐾</Text>
+        </Pressable>
+        <Pressable
+          onPress={() => setTab('decorations')}
+          style={[styles.tabButton, tab === 'decorations' && styles.activeTab]}
+        >
+          <Text style={styles.tabIcon}>🛠️</Text>
+        </Pressable>
+      </View>
+      <View style={styles.content}>
+        <Text style={styles.message} numberOfLines={1}>{message}</Text>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.trayRow}
+        >
+          {tab === 'friends'
+            ? creatures.map((creature) => (
+                <CreatureChip
+                  key={creature.id}
+                  creature={creature}
+                  onDragStart={onCreatureDragStart}
+                  onDragMove={onDragMove}
+                  onDragEnd={onDragEnd}
+                />
+              ))
+            : decorations.map(({ definition, unlocked }) => (
+                <DecorationChip
+                  key={definition.id}
+                  decoration={definition}
+                  unlocked={unlocked}
+                  onDragStart={onDecorationDragStart}
+                  onDragMove={onDragMove}
+                  onDragEnd={onDragEnd}
+                />
+              ))}
         </ScrollView>
-      )}
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   tray: {
-    backgroundColor: colors.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingVertical: 16,
-    paddingHorizontal: 16,
-    gap: 12,
-    borderTopWidth: 1,
-    borderColor: colors.border,
+    position: 'absolute',
+    left: 14,
+    right: 14,
+    bottom: 10,
+    height: 76,
+    flexDirection: 'row',
+    backgroundColor: 'rgba(255,252,239,0.94)',
+    borderRadius: 20,
+    padding: 7,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+    shadowColor: '#425D30',
+    shadowOpacity: 0.24,
+    shadowRadius: 8,
+    elevation: 8,
   },
-  trayTitle: { fontSize: 14, fontWeight: '700', color: colors.textSecondary },
-  empty: { fontSize: 14, color: colors.textSecondary, paddingVertical: 12 },
-  trayRow: { gap: 12, paddingRight: 8 },
-  chip: { width: 66, alignItems: 'center', gap: 6 },
+  tabColumn: { flexDirection: 'row', gap: 5, alignItems: 'center', paddingRight: 8 },
+  tabButton: {
+    width: 37,
+    height: 37,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E8E4D3',
+  },
+  activeTab: { backgroundColor: '#FFC65B' },
+  tabIcon: { fontSize: 18 },
+  content: { flex: 1, minWidth: 0 },
+  message: { height: 18, fontSize: 10, fontWeight: '800', color: '#65705B' },
+  trayRow: { gap: 8, paddingRight: 8, alignItems: 'center' },
+  chip: { width: 48, alignItems: 'center', gap: 1 },
+  lockedChip: { opacity: 0.52 },
   chipThumb: {
-    width: 58,
-    height: 58,
-    borderRadius: 29,
+    width: 38,
+    height: 38,
+    borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chipEmoji: { fontSize: 28 },
-  chipName: { fontSize: 12, fontWeight: '700', color: colors.textPrimary },
+  decorThumb: { backgroundColor: '#E8F0D6' },
+  decorIcon: { fontSize: 22 },
+  chipName: { maxWidth: 50, fontSize: 8, fontWeight: '800', color: colors.textPrimary },
 });

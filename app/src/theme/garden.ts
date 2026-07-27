@@ -12,13 +12,22 @@ export const GRID_N = 6;
 export const TILE_W = 52;
 export const TILE_H = 26;
 export const PAD = 8;
+const SCENE_TOP = 34;
 
 /** 격자 원점 보정: col-row 의 최소값 -(N-1) 을 0 이상으로 밀어준다. */
 const ORIGIN_X = PAD + ((GRID_N - 1) * TILE_W) / 2;
-const ORIGIN_Y = PAD;
+const ORIGIN_Y = SCENE_TOP;
 
-export const GRID_WIDTH = 2 * PAD + GRID_N * TILE_W;
-export const GRID_HEIGHT = 2 * PAD + GRID_N * TILE_H + TILE_H;
+export const GRID_WIDTH = 360;
+export const GRID_HEIGHT = 480;
+
+/** 2D 정원 배경에서 6×6 논리 좌표가 놓이는 백분율 위치. */
+export function gardenPointPercent(row: number, col: number): { x: number; y: number } {
+  return {
+    x: 24 + col * 9.2 + row * 3.1,
+    y: 42 + row * 7.2 - col * 1.3,
+  };
+}
 
 /** 타일 중심의 화면 좌표. */
 export function tileCenter(row: number, col: number): { x: number; y: number } {
@@ -29,13 +38,25 @@ export function tileCenter(row: number, col: number): { x: number; y: number } {
 }
 
 /** 화면 좌표(격자 컨테이너 기준) → 가장 가까운 타일 (범위 밖이면 null). */
-export function screenToTile(px: number, py: number): { row: number; col: number } | null {
-  const x = px - ORIGIN_X;
-  const y = py - (ORIGIN_Y + TILE_H / 2);
-  const col = Math.round(x / TILE_W + y / TILE_H);
-  const row = Math.round(y / TILE_H - x / TILE_W);
-  if (row < 0 || row >= GRID_N || col < 0 || col >= GRID_N) return null;
-  return { row, col };
+export function screenToTile(
+  px: number,
+  py: number,
+  viewportWidth = GRID_WIDTH,
+  viewportHeight = GRID_HEIGHT
+): { row: number; col: number } | null {
+  let best: { row: number; col: number; distance: number } | null = null;
+  for (let row = 0; row < GRID_N; row++) {
+    for (let col = 0; col < GRID_N; col++) {
+      const point = gardenPointPercent(row, col);
+      const sx = (point.x / 100) * viewportWidth;
+      const sy = (point.y / 100) * viewportHeight;
+      const distance = Math.hypot(px - sx, py - sy);
+      if (!best || distance < best.distance) best = { row, col, distance };
+    }
+  }
+  return best && best.distance <= Math.max(42, viewportWidth * 0.045)
+    ? { row: best.row, col: best.col }
+    : null;
 }
 
 export const TILE_COLORS: Record<TileType, { top: string; side: string }> = {
