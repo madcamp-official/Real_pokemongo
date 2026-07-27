@@ -1,0 +1,502 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>장수말벌 비행 애니메이션</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Pretendard, "Noto Sans KR", system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      html,
+      body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+      }
+
+      body {
+        background:
+          radial-gradient(circle at 18% 22%, rgba(255, 247, 184, 0.78), transparent 22%),
+          radial-gradient(circle at 77% 68%, rgba(116, 188, 137, 0.32), transparent 27%),
+          linear-gradient(155deg, #dff4ff 0%, #b9e0ef 46%, #8fc6a7 100%);
+      }
+
+      .scene {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        isolation: isolate;
+      }
+
+      .scene::before,
+      .scene::after {
+        position: absolute;
+        right: -8vw;
+        bottom: -18vh;
+        width: 64vw;
+        height: 55vh;
+        border-radius: 50% 45% 0 0;
+        background: linear-gradient(145deg, #4f9862, #1d5b4a);
+        content: "";
+        filter: blur(1px);
+        opacity: 0.7;
+        transform: rotate(-7deg);
+      }
+
+      .scene::after {
+        right: auto;
+        bottom: -29vh;
+        left: -12vw;
+        width: 78vw;
+        height: 62vh;
+        background: linear-gradient(145deg, #78b66d, #2b7053);
+        opacity: 0.62;
+        transform: rotate(9deg);
+      }
+
+      .cloud {
+        position: absolute;
+        width: 26vw;
+        min-width: 210px;
+        height: 9vw;
+        min-height: 74px;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.42);
+        filter: blur(2px);
+        animation: cloud-drift 24s linear infinite;
+      }
+
+      .cloud.one {
+        top: 14%;
+        left: -28vw;
+      }
+
+      .cloud.two {
+        top: 50%;
+        left: -34vw;
+        opacity: 0.5;
+        animation-duration: 31s;
+        animation-delay: -15s;
+      }
+
+      .flight-rig {
+        position: absolute;
+        top: 0;
+        left: 0;
+        z-index: 3;
+        width: clamp(230px, 34vw, 510px);
+        aspect-ratio: 1;
+        pointer-events: none;
+        will-change: transform;
+        animation: flight-path 18s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+      }
+
+      .bob-rig {
+        width: 100%;
+        height: 100%;
+        transform-origin: 50% 50%;
+        will-change: transform;
+        animation: body-bob 2.35s ease-in-out infinite alternate;
+      }
+
+      .hornet {
+        display: block;
+        width: 100%;
+        height: 100%;
+        overflow: visible;
+        filter: drop-shadow(0 18px 16px rgba(21, 43, 36, 0.22));
+      }
+
+      .wing {
+        transform-box: view-box;
+        will-change: transform;
+      }
+
+      .near-upper {
+        transform-origin: 223px 220px;
+        animation: upper-wing 0.19s cubic-bezier(0.42, 0, 0.58, 1) infinite;
+      }
+
+      .near-lower {
+        transform-origin: 220px 229px;
+        animation: lower-wing 0.205s cubic-bezier(0.44, 0, 0.56, 1) -0.045s infinite;
+      }
+
+      .far-upper {
+        transform-origin: 222px 220px;
+        opacity: 0.43;
+        animation: far-upper-wing 0.198s cubic-bezier(0.42, 0, 0.58, 1) -0.09s infinite;
+      }
+
+      .far-lower {
+        transform-origin: 220px 229px;
+        opacity: 0.36;
+        animation: far-lower-wing 0.214s cubic-bezier(0.44, 0, 0.56, 1) -0.13s infinite;
+      }
+
+      .leg {
+        transform-box: view-box;
+        will-change: transform;
+      }
+
+      .front-leg {
+        transform-origin: 141px 268px;
+        animation: front-leg-sway 1.45s ease-in-out infinite alternate;
+      }
+
+      .middle-leg {
+        transform-origin: 224px 272px;
+        animation: middle-leg-sway 1.7s ease-in-out -0.45s infinite alternate;
+      }
+
+      .back-leg {
+        transform-origin: 322px 283px;
+        animation: back-leg-sway 1.58s ease-in-out -0.8s infinite alternate;
+      }
+
+      .shadow {
+        position: absolute;
+        top: 64%;
+        left: 23%;
+        width: 58%;
+        height: 12%;
+        border-radius: 50%;
+        background: rgba(29, 61, 51, 0.22);
+        filter: blur(13px);
+        animation: shadow-pulse 2.35s ease-in-out infinite alternate;
+      }
+
+      .controls {
+        position: fixed;
+        top: max(18px, env(safe-area-inset-top));
+        right: max(18px, env(safe-area-inset-right));
+        z-index: 10;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .label,
+      button {
+        border: 1px solid rgba(255, 255, 255, 0.72);
+        border-radius: 999px;
+        background: rgba(18, 52, 43, 0.68);
+        color: #fff;
+        box-shadow: 0 8px 26px rgba(24, 62, 51, 0.15);
+        backdrop-filter: blur(12px);
+      }
+
+      .label {
+        padding: 10px 14px;
+        font-size: 13px;
+        letter-spacing: 0.04em;
+      }
+
+      button {
+        min-width: 94px;
+        padding: 10px 16px;
+        font: inherit;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: rgba(18, 52, 43, 0.82);
+      }
+
+      button:focus-visible {
+        outline: 3px solid #fff19f;
+        outline-offset: 3px;
+      }
+
+      .paused *,
+      .paused *::before,
+      .paused *::after {
+        animation-play-state: paused !important;
+      }
+
+      @keyframes flight-path {
+        0%,
+        100% {
+          transform: translate3d(5vw, 35vh, 0) rotate(-3deg) scale(0.84);
+        }
+        18% {
+          transform: translate3d(31vw, 11vh, 0) rotate(4deg) scale(1);
+        }
+        38% {
+          transform: translate3d(64vw, 24vh, 0) rotate(-1deg) scale(0.92);
+        }
+        57% {
+          transform: translate3d(56vw, 60vh, 0) rotate(5deg) scale(1.05);
+        }
+        76% {
+          transform: translate3d(22vw, 55vh, 0) rotate(-5deg) scale(0.9);
+        }
+      }
+
+      @keyframes body-bob {
+        0% {
+          transform: translate3d(0, -9px, 0) rotate(-1.4deg);
+        }
+        45% {
+          transform: translate3d(2px, 2px, 0) rotate(0.5deg);
+        }
+        100% {
+          transform: translate3d(-1px, 10px, 0) rotate(1.8deg);
+        }
+      }
+
+      @keyframes upper-wing {
+        0%,
+        100% {
+          transform: rotate(4deg) scaleY(1);
+        }
+        42% {
+          transform: rotate(-35deg) scaleY(0.7);
+        }
+        56% {
+          transform: rotate(-43deg) scaleY(0.58);
+        }
+        83% {
+          transform: rotate(-5deg) scaleY(0.94);
+        }
+      }
+
+      @keyframes lower-wing {
+        0%,
+        100% {
+          transform: rotate(-2deg) scaleY(1);
+        }
+        39% {
+          transform: rotate(28deg) scaleY(0.73);
+        }
+        55% {
+          transform: rotate(37deg) scaleY(0.61);
+        }
+        81% {
+          transform: rotate(3deg) scaleY(0.93);
+        }
+      }
+
+      @keyframes far-upper-wing {
+        0%,
+        100% {
+          transform: translate(-3px, 6px) rotate(8deg) scaleY(0.94);
+        }
+        46% {
+          transform: translate(-3px, 6px) rotate(-29deg) scaleY(0.57);
+        }
+        61% {
+          transform: translate(-3px, 6px) rotate(-37deg) scaleY(0.52);
+        }
+      }
+
+      @keyframes far-lower-wing {
+        0%,
+        100% {
+          transform: translate(-4px, 8px) rotate(-5deg) scaleY(0.94);
+        }
+        43% {
+          transform: translate(-4px, 8px) rotate(23deg) scaleY(0.58);
+        }
+        59% {
+          transform: translate(-4px, 8px) rotate(31deg) scaleY(0.52);
+        }
+      }
+
+      @keyframes front-leg-sway {
+        from {
+          transform: rotate(-1.8deg) translateY(-1px);
+        }
+        to {
+          transform: rotate(2.2deg) translateY(2px);
+        }
+      }
+
+      @keyframes middle-leg-sway {
+        from {
+          transform: rotate(1.5deg) translateY(-1px);
+        }
+        to {
+          transform: rotate(-2deg) translateY(2px);
+        }
+      }
+
+      @keyframes back-leg-sway {
+        from {
+          transform: rotate(-1deg);
+        }
+        to {
+          transform: rotate(1.8deg) translateY(2px);
+        }
+      }
+
+      @keyframes shadow-pulse {
+        from {
+          opacity: 0.43;
+          transform: scale(0.9);
+        }
+        to {
+          opacity: 0.22;
+          transform: scale(1.06);
+        }
+      }
+
+      @keyframes cloud-drift {
+        to {
+          transform: translateX(145vw);
+        }
+      }
+
+      @media (max-width: 680px) {
+        .flight-rig {
+          width: clamp(210px, 58vw, 340px);
+        }
+
+        .label {
+          display: none;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .scene * {
+          animation-duration: 8s !important;
+        }
+
+        .wing,
+        .leg {
+          animation: none !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="scene" aria-label="장수말벌 비행 애니메이션">
+      <div class="cloud one" aria-hidden="true"></div>
+      <div class="cloud two" aria-hidden="true"></div>
+
+      <div class="controls">
+        <span class="label">장수말벌 · Vespa mandarinia</span>
+        <button id="motion-toggle" type="button" aria-pressed="false">일시정지</button>
+      </div>
+
+      <div class="flight-rig" aria-hidden="true">
+        <div class="bob-rig">
+          <div class="shadow"></div>
+          <svg
+            class="hornet"
+            viewBox="0 0 512 512"
+            role="img"
+            aria-label="날갯짓하며 날아다니는 장수말벌"
+          >
+            <defs>
+              <path
+                id="upper-wing-shape"
+                d="M213 229 C245 166 341 75 449 70 C473 68 483 78 474 99 C446 155 330 212 213 229 Z"
+              />
+              <path
+                id="lower-wing-shape"
+                d="M211 231 C280 190 396 143 484 153 C506 156 505 169 491 183 C432 235 310 251 211 231 Z"
+              />
+              <path
+                id="front-leg-shape"
+                d="M103 247 L165 250 L158 304 L124 343 L114 395 L76 398 L101 337 L81 319 L82 286 Z"
+              />
+              <path
+                id="middle-leg-shape"
+                d="M183 252 L246 253 L250 307 L229 353 L220 429 L179 431 L196 352 L176 309 Z"
+              />
+              <path
+                id="back-leg-shape"
+                d="M296 259 L345 267 L354 318 L385 355 L428 420 L395 438 L356 379 L327 347 L302 305 Z"
+              />
+
+              <clipPath id="upper-wing-clip" clipPathUnits="userSpaceOnUse">
+                <use href="#upper-wing-shape" />
+              </clipPath>
+              <clipPath id="lower-wing-clip" clipPathUnits="userSpaceOnUse">
+                <use href="#lower-wing-shape" />
+              </clipPath>
+              <clipPath id="front-leg-clip" clipPathUnits="userSpaceOnUse">
+                <use href="#front-leg-shape" />
+              </clipPath>
+              <clipPath id="middle-leg-clip" clipPathUnits="userSpaceOnUse">
+                <use href="#middle-leg-shape" />
+              </clipPath>
+              <clipPath id="back-leg-clip" clipPathUnits="userSpaceOnUse">
+                <use href="#back-leg-shape" />
+              </clipPath>
+
+              <mask
+                id="body-mask"
+                x="0"
+                y="0"
+                width="512"
+                height="512"
+                maskUnits="userSpaceOnUse"
+              >
+                <rect width="512" height="512" fill="#fff" />
+                <use href="#upper-wing-shape" fill="#000" />
+                <use href="#lower-wing-shape" fill="#000" />
+                <use href="#front-leg-shape" fill="#000" />
+                <use href="#middle-leg-shape" fill="#000" />
+                <use href="#back-leg-shape" fill="#000" />
+              </mask>
+            </defs>
+
+            <g class="wing far-upper" clip-path="url(#upper-wing-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+            <g class="wing far-lower" clip-path="url(#lower-wing-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+
+            <image
+              href="assets/vespa-mandarinia.png"
+              width="512"
+              height="512"
+              mask="url(#body-mask)"
+            />
+
+            <g class="leg front-leg" clip-path="url(#front-leg-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+            <g class="leg middle-leg" clip-path="url(#middle-leg-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+            <g class="leg back-leg" clip-path="url(#back-leg-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+
+            <g class="wing near-upper" clip-path="url(#upper-wing-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+            <g class="wing near-lower" clip-path="url(#lower-wing-clip)">
+              <image href="assets/vespa-mandarinia.png" width="512" height="512" />
+            </g>
+          </svg>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const toggle = document.querySelector("#motion-toggle");
+
+      toggle.addEventListener("click", () => {
+        const paused = document.body.classList.toggle("paused");
+        toggle.textContent = paused ? "계속 재생" : "일시정지";
+        toggle.setAttribute("aria-pressed", String(paused));
+      });
+    </script>
+  </body>
+</html>

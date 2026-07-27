@@ -46,6 +46,11 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
   const visual = getSpeciesVisual(card.species_id);
   const heroBg = card.is_dangerous ? colors.dangerBg : getPastel(visual.pastel);
   const timeIcon = ACTIVE_TIME_ICON[card.active_time] ?? '🕒';
+  // 앱이 새 버전이어도 이전 서버 응답·캐시에는 후속 콘텐츠 필드가 없을 수 있다.
+  // 도감 기본 정보는 계속 보여 주고, 선택 콘텐츠만 빈 상태로 처리한다.
+  const observePoints = card.observe_points ?? [];
+  const quiz = card.quiz ?? [];
+  const similarSpecies = card.similar_species ?? [];
 
   const inviteToGarden = () => {
     navigation.navigate('Main');
@@ -101,10 +106,10 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             <Text style={styles.funFactText}>{card.fun_fact}</Text>
           </View>
 
-          {card.observe_points.length > 0 && (
+          {observePoints.length > 0 && (
             <View style={styles.observeSection}>
               <Text style={styles.sectionTitle}>🔍 관찰 포인트</Text>
-              {card.observe_points.map((point) => (
+              {observePoints.map((point) => (
                 <View key={point} style={styles.observeRow}>
                   <Text style={styles.observeBullet}>•</Text>
                   <Text style={styles.observeText}>{point}</Text>
@@ -113,10 +118,10 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             </View>
           )}
 
-          {card.quiz.length > 0 && (
+          {quiz.length > 0 && (
             <View style={styles.quizSection}>
               <Text style={styles.sectionTitle}>🧠 퀴즈에 도전해봐요</Text>
-              {card.quiz.map((q) => (
+              {quiz.map((q) => (
                 <QuizQuestion key={q.q} question={q} />
               ))}
             </View>
@@ -126,11 +131,11 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             <Text style={styles.ctaText}>우리집 정원에 초대하기</Text>
           </Pressable>
 
-          {card.similar_species.length > 0 && (
+          {similarSpecies.length > 0 && (
             <View style={styles.similarSection}>
               <Text style={styles.sectionTitle}>👀 헷갈리기 쉬운 친구들</Text>
               <View style={styles.similarRow}>
-                {card.similar_species.map((s) => (
+                {similarSpecies.map((s) => (
                   <Pressable
                     key={s.species_id}
                     style={styles.similarChip}

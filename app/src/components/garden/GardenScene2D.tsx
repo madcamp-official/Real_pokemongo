@@ -1,6 +1,7 @@
 import { forwardRef, useEffect, useMemo, useRef } from 'react';
 import {
   Animated as RNAnimated,
+  Easing,
   Image,
   Pressable,
   StyleSheet,
@@ -15,7 +16,10 @@ import Animated, {
   useSharedValue,
 } from 'react-native-reanimated';
 import type { GardenTile, Placement, TaxonGroup } from '@/types/api';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import {
+  GardenCreatureArt,
+  hasWingedInsectArt,
+} from '@/components/garden/GardenCreatureArt';
 import { DecorationArt } from '@/components/garden/DecorationArt';
 import {
   DECORATIONS,
@@ -24,6 +28,24 @@ import {
 import { gardenPointPercent } from '@/theme/garden';
 
 const GARDEN_BACKGROUND = require('../../../assets/garden/garden-starter-world-v1.png');
+
+// 나무·관목은 정원의 지형을 이루는 오브젝트이므로 일반 초화류보다 크게 보인다.
+// DB 응답의 taxon- 접두사 유무와 상관없이 판별한다.
+const TREE_SPECIES = new Set([
+  'toxicodendron-vernicifluum',
+  'lindera-obtusiloba',
+  'quercus-mongolica',
+  'pinus-densiflora',
+  'zanthoxylum-schinifolium',
+  'neillia-incisa',
+  'quercus-variabilis',
+  'callicarpa-japonica',
+  'ligustrum-obtusifolium',
+]);
+
+function isTreeSpecies(speciesId: string): boolean {
+  return TREE_SPECIES.has(speciesId.replace(/^(taxon-|sp_)/, '').replace(/_/g, '-'));
+}
 
 export const GARDEN_WORLD_WIDTH = 1400;
 export const GARDEN_WORLD_HEIGHT = 596;
@@ -49,6 +71,8 @@ interface Props {
   isDragging: boolean;
   compatibleTiles: Set<string>;
   onCreaturePress: (creatureId: string) => void;
+  onCreatureMoveStart: (creatureId: string) => void;
+  onCompatibleTilePress?: (row: number, col: number) => void;
   onDecorationRemove: (id: string) => void;
   onTransformChange: (transform: GardenTransform) => void;
 }
@@ -67,6 +91,8 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
     isDragging,
     compatibleTiles,
     onCreaturePress,
+    onCreatureMoveStart,
+    onCompatibleTilePress,
     onDecorationRemove,
     onTransformChange,
   },
@@ -167,11 +193,25 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
               const key = `${tile.row},${tile.col}`;
               if (!compatibleTiles.has(key)) return null;
               const point = gardenPointPercent(tile.row, tile.col);
-              return (
+              const left = `${point.x}%` as `${number}%`;
+              const top = `${point.y}%` as `${number}%`;
+              return onCompatibleTilePress ? (
+                <Pressable
+                  key={key}
+                  onPress={() => onCompatibleTilePress(tile.row, tile.col)}
+                  accessibilityRole="button"
+                  accessibilityLabel="이 위치로 옮기기"
+                  style={({ pressed }) => [
+                    styles.dropTarget,
+                    { left, top },
+                    pressed && styles.dropTargetPressed,
+                  ]}
+                />
+              ) : (
                 <View
                   key={key}
                   pointerEvents="none"
-                  style={[styles.dropTarget, { left: `${point.x}%`, top: `${point.y}%` }]}
+                  style={[styles.dropTarget, { left, top }]}
                 />
               );
             })}
@@ -218,6 +258,7 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
                 left={`${point.x}%`}
                 top={`${point.y}%`}
                 onPress={onCreaturePress}
+                onMoveStart={onCreatureMoveStart}
               />
             );
           })}
@@ -248,6 +289,7 @@ function GardenSprite({
   left,
   top,
   onPress,
+  onMoveStart,
 }: {
   creatureId: string;
   speciesId: string;
@@ -255,51 +297,192 @@ function GardenSprite({
   left: `${number}%`;
   top: `${number}%`;
   onPress: (creatureId: string) => void;
+  onMoveStart: (creatureId: string) => void;
 }) {
   const motion = useRef(new RNAnimated.Value(0)).current;
+  const flight = useRef(new RNAnimated.ValueXY({ x: 0, y: 0 })).current;
   const delay = useMemo(
     () => [...creatureId].reduce((sum, char) => sum + char.charCodeAt(0), 0) % 1500,
     [creatureId]
   );
   const isPlant = group === '식물';
+  const isInsect = group === '곤충';
+  const isTree = isTreeSpecies(speciesId);
+  const isWingedInsect = isInsect && hasWingedInsectArt(speciesId);
+  const artSize = isTree ? 178 : isPlant ? 78 : group === '조류' ? 74 : isInsect ? 48 : 62;
+  const motionDuration = isPlant ? 2100 : isInsect ? 1650 : 2900;
+  const anchorWidth = isTree ? 190 : 100;
+  const anchorHeight = isTree ? 190 : 102;
+  const flightPath = useMemo(() => {
+    const seed = [...creatureId].reduce(
+      (value, char) => Math.imul(value ^ char.charCodeAt(0), 16777619),
+      2166136261
+    );
+    const unit = (offset: number) => {
+      const mixed = Math.imul(seed ^ (offset * 374761393), 668265263);
+      return ((mixed ^ (mixed >>> 13)) >>> 0) / 4294967295;
+    };
+    const direction = unit(1) > 0.5 ? 1 : -1;
+    return [
+      {
+        x: direction * (62 + unit(2) * 38),
+        y: -(20 + unit(3) * 28),
+        duration: 3000 + unit(4) * 1600,
+      },
+      {
+        x: -direction * (45 + unit(5) * 40),
+        y: 10 + unit(6) * 26,
+        duration: 3600 + unit(7) * 1800,
+      },
+      {
+        x: direction * (85 + unit(8) * 45),
+        y: -(10 + unit(9) * 34),
+        duration: 3400 + unit(10) * 2000,
+      },
+      {
+        x: -direction * (60 + unit(11) * 40),
+        y: -(22 + unit(12) * 28),
+        duration: 3800 + unit(13) * 1800,
+      },
+      {
+        x: 0,
+        y: 0,
+        duration: 3400 + unit(14) * 1600,
+      },
+    ];
+  }, [creatureId]);
 
   useEffect(() => {
+    if (isTree) {
+      motion.setValue(0);
+      flight.setValue({ x: 0, y: 0 });
+      return;
+    }
+
+    if (isWingedInsect) {
+      motion.setValue(0);
+      flight.setValue({ x: 0, y: 0 });
+      const roam = RNAnimated.loop(
+        RNAnimated.sequence(
+          flightPath.map((point) =>
+            RNAnimated.timing(flight, {
+              toValue: { x: point.x, y: point.y },
+              duration: point.duration,
+              easing: Easing.inOut(Easing.sin),
+              useNativeDriver: true,
+            })
+          )
+        )
+      );
+      const hover = RNAnimated.loop(
+        RNAnimated.sequence([
+          RNAnimated.timing(motion, {
+            toValue: 1,
+            duration: 1500,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+          RNAnimated.timing(motion, {
+            toValue: 0,
+            duration: 1900,
+            easing: Easing.inOut(Easing.sin),
+            useNativeDriver: true,
+          }),
+        ])
+      );
+      const animation = RNAnimated.sequence([
+        RNAnimated.delay(250 + delay),
+        RNAnimated.parallel([roam, hover]),
+      ]);
+      animation.start();
+      return () => animation.stop();
+    }
+
+    flight.setValue({ x: 0, y: 0 });
     const animation = RNAnimated.loop(
       RNAnimated.sequence([
         RNAnimated.delay(delay),
         RNAnimated.timing(motion, {
           toValue: 1,
-          duration: isPlant ? 2100 : 2900,
+          duration: motionDuration,
           useNativeDriver: true,
         }),
         RNAnimated.timing(motion, {
           toValue: 0,
-          duration: isPlant ? 2100 : 2900,
+          duration: motionDuration + (isInsect ? 180 : 0),
           useNativeDriver: true,
         }),
       ])
     );
     animation.start();
     return () => animation.stop();
-  }, [delay, isPlant, motion]);
+  }, [
+    delay,
+    flight,
+    flightPath,
+    isPlant,
+    isInsect,
+    isTree,
+    isWingedInsect,
+    motion,
+    motionDuration,
+  ]);
 
-  const transform = isPlant
+  const transform = isTree
+    ? []
+    : isWingedInsect
+    ? [
+        { translateX: flight.x },
+        { translateY: flight.y },
+        {
+          translateY: motion.interpolate({
+            inputRange: [0, 1],
+            outputRange: [-1.5, 2.5],
+          }),
+        },
+        {
+          rotate: motion.interpolate({
+            inputRange: [0, 1],
+            outputRange: ['-1.2deg', '1.2deg'],
+          }),
+        },
+      ]
+    : isPlant
     ? [{ rotate: motion.interpolate({ inputRange: [0, 1], outputRange: ['-2deg', '2deg'] }) }]
     : [
-        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: [-7, 8] }) },
-        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: [0, -4, 0] }) },
+        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: isInsect ? [-12, 13] : [-7, 8] }) },
+        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: isInsect ? [0, -7, 1] : [0, -4, 0] }) },
       ];
 
   return (
-    <RNAnimated.View style={[styles.spriteAnchor, { left, top, transform }]}>
+    <RNAnimated.View
+      style={[
+        styles.spriteAnchor,
+        {
+          left,
+          top,
+          width: anchorWidth,
+          height: anchorHeight,
+          marginLeft: -anchorWidth / 2,
+          // 모든 스프라이트의 발밑이 같은 타일 좌표에 오도록 맞춘다.
+          marginTop: -anchorHeight + 14,
+          transform,
+        },
+      ]}
+    >
       <Pressable
         onPress={() => onPress(creatureId)}
+        onLongPress={() => onMoveStart(creatureId)}
+        delayLongPress={360}
         accessibilityRole="button"
-        accessibilityLabel="정원 친구 정보 보기"
-        style={({ pressed }) => [styles.spriteButton, pressed && styles.spritePressed]}
+        accessibilityLabel="정원 친구 정보 보기, 길게 눌러 위치 옮기기"
+        style={({ pressed }) => [
+          styles.spriteButton,
+          pressed && !isTree && styles.spritePressed,
+        ]}
       >
-        <View style={[styles.spriteShadow, isPlant && styles.plantShadow]} />
-        <CreatureArt speciesId={speciesId} size={isPlant ? 62 : 54} />
+        <View style={[styles.spriteShadow, isPlant && styles.plantShadow, isTree && styles.treeShadow]} />
+        <GardenCreatureArt speciesId={speciesId} size={artSize} />
       </Pressable>
     </RNAnimated.View>
   );
@@ -353,24 +536,25 @@ const styles = StyleSheet.create({
     borderWidth: 3,
     borderColor: 'rgba(255,255,220,0.96)',
   },
+  dropTargetPressed: {
+    backgroundColor: 'rgba(255,207,64,0.72)',
+    transform: [{ scale: 1.12 }],
+  },
   decoration: { position: 'absolute', alignItems: 'center', justifyContent: 'flex-end' },
   spriteAnchor: {
     position: 'absolute',
-    width: 72,
-    height: 78,
-    marginLeft: -36,
-    marginTop: -62,
   },
   spriteButton: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
   spritePressed: { opacity: 0.75, transform: [{ scale: 0.94 }] },
   spriteShadow: {
     position: 'absolute',
     bottom: 3,
-    width: 45,
-    height: 13,
+    width: 52,
+    height: 14,
     borderRadius: 24,
     backgroundColor: 'rgba(42,63,28,0.25)',
     transform: [{ scaleX: 1.2 }],
   },
   plantShadow: { width: 52, opacity: 0.75 },
+  treeShadow: { width: 78, height: 18, opacity: 0.65 },
 });
