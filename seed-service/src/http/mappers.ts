@@ -172,9 +172,11 @@ export function creatureToApiCreature(c: Creature): ApiCreature {
 }
 
 /**
- * 종 + (있으면) 도감 기록 + 실제 개체 목록 → DexEntry. 미해금 종은 mock 관례와 동일하게
- * name="???". D단계부터 `creatures`는 합성이 아니라 실제 `Creature` 레코드다(종당 최대
- * 1마리 — ObservationFlow.recordIdentification이 첫 해금 때만 생성).
+ * 종 + (있으면) 도감 기록 + 실제 개체 목록 → DexEntry. 이름은 미해금 종도 그대로 노출한다
+ * (도감 목록에서 "무엇을 찾아야 하는지" 알 수 있게) — 실루엣/사진/재미있는 사실 등 나머지
+ * 상세 정보만 발견 전에는 숨긴다(SpeciesGridCard 잠금 UI, 종 카드 화면). D단계부터
+ * `creatures`는 합성이 아니라 실제 `Creature` 레코드다(종당 최대 1마리 —
+ * ObservationFlow.recordIdentification이 첫 해금 때만 생성).
  */
 export function collectionEntryToDexEntry(
   taxon: Taxon,
@@ -184,7 +186,7 @@ export function collectionEntryToDexEntry(
   const discovered = entry?.unlocked ?? false;
   return {
     species_id: taxon.id as string,
-    name: discovered ? taxon.korName || taxon.sciName : "???",
+    name: taxon.korName || taxon.sciName,
     discovered,
     group: taxonGroupToKorean(taxon.group),
     creatures: discovered ? creatures.map(creatureToApiCreature) : [],

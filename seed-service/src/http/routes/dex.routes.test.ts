@@ -51,7 +51,22 @@ test("GET /dex: 시드 종 전체가 discovered=false로 나온다(관찰 전)",
   assert.equal(res.statusCode, 200);
   const entries = res.json();
   assert.equal(entries.length, SEED_TAXA.length);
-  assert.ok(entries.every((e: { discovered: boolean; name: string }) => e.discovered === false && e.name === "???"));
+  assert.ok(entries.every((e: { discovered: boolean }) => e.discovered === false));
+});
+
+test("GET /dex: 미해금 종도 이름은 실제 국명으로 보인다(???로 가려지지 않음)", async () => {
+  const { server } = await testServer();
+  const token = await signupAndGetToken(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/dex",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  const entries = res.json() as { species_id: string; name: string; discovered: boolean }[];
+  const dandelion = entries.find((e) => e.species_id === "taxon-dandelion");
+  assert.equal(dandelion?.discovered, false);
+  assert.equal(dandelion?.name, "서양민들레");
+  assert.notEqual(dandelion?.name, "???");
 });
 
 test("GET /dex: ?group= 으로 서버사이드 필터링(곤충 31종)", async () => {

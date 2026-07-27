@@ -98,10 +98,10 @@ test("taxonToSpeciesCard: 콘텐츠/안전정보 없을 때 안전한 기본값"
   assert.equal(card.safety_notes, undefined);
 });
 
-test("collectionEntryToDexEntry: 미해금은 이름 '???'(mock 관례와 동일), creatures 비어있음", () => {
+test("collectionEntryToDexEntry: 미해금이어도 이름은 실제 국명(도감에서 뭘 찾아야 하는지 알 수 있게), creatures만 비어있음", () => {
   const entry = collectionEntryToDexEntry(taxon(), null);
   assert.equal(entry.discovered, false);
-  assert.equal(entry.name, "???");
+  assert.equal(entry.name, "민들레");
   assert.deepEqual(entry.creatures, []);
 });
 

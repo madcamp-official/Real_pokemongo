@@ -43,8 +43,8 @@ export function registerDexRoutes(
         }),
       );
 
-      // ?sort=name 만 지원(현재 유일하게 의미 있는 축 — 미해금 종은 이름이 전부 "???"라
-      // 서로 순서가 안 갈리는 게 정상). 지정 안 하면 기존과 동일하게 taxa.list() 순서 유지.
+      // ?sort=name 만 지원. 이름은 미해금 종도 실제 국명이 나오므로(collectionEntryToDexEntry
+      // 참고) 정렬이 항상 의미 있다. 지정 안 하면 기존과 동일하게 taxa.list() 순서 유지.
       if (sort === "name") {
         entries.sort((a, b) => a.name.localeCompare(b.name, "ko"));
       }
