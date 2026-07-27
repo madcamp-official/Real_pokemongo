@@ -12,6 +12,7 @@ import { XPBar } from '@/components/rewards/XPBar';
 import { BadgeGrid } from '@/components/rewards/BadgeGrid';
 import { QuestList } from '@/components/rewards/QuestList';
 import { LevelUpCelebration } from '@/components/rewards/LevelUpCelebration';
+import { ScreenHeader } from '@/components/nav/ScreenHeader';
 import { colors } from '@/theme/colors';
 import type { RootStackParamList } from '@/navigation/types';
 import type { XPProfile } from '@/types/api';
@@ -84,9 +85,7 @@ export default function RewardsScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
-      <View style={styles.header}>
-        <Text style={styles.title}>보상함</Text>
-      </View>
+      <ScreenHeader title="보상함" />
 
       {isLoading || !xpQuery.data ? (
         <View style={styles.center}>

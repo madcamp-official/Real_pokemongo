@@ -1,26 +1,19 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 /**
- * 촬영 가이드 오버레이 (F2).
- * 중앙 프레이밍 가이드 + 상황별 힌트(근접/흔들림) 안내.
- * Phase 1에서는 정적 프레임 + 안내 카피. 실시간 흔들림/근접 감지는 F19(프리뷰 스캔)와
- * 함께 후속 고도화 대상.
+ * 촬영 프레이밍 가이드 (F2).
+ * 중앙 네 모서리 가이드만 담당한다. 안내 문구는 CameraScreen 하단 힌트 알약이
+ * 맡는다(상단에 겹쳐 그리면 게스트 배지·컨트롤과 충돌해 분리).
  */
 interface Props {
-  hint?: string;
   /** F8 레벨업 언락 시 프레임 강조색(기본은 흰색). 예: 골드 프레임. */
   accentColor?: string;
 }
 
-export function GuideOverlay({ hint = '생물을 가운데 담아요', accentColor }: Props) {
+export function GuideOverlay({ accentColor }: Props) {
   const cornerColor = accentColor ?? DEFAULT_COLOR;
   return (
     <View style={styles.overlay} pointerEvents="none">
-      <View style={styles.topHint}>
-        <Text style={styles.hintText}>{hint}</Text>
-      </View>
-
-      {/* 중앙 프레이밍 가이드 (네 모서리) */}
       <View style={styles.frame}>
         <View style={[styles.corner, styles.tl, { borderColor: cornerColor }]} />
         <View style={[styles.corner, styles.tr, { borderColor: cornerColor }]} />
@@ -31,9 +24,11 @@ export function GuideOverlay({ hint = '생물을 가운데 담아요', accentCol
   );
 }
 
-const CORNER = 28;
+const CORNER = 30;
 const BORDER = 3;
-const DEFAULT_COLOR = 'rgba(255,255,255,0.9)';
+const RADIUS = 14;
+// 스캔 말풍선과 겹쳐도 시선을 뺏지 않도록 기존보다 옅게 잡는다.
+const DEFAULT_COLOR = 'rgba(255,255,255,0.72)';
 
 const styles = StyleSheet.create({
   overlay: {
@@ -45,19 +40,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  topHint: {
-    position: 'absolute',
-    top: 24,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-    borderRadius: 20,
-  },
-  hintText: { color: '#fff', fontSize: 15, fontWeight: '600' },
-  frame: { width: '72%', aspectRatio: 1, maxWidth: 320 },
+  frame: { width: '70%', aspectRatio: 1, maxWidth: 300 },
   corner: { position: 'absolute', width: CORNER, height: CORNER },
-  tl: { top: 0, left: 0, borderTopWidth: BORDER, borderLeftWidth: BORDER, borderTopLeftRadius: 8 },
-  tr: { top: 0, right: 0, borderTopWidth: BORDER, borderRightWidth: BORDER, borderTopRightRadius: 8 },
-  bl: { bottom: 0, left: 0, borderBottomWidth: BORDER, borderLeftWidth: BORDER, borderBottomLeftRadius: 8 },
-  br: { bottom: 0, right: 0, borderBottomWidth: BORDER, borderRightWidth: BORDER, borderBottomRightRadius: 8 },
+  tl: { top: 0, left: 0, borderTopWidth: BORDER, borderLeftWidth: BORDER, borderTopLeftRadius: RADIUS },
+  tr: { top: 0, right: 0, borderTopWidth: BORDER, borderRightWidth: BORDER, borderTopRightRadius: RADIUS },
+  bl: { bottom: 0, left: 0, borderBottomWidth: BORDER, borderLeftWidth: BORDER, borderBottomLeftRadius: RADIUS },
+  br: { bottom: 0, right: 0, borderBottomWidth: BORDER, borderRightWidth: BORDER, borderBottomRightRadius: RADIUS },
 });

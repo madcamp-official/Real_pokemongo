@@ -43,7 +43,11 @@ interface AuthState {
   setConsent: (consent: ConsentState) => void;
   completeOnboarding: () => void;
 
-  startGuest: () => void;
+  /**
+   * 게스트 세션 시작. 서버에서 받은 토큰을 함께 넘긴다 —
+   * 토큰 없이 시작하면 도감·지도·업로드가 전부 401이 된다(서버 미가동 시의 폴백일 뿐).
+   */
+  startGuest: (token?: string, user?: UserProfile) => void;
   incrementGuestSighting: () => void;
   resetGuestData: () => void;
   setUser: (user: UserProfile) => void;
@@ -85,7 +89,10 @@ export const useAuthStore = create<AuthState>()(
       setConsent: (consent) => set({ consent }),
       completeOnboarding: () => set({ onboardingComplete: true }),
 
-      startGuest: () => set({ isGuest: true, guestSightingCount: 0 }),
+      startGuest: (token, user) => {
+        set({ isGuest: true, guestSightingCount: 0, accessToken: token ?? null, user: user ?? null });
+        if (token) void setStoredToken(token);
+      },
       incrementGuestSighting: () =>
         set((s) => ({ guestSightingCount: s.guestSightingCount + 1 })),
       resetGuestData: () => set({ isGuest: false, guestSightingCount: 0 }),

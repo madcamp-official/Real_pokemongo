@@ -1,72 +1,47 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
-
-export type CaptureMode = 'single' | 'burst';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { colors } from '@/theme/colors';
 
 /**
- * 초대형 셔터 버튼 + 단일/버스트 모드 토글 (F2).
- * 아동 대상이라 터치 타깃을 크게 잡는다.
+ * 초대형 셔터 버튼 (F2).
+ * 누르는 동안 계속 촬영되고 떼면 끝난다 — 톡 누르면 한 장, 꾹 누르면 연속.
+ * 아동 대상이라 터치 타깃을 크게 잡고, 누르는 중임을 코랄 링으로 분명히 보여준다.
  */
 interface Props {
-  mode: CaptureMode;
+  /** 누르고 있는 중인지 — 시각 피드백에만 쓴다. */
+  holding?: boolean;
   disabled?: boolean;
-  onCapture: () => void;
-  onToggleMode: () => void;
+  onPressIn: () => void;
+  onPressOut: () => void;
 }
 
-export function CaptureButton({ mode, disabled, onCapture, onToggleMode }: Props) {
+export function CaptureButton({ holding, disabled, onPressIn, onPressOut }: Props) {
   return (
-    <View style={styles.row}>
-      <View style={styles.side} />
-
-      <Pressable
-        onPress={onCapture}
-        disabled={disabled}
-        style={({ pressed }) => [
-          styles.shutterOuter,
-          pressed && !disabled && styles.pressed,
-          disabled && styles.disabled,
-        ]}
-        accessibilityRole="button"
-        accessibilityLabel="촬영"
-      >
-        <View style={styles.shutterInner} />
-      </Pressable>
-
-      <View style={styles.side}>
-        <Pressable
-          onPress={onToggleMode}
-          disabled={disabled}
-          style={styles.modeToggle}
-          accessibilityRole="button"
-          accessibilityLabel={mode === 'single' ? '단일 촬영' : '버스트 촬영'}
-        >
-          <Text style={styles.modeText}>{mode === 'single' ? '단일' : '연속'}</Text>
-        </Pressable>
-      </View>
-    </View>
+    <Pressable
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}
+      disabled={disabled}
+      style={[styles.shutterOuter, holding && styles.shutterOuterHolding, disabled && styles.disabled]}
+      accessibilityRole="button"
+      accessibilityLabel="촬영 — 누르고 있으면 연속으로 담아요"
+    >
+      <View style={[styles.shutterInner, holding && styles.shutterInnerHolding]} />
+    </Pressable>
   );
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  side: { width: 72, alignItems: 'center', justifyContent: 'center' },
   shutterOuter: {
-    width: 84,
-    height: 84,
-    borderRadius: 42,
+    width: 88,
+    height: 88,
+    borderRadius: 44,
     borderWidth: 5,
-    borderColor: 'rgba(255,255,255,0.9)',
+    borderColor: 'rgba(255,255,255,0.95)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  shutterInner: { width: 64, height: 64, borderRadius: 32, backgroundColor: '#fff' },
-  pressed: { transform: [{ scale: 0.92 }] },
+  shutterOuterHolding: { borderColor: colors.primary },
+  shutterInner: { width: 68, height: 68, borderRadius: 34, backgroundColor: '#fff' },
+  // 누르는 동안 안쪽 원이 작아지며 코랄로 — "지금 담고 있어요" 신호.
+  shutterInnerHolding: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.primary },
   disabled: { opacity: 0.5 },
-  modeToggle: {
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 16,
-    backgroundColor: 'rgba(0,0,0,0.45)',
-  },
-  modeText: { color: '#fff', fontSize: 14, fontWeight: '700' },
 });

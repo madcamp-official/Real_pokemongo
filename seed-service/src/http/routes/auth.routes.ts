@@ -131,6 +131,17 @@ export function registerAuthRoutes(
     },
   );
 
+  // 게스트도 서버 세션(토큰)을 갖는다. 토큰 없이는 /dex·/map/pins·/sightings/upload가
+  // 전부 401이라 게스트 모드에서 앱이 아무것도 못 한다 — 아래 /session/guest/convert가
+  // `preHandler: authenticate`인 것도 "게스트는 이미 토큰을 들고 있다"는 전제였다.
+  // 자격증명(이메일/비밀번호)은 저장하지 않으므로 이 계정은 이 토큰으로만 접근 가능하고,
+  // 나중에 /auth/signup으로 정식 전환한다.
+  server.post("/session/guest", async (request, reply) => {
+    const user = await app.accounts.createUser({ nickname: "탐험가", avatar: "fox" });
+    const accessToken = await reply.jwtSign({ sub: user.id });
+    return buildSignupResponse(accessToken, user, "");
+  });
+
   server.post(
     "/session/guest/convert",
     { preHandler: authenticate },

@@ -1,8 +1,9 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
+import { startGuestSession } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
 import { MainTabs } from '@/navigation/MainTabs';
 import TutorialScreen from '@/screens/onboarding/TutorialScreen';
@@ -22,10 +23,28 @@ export function RootNavigator() {
   const accessToken = useAuthStore((s) => s.accessToken);
   const isGuest = useAuthStore((s) => s.isGuest);
   const hydrateToken = useAuthStore((s) => s.hydrateToken);
+  const startGuest = useAuthStore((s) => s.startGuest);
+  const guestRepairAttempted = useRef(false);
 
   useEffect(() => {
     void hydrateToken();
   }, [hydrateToken]);
+
+  // 게스트인데 토큰이 없는 세션을 자동 복구한다.
+  // 예전에는 게스트가 서버 세션 없이 시작돼서 /dex·/map/pins·/sightings/upload가 전부
+  // 401이 났고, 화면에는 "서버에 연결하지 못했어요"로 보였다. 이미 그 상태로 저장된
+  // 기기는 재설치 없이는 못 빠져나오므로 여기서 세션을 새로 받아 붙인다.
+  useEffect(() => {
+    if (!hasHydratedStore || !hasHydratedToken) return;
+    if (!isGuest || accessToken || guestRepairAttempted.current) return;
+    guestRepairAttempted.current = true;
+    void startGuestSession()
+      .then((session) => startGuest(session.access_token, session.user))
+      .catch(() => {
+        // 서버에 못 닿으면 다음 실행 때 다시 시도한다(로컬 게스트로는 계속 사용 가능).
+        guestRepairAttempted.current = false;
+      });
+  }, [hasHydratedStore, hasHydratedToken, isGuest, accessToken, startGuest]);
 
   // zustand persist 재수화(로컬 상태) + secure-store 토큰 복원이 끝날 때까지 대기.
   // 대기 없이 렌더하면 재방문 사용자에게 튜토리얼이 잠깐 다시 보이는 깜빡임이 생긴다.

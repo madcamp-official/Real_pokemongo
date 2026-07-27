@@ -8,6 +8,7 @@ import { fetchDex, fetchDexCompletion } from '@/api/dex';
 import { DexProgressHeader } from '@/components/dex/DexProgressHeader';
 import { FilterChips, type DexFilter } from '@/components/dex/FilterChips';
 import { SpeciesGridCard } from '@/components/dex/SpeciesGridCard';
+import { ScreenHeader } from '@/components/nav/ScreenHeader';
 import { colors } from '@/theme/colors';
 import type { DexEntry } from '@/types/api';
 import type { RootStackParamList } from '@/navigation/types';
@@ -38,6 +39,7 @@ export default function DexScreen() {
 
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
+      <ScreenHeader title="도감" />
       <FlatList
         data={filtered}
         keyExtractor={(item) => item.species_id}

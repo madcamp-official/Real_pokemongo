@@ -18,6 +18,15 @@ export async function login(req: LoginRequest): Promise<LoginResponse> {
   return data;
 }
 
+/**
+ * 게스트 세션 시작 — 자격증명 없는 임시 계정과 토큰을 발급받는다.
+ * 토큰이 없으면 도감·지도·업로드가 전부 401이라 게스트 모드에서 앱이 동작하지 않는다.
+ */
+export async function startGuestSession(): Promise<SignupResponse> {
+  const { data } = await apiClient.post<SignupResponse>('/session/guest');
+  return data;
+}
+
 export interface GuestConvertResponse {
   migrated_sightings: number;
 }

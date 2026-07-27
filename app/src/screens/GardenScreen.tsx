@@ -8,6 +8,7 @@ import { useGardenStore } from '@/store/gardenStore';
 import { IsoGrid } from '@/components/garden/IsoGrid';
 import { CreatureTray, type OwnedCreature } from '@/components/garden/CreatureTray';
 import { CreatureStatusSheet } from '@/components/garden/CreatureStatusSheet';
+import { ScreenHeader } from '@/components/nav/ScreenHeader';
 import { getSpeciesVisual } from '@/theme/species';
 import { screenToTile } from '@/theme/garden';
 import { colors } from '@/theme/colors';
@@ -139,7 +140,7 @@ export default function GardenScreen() {
   return (
     <View ref={rootRef} collapsable={false} style={styles.root}>
       <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
-        <Text style={styles.title}>홈 가든</Text>
+        <ScreenHeader title="홈 가든" />
         <Text style={styles.greeting}>{greeting}</Text>
       </View>
 

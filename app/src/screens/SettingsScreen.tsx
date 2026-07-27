@@ -9,8 +9,10 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { ScreenHeader } from '@/components/nav/ScreenHeader';
 import { useAuthStore, GUEST_SIGHTING_LIMIT } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
 import { fetchRestoreBundle, deleteAccount } from '@/api/account';
@@ -22,6 +24,7 @@ import type { RootStackParamList } from '@/navigation/types';
  * 계정 정보, 알림/위치·사진 수집 범위 토글, 데이터 복원, 계정 삭제, 로그아웃.
  */
 export default function SettingsScreen() {
+  const insets = useSafeAreaInsets();
   const isGuest = useAuthStore((s) => s.isGuest);
   const guestSightingCount = useAuthStore((s) => s.guestSightingCount);
   const user = useAuthStore((s) => s.user);
@@ -102,7 +105,9 @@ export default function SettingsScreen() {
   };
 
   return (
-    <ScrollView style={styles.root} contentContainerStyle={styles.content}>
+    <View style={[styles.root, { paddingTop: insets.top }]}>
+      <ScreenHeader title="설정" />
+      <ScrollView contentContainerStyle={styles.content}>
       {isGuest ? (
         <Pressable style={styles.guestBanner} onPress={goToConvert}>
           <Text style={styles.guestBannerTitle}>게스트 모드입니다</Text>
@@ -182,7 +187,8 @@ export default function SettingsScreen() {
           </Pressable>
         </Section>
       )}
-    </ScrollView>
+      </ScrollView>
+    </View>
   );
 }
 

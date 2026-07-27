@@ -1,6 +1,8 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useState } from 'react';
+import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
+import { startGuestSession } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Choice'>;
@@ -14,11 +16,29 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Choice'>;
 export default function ChoiceScreen({ navigation }: Props) {
   const startGuest = useAuthStore((s) => s.startGuest);
   const completeOnboarding = useAuthStore((s) => s.completeOnboarding);
+  const [startingGuest, setStartingGuest] = useState(false);
 
-  const onGuest = () => {
-    startGuest();
-    completeOnboarding();
-    navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+  const onGuest = async () => {
+    if (startingGuest) return;
+    setStartingGuest(true);
+    try {
+      // 서버 세션(토큰)을 먼저 받는다 — 토큰이 있어야 도감·지도·업로드가 동작한다.
+      // 서버에 못 닿아도 앱에는 들어가게 둔다(로컬 전용 게스트로 강등, 기존 동작 유지).
+      let token: string | undefined;
+      let user;
+      try {
+        const session = await startGuestSession();
+        token = session.access_token;
+        user = session.user;
+      } catch {
+        // 무시 — 아래에서 토큰 없이 시작한다.
+      }
+      startGuest(token, user);
+      completeOnboarding();
+      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+    } finally {
+      setStartingGuest(false);
+    }
   };
 
   const onLogin = () => {
@@ -51,11 +71,21 @@ export default function ChoiceScreen({ navigation }: Props) {
           <Text style={styles.secondaryDesc}>도감과 기록을 안전하게 보관해요</Text>
         </Pressable>
 
-        <Pressable style={styles.secondaryCard} onPress={onGuest}>
-          <Text style={styles.secondaryTitle}>게스트로 둘러보기</Text>
-          <Text style={styles.secondaryDesc}>
-            로그인 없이 촬영 1~2회를 체험할 수 있어요
-          </Text>
+        <Pressable
+          style={styles.secondaryCard}
+          onPress={() => void onGuest()}
+          disabled={startingGuest}
+        >
+          {startingGuest ? (
+            <ActivityIndicator color="#5B8C3E" />
+          ) : (
+            <>
+              <Text style={styles.secondaryTitle}>게스트로 둘러보기</Text>
+              <Text style={styles.secondaryDesc}>
+                로그인 없이 촬영 1~2회를 체험할 수 있어요
+              </Text>
+            </>
+          )}
         </Pressable>
       </View>
     </View>
