@@ -23,6 +23,7 @@ import { AudioConversionError } from "../../core/audio/AudioConverter.js";
 import { asAudioSightingId, asObservationId, asTaxonId } from "../../core/domain/ids.js";
 import type { AudioSighting } from "../../core/audio/audioTypes.js";
 import { signMediaToken, verifyMediaToken } from "../../core/media/mediaToken.js";
+import { checkAudioHealth } from "../../core/audio/audioHealth.js";
 
 const identifyBodySchema = {
   type: "object",
@@ -204,7 +205,7 @@ export function registerAudioRoutes(
           candidates: outcome.candidates,
           unknown: outcome.unknown,
           unknownReason: outcome.unknownReason,
-          modelProvider: "birdnet",
+          modelProvider: app.config.audio.model.name,
           modelVersion: outcome.modelVersion,
           locationPriorUsed: outcome.locationPriorUsed,
           createdAt: new Date().toISOString(),
@@ -289,7 +290,7 @@ export function registerAudioRoutes(
         taxon,
         rank: taxon.rank,
         confidence: chosen.confidence,
-        source: "birdnet",
+        source: app.config.audio.model.name,
         media: [],
         modality: "audio",
         now: new Date(),
@@ -422,6 +423,29 @@ export function registerAudioRoutes(
       return reply.send(bytes);
     },
   );
+
+  // 9단계: 운영 모니터링 전용(계약 문서 소속 엔드포인트 아님) — 인증 불필요, CAMP-3의
+  // /health·/ready와 같은 관례(로컬호스트/내부망에서만 접근한다는 전제).
+  server.get("/audio/health", async (_request, reply) => {
+    const report = await checkAudioHealth({
+      modelEndpoint: app.config.audio.model.endpoint,
+      modelTimeoutMs: app.config.audio.model.timeoutMs,
+      expectedModelVersion: app.config.audio.model.expectedVersion,
+      references: app.repos.speciesSoundReferences,
+    });
+    return reply.code(report.ready ? 200 : 503).send({
+      ready: report.ready,
+      model: {
+        configured: report.model.configured,
+        reachable: report.model.reachable,
+        expected_version: report.model.expectedVersion,
+      },
+      reference_embeddings: {
+        ready: report.referenceEmbeddings.ready,
+        approved_clip_count: report.referenceEmbeddings.approvedClipCount,
+      },
+    });
+  });
 }
 
 /** confirmationId가 이미 설정된 세션에 대한 응답 분기 — 처음 게이트에서든(이미 confirmed),

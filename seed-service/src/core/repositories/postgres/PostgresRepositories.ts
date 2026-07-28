@@ -1097,6 +1097,14 @@ export class PgSpeciesSoundReferenceRepo implements SpeciesSoundReferenceReposit
       );
     }
   }
+
+  async countApprovedWithEmbedding(): Promise<number> {
+    const r = await this.pool.query(
+      `SELECT count(*) FROM species_sound_reference
+       WHERE quality_status = 'approved' AND embedding_ref IS NOT NULL`,
+    );
+    return Number(r.rows[0].count);
+  }
 }
 
 function rowToSpeciesSoundReference(row: any): SpeciesSoundReference {

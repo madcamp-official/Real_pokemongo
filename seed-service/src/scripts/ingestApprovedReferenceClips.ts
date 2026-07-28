@@ -46,7 +46,6 @@ interface ClipRow {
   license: string;
   attribution: string;
   qualityStatus: string;
-  referenceSetVersion: string;
   xcId: string;
   duration: string;
 }
@@ -118,7 +117,6 @@ function readApprovedRows(): ClipRow[] {
     license: col("license"),
     attribution: col("attribution"),
     qualityStatus: col("quality_status"),
-    referenceSetVersion: col("reference_set_version"),
     xcId: col("xc_id"),
     duration: col("duration"),
   };
@@ -133,7 +131,6 @@ function readApprovedRows(): ClipRow[] {
       license: cols[idx.license] ?? "",
       attribution: cols[idx.attribution] ?? "",
       qualityStatus: cols[idx.qualityStatus] ?? "pending",
-      referenceSetVersion: cols[idx.referenceSetVersion] || "v1",
       xcId: cols[idx.xcId] ?? "",
       duration: cols[idx.duration] ?? "",
     }))
@@ -219,7 +216,9 @@ async function main() {
         license: row.license,
         attribution: row.attribution,
         qualityStatus: "approved",
-        referenceSetVersion: row.referenceSetVersion,
+        // 9단계: clips.csv 컬럼(소싱 당시 임시값) 대신 배포 설정을 단일 진실 원천으로 쓴다
+        // (config/index.ts "AUDIO_REFERENCE_SET_VERSION" 주석 참고).
+        referenceSetVersion: cfg.audio.referenceSetVersion,
         embeddingRef,
         embeddingModelVersion: embeddingResult.modelVersion,
       };

@@ -872,3 +872,45 @@ test("POST /audio/similarity/score: 모델 서비스 오류는 503 audio_process
   assert.equal(res.statusCode, 503);
   assert.equal(res.json().error, "audio_processor_unavailable");
 });
+
+// ── 9단계: GET /audio/health ────────────────────────────────────────────
+test("GET /audio/health: 모델 미설정 + 승인된 참조 없음(기본 테스트 환경)은 인증 없이도 503과 ready=false", async () => {
+  const { server } = await testServer();
+  const res = await server.inject({ method: "GET", url: "/audio/health" });
+  assert.equal(res.statusCode, 503);
+  const body = res.json();
+  assert.equal(body.ready, false);
+  assert.equal(body.model.configured, false);
+  assert.equal(body.model.reachable, false);
+  assert.equal(body.reference_embeddings.ready, false);
+  assert.equal(body.reference_embeddings.approved_clip_count, 0);
+});
+
+test("GET /audio/health: 모델 도달 가능 + 승인된 임베딩 참조 있음 → 200과 ready=true", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () => new Response("", { status: 200 })) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => server.inject({ method: "GET", url: "/audio/health" }));
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.ready, true);
+  assert.equal(body.model.configured, true);
+  assert.equal(body.model.reachable, true);
+  assert.equal(body.reference_embeddings.ready, true);
+  assert.equal(body.reference_embeddings.approved_clip_count, 1);
+});
+
+test("GET /audio/health: 모델이 설정됐지만 /ready가 실패 응답이면 503", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () => new Response("", { status: 503 })) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => server.inject({ method: "GET", url: "/audio/health" }));
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().model.reachable, false);
+});

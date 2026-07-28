@@ -192,4 +192,8 @@ export interface SpeciesSoundReferenceRepository {
   /** 적재 스크립트(ingest_approved_clips.ts) 전용 — 같은 id로 다시 부르면 덮어쓴다(재적재
    * 멱등성, 사람이 clips.csv를 고치고 다시 돌릴 수 있어야 하므로). */
   upsertMany(refs: SpeciesSoundReference[]): Promise<void>;
+  /** 9단계: GET /audio/health가 "참조 임베딩이 준비됐는가"를 판단하는 데 쓴다. 종별로
+   * 순회하지 않고 전체 승인+임베딩완료 건수를 한 번에 세는 이유는 health 체크가 자주(운영
+   * 모니터링) 호출될 수 있어 18종을 매번 순회하는 건 낭비이기 때문. */
+  countApprovedWithEmbedding(): Promise<number>;
 }

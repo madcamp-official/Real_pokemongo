@@ -369,4 +369,9 @@ export class InMemorySpeciesSoundReferenceRepo implements SpeciesSoundReferenceR
   async upsertMany(refs: SpeciesSoundReference[]) {
     for (const r of refs) this.m.set(r.id, r);
   }
+  async countApprovedWithEmbedding() {
+    return [...this.m.values()].filter(
+      (r) => r.qualityStatus === "approved" && Boolean(r.embeddingRef),
+    ).length;
+  }
 }
