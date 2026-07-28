@@ -14,7 +14,7 @@ import { InfoTile } from '@/components/species/InfoTile';
 import { QuizQuestion } from '@/components/species/QuizQuestion';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
 import { PhotoGalleryBlock } from '@/components/species/PhotoGalleryBlock';
 import type { RootStackParamList } from '@/navigation/types';
 
@@ -74,7 +74,7 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
           </View>
 
           <View style={styles.heroImageWrap}>
-            <CreatureArt speciesId={card.species_id} size={132} />
+            <GardenCreatureArt speciesId={card.species_id} size={132} />
           </View>
         </View>
 

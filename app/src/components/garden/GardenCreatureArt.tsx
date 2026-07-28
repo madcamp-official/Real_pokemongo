@@ -90,18 +90,16 @@ const WINGED_INSECT_SPECIES = new Set([
   'acrida-cinerea',
   'atractomorpha-lata',
   'carbula-putoni',
-  // garden-v6
-  'apis-mellifera',
-  'pieris-rapae',
-  'harmonia-axyridis',
+  // garden-v6(칠성무당벌레만 학명 기반 taxon ID라 이 키로 직접 도달함 — 나머지 세 종은
+  // honeybee/cabbage-white/ladybug 키가 이미 커버하므로 별도 등록 불필요, GARDEN_ART의
+  // 같은 절 주석 참고)
   'coccinella-septempunctata',
 ]);
 
 const DANDELION = require('../../../assets/species/garden-v1/dandelion.png') as ImageSourcePropType;
 const DAYFLOWER = require('../../../assets/species/garden-v1/dayflower.png') as ImageSourcePropType;
-const LADYBUG = require('../../../assets/species/garden-v1/ladybug.png') as ImageSourcePropType;
-const CABBAGE_WHITE = require('../../../assets/species/garden-v1/cabbage-white.png') as ImageSourcePropType;
-const HONEYBEE = require('../../../assets/species/garden-v1/honeybee.png') as ImageSourcePropType;
+// ladybug/cabbage-white/honeybee의 v1 그림(garden-v1/ladybug.png 등)은 v6로 교체돼
+// 더 이상 안 쓴다 — GARDEN_ART의 "곤충" 절 주석 참고.
 
 // 홈 가든 v2: 사용자가 제공한 종별 일러스트. 원본의 마젠타 배경을 제거한
 // 512px PNG만 이 레지스트리에 연결한다. 파일명은 DB taxon id의 접두사(taxon-)를
@@ -293,21 +291,22 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
   'fly-agaric': FLY_AGARIC,
   'rhabdophis-tigrinus': RHABDOPHIS_TIGRINUS,
 
-  // v1 식물·곤충(이전 보유 종 호환)
+  // v1 식물(교체 그림 없음)
   dandelion: DANDELION,
   dayflower: DAYFLOWER,
 
-  // 곤충
-  ladybug: LADYBUG,
-  'cabbage-white': CABBAGE_WHITE,
-  honeybee: HONEYBEE,
-  // v6 전용 곤충
-  'apis-mellifera': APIS_MELLIFERA,
-  'pieris-rapae': PIERIS_RAPAE,
-  'harmonia-axyridis': HARMONIA_AXYRIDIS,
+  // 곤충 — v6에서 더 다듬어진 그림이 나온 세 종은 실제 taxon ID(각각 taxon-ladybug,
+  // taxon-cabbage-white, taxon-honeybee → 아래 정규화된 키)가 그대로 v6 그림을 가리키게
+  // 한다. sciName 슬러그(apis-mellifera 등)를 별도 키로 두면 어떤 taxon ID로도 이 키에
+  // 도달할 수 없어(정규화 결과가 항상 honeybee/ladybug/cabbage-white다) 그림이 영원히
+  // 안 쓰이는 죽은 항목이 된다 — 실기기 테스트로 실제 발견된 문제. 칠성무당벌레만
+  // taxon ID 자체가 학명 기반(taxon-coccinella-septempunctata)이라 별도 키가 필요하다.
+  ladybug: HARMONIA_AXYRIDIS,
+  'cabbage-white': PIERIS_RAPAE,
+  honeybee: APIS_MELLIFERA,
   'coccinella-septempunctata': COCCINELLA_SEPTEMPUNCTATA,
 
-  // 초기 mock ID 호환
-  butterfly: CABBAGE_WHITE,
-  bee: HONEYBEE,
+  // 초기 mock ID 호환 — 같은 종을 가리키므로 위와 동일한 v6 그림을 쓴다.
+  butterfly: PIERIS_RAPAE,
+  bee: APIS_MELLIFERA,
 };

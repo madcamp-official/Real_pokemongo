@@ -1,7 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
 import type { DexEntry } from '@/types/api';
 
 /**
@@ -36,7 +36,7 @@ export function SpeciesGridCard({ entry, onPress }: Props) {
       onPress={() => onPress(entry)}
     >
       <View style={[styles.thumb, { backgroundColor: getPastel(visual.pastel) }]}>
-        <CreatureArt speciesId={entry.species_id} size={44} />
+        <GardenCreatureArt speciesId={entry.species_id} size={44} />
       </View>
       <Text style={styles.name} numberOfLines={1}>
         {entry.name}
