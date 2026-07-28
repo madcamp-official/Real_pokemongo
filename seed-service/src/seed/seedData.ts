@@ -1755,9 +1755,9 @@ export const SEED_CONTENT: SpeciesContent[] = [
  */
 export type GardenTaxonGroupLabel = "곤충" | "양서류" | "식물" | "조류" | "기타";
 export const TILE_COMPATIBILITY: Record<GardenTaxonGroupLabel, string[]> = {
-  곤충: ["잔디", "꽃밭"],
-  양서류: ["물웅덩이", "잔디"],
-  식물: ["흙", "꽃밭"],
-  조류: ["잔디", "돌"],
-  기타: ["흙", "잔디", "돌"],
+  곤충: ["잔디", "꽃밭", "흙", "돌"],
+  양서류: ["물웅덩이", "잔디", "흙"],
+  식물: ["흙", "꽃밭", "잔디"],
+  조류: ["잔디", "돌", "꽃밭", "흙"],
+  기타: ["흙", "잔디", "돌", "꽃밭", "물웅덩이"],
 };

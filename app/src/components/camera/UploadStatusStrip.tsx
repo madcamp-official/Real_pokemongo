@@ -7,7 +7,7 @@ import { useUploadQueue } from '@/store/uploadQueueStore';
  */
 export function UploadStatusStrip() {
   const items = useUploadQueue((s) => s.items);
-  const processQueue = useUploadQueue((s) => s.processQueue);
+  const retryAllFailed = useUploadQueue((s) => s.retryAllFailed);
 
   const pending = items.filter(
     (i) => i.status === 'pending' || i.status === 'uploading'
@@ -28,7 +28,7 @@ export function UploadStatusStrip() {
         <Text style={styles.text}>업로드 완료 {done}건 ✓</Text>
       )}
       {failed > 0 && (
-        <Pressable onPress={() => void processQueue()} style={styles.retry}>
+        <Pressable onPress={retryAllFailed} style={styles.retry}>
           <Text style={styles.retryText}>실패 {failed}건 · 다시 시도</Text>
         </Pressable>
       )}

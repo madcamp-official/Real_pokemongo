@@ -17,9 +17,12 @@ export const MAP_HTML_URL = `${env.API_BASE_URL}/map.html`;
  *
  * 그래서 페이지를 URL 로 열지 않고 HTML 을 받아와 이 baseUrl 로 렌더한다 —
  * WebView 문서의 origin 이 이 값이 되어 SDK 요청의 Referer 도 이 값으로 나간다.
+ * 반드시 https origin을 써야 한다. 카카오 로더는 location.protocol을 보고 후속 SDK와
+ * 타일 URL의 scheme을 고르므로 http origin을 쓰면 Android WebView에서 cleartext
+ * 후속 요청이 차단되어 ready 메시지 없이 로딩 화면에 영원히 머물 수 있다.
  * 콘솔에 등록된 도메인을 바꾸면 이 상수도 같이 바꿔야 한다.
  */
-export const KAKAO_ALLOWED_ORIGIN = 'http://localhost:8080';
+export const KAKAO_ALLOWED_ORIGIN = 'https://localhost:8080';
 
 /** 지도 페이지 HTML 을 문자열로 받아온다(WebView 에 baseUrl 과 함께 주입하기 위함). */
 export async function fetchMapHtml(): Promise<string> {

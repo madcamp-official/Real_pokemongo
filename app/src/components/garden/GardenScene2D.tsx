@@ -206,7 +206,9 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
                     { left, top },
                     pressed && styles.dropTargetPressed,
                   ]}
-                />
+                >
+                  <Text style={styles.dropTargetMark}>＋</Text>
+                </Pressable>
               ) : (
                 <View
                   key={key}
@@ -325,29 +327,29 @@ function GardenSprite({
     const direction = unit(1) > 0.5 ? 1 : -1;
     return [
       {
-        x: direction * (62 + unit(2) * 38),
-        y: -(20 + unit(3) * 28),
-        duration: 3000 + unit(4) * 1600,
+        x: direction * (7 + unit(2) * 5),
+        y: -(3 + unit(3) * 3),
+        duration: 4200 + unit(4) * 1400,
       },
       {
-        x: -direction * (45 + unit(5) * 40),
-        y: 10 + unit(6) * 26,
-        duration: 3600 + unit(7) * 1800,
+        x: -direction * (6 + unit(5) * 5),
+        y: 2 + unit(6) * 4,
+        duration: 4600 + unit(7) * 1500,
       },
       {
-        x: direction * (85 + unit(8) * 45),
-        y: -(10 + unit(9) * 34),
-        duration: 3400 + unit(10) * 2000,
+        x: direction * (8 + unit(8) * 5),
+        y: -(2 + unit(9) * 4),
+        duration: 4400 + unit(10) * 1600,
       },
       {
-        x: -direction * (60 + unit(11) * 40),
-        y: -(22 + unit(12) * 28),
-        duration: 3800 + unit(13) * 1800,
+        x: -direction * (7 + unit(11) * 5),
+        y: -(3 + unit(12) * 3),
+        duration: 4800 + unit(13) * 1400,
       },
       {
         x: 0,
         y: 0,
-        duration: 3400 + unit(14) * 1600,
+        duration: 4500 + unit(14) * 1400,
       },
     ];
   }, [creatureId]);
@@ -437,21 +439,21 @@ function GardenSprite({
         {
           translateY: motion.interpolate({
             inputRange: [0, 1],
-            outputRange: [-1.5, 2.5],
+            outputRange: [-1, 1.5],
           }),
         },
         {
           rotate: motion.interpolate({
             inputRange: [0, 1],
-            outputRange: ['-1.2deg', '1.2deg'],
+            outputRange: ['-0.6deg', '0.6deg'],
           }),
         },
       ]
     : isPlant
-    ? [{ rotate: motion.interpolate({ inputRange: [0, 1], outputRange: ['-2deg', '2deg'] }) }]
+    ? [{ rotate: motion.interpolate({ inputRange: [0, 1], outputRange: ['-1deg', '1deg'] }) }]
     : [
-        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: isInsect ? [-12, 13] : [-7, 8] }) },
-        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: isInsect ? [0, -7, 1] : [0, -4, 0] }) },
+        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: isInsect ? [-3, 4] : [-2, 3] }) },
+        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: isInsect ? [0, -2, 0] : [0, -1.5, 0] }) },
       ];
 
   return (
@@ -481,7 +483,6 @@ function GardenSprite({
           pressed && !isTree && styles.spritePressed,
         ]}
       >
-        <View style={[styles.spriteShadow, isPlant && styles.plantShadow, isTree && styles.treeShadow]} />
         <GardenCreatureArt speciesId={speciesId} size={artSize} />
       </Pressable>
     </RNAnimated.View>
@@ -527,18 +528,22 @@ const styles = StyleSheet.create({
   lockText: { fontSize: 15, fontWeight: '900', color: '#5D563D' },
   dropTarget: {
     position: 'absolute',
-    width: 58,
-    height: 30,
-    marginLeft: -29,
-    marginTop: -15,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,240,112,0.42)',
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,220,0.96)',
+    width: 40,
+    height: 40,
+    marginLeft: -20,
+    marginTop: -20,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   dropTargetPressed: {
-    backgroundColor: 'rgba(255,207,64,0.72)',
     transform: [{ scale: 1.12 }],
+  },
+  dropTargetMark: {
+    color: 'rgba(46,92,39,0.82)',
+    fontSize: 20,
+    fontWeight: '900',
+    textShadowColor: 'rgba(244,252,222,0.72)',
+    textShadowRadius: 2,
   },
   decoration: { position: 'absolute', alignItems: 'center', justifyContent: 'flex-end' },
   spriteAnchor: {
@@ -546,15 +551,4 @@ const styles = StyleSheet.create({
   },
   spriteButton: { flex: 1, alignItems: 'center', justifyContent: 'flex-end' },
   spritePressed: { opacity: 0.75, transform: [{ scale: 0.94 }] },
-  spriteShadow: {
-    position: 'absolute',
-    bottom: 3,
-    width: 52,
-    height: 14,
-    borderRadius: 24,
-    backgroundColor: 'rgba(42,63,28,0.25)',
-    transform: [{ scaleX: 1.2 }],
-  },
-  plantShadow: { width: 52, opacity: 0.75 },
-  treeShadow: { width: 78, height: 18, opacity: 0.65 },
 });

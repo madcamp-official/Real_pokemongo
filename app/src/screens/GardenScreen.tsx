@@ -131,9 +131,13 @@ export default function GardenScreen() {
     const creature = draggingCreature ?? movingCreature;
     if (!creature) return set;
     const allowed = compatQuery.data?.[creature.group] ?? [];
-    for (const t of tiles) if (allowed.includes(t.type)) set.add(`${t.row},${t.col}`);
+    const occupied = new Set(placements.map((placement) => `${placement.row},${placement.col}`));
+    for (const t of tiles) {
+      const key = `${t.row},${t.col}`;
+      if (allowed.includes(t.type) && !occupied.has(key)) set.add(key);
+    }
     return set;
-  }, [draggingCreature, movingCreature, compatQuery.data, tiles]);
+  }, [draggingCreature, movingCreature, compatQuery.data, placements, tiles]);
 
   const flashWarn = (msg: string) => {
     setWarn(msg);
@@ -204,9 +208,13 @@ export default function GardenScreen() {
       worldX,
       worldY,
       GARDEN_WORLD_WIDTH,
-      GARDEN_WORLD_HEIGHT
+      GARDEN_WORLD_HEIGHT,
+      compatibleTiles
     );
-    if (!tile) return;
+    if (!tile) {
+      flashWarn(`${creature!.name}이(가) 갈 수 있는 정원 안쪽에 놓아주세요`);
+      return;
+    }
 
     placeCreatureAt(creature!, tile.row, tile.col);
   };
@@ -270,7 +278,9 @@ export default function GardenScreen() {
             decorations={decorations}
             creatures={gardenCreatures}
             level={level}
-            isDragging={!!draggingCreature || !!movingCreature}
+            // 트레이에서 끌 때는 배경을 슬롯으로 덮지 않는다. 기존 친구를 길게 눌러
+            // 옮길 때만 작은 위치 표식을 보여 탭 이동 가능성을 유지한다.
+            isDragging={!!movingCreature}
             compatibleTiles={compatibleTiles}
             onCreaturePress={setSelectedId}
             onCreatureMoveStart={startMovingPlacedCreature}

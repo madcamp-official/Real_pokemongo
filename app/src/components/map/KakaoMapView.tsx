@@ -6,6 +6,8 @@ import { getSpeciesVisual } from '@/theme/species';
 import { colors } from '@/theme/colors';
 import type { MapPin } from '@/types/api';
 
+const MAP_READY_TIMEOUT_MS = 12_000;
+
 export interface KakaoMapViewHandle {
   setPins: (pins: MapPin[]) => void;
   setCenter: (lat: number, lng: number) => void;
@@ -37,6 +39,7 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
   const isReady = useRef(false);
   /** ready 이전에 들어온 명령은 모아뒀다가 준비되면 한 번에 흘려보낸다. */
   const pending = useRef<unknown[]>([]);
+  const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [loading, setLoading] = useState(true);
   const [html, setHtml] = useState<string | null>(null);
 
@@ -57,6 +60,21 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
       cancelled = true;
     };
   }, [onError]);
+
+  // SDK/도메인/네트워크 문제로 페이지가 아무 메시지도 못 보내더라도 무한 로딩으로
+  // 남기지 않는다. mapHtml 쪽 타임아웃과 별도로 네이티브 레이어에서도 방어한다.
+  useEffect(() => {
+    if (!html) return;
+    readyTimer.current = setTimeout(() => {
+      if (isReady.current) return;
+      setLoading(false);
+      onError?.('map_ready_timeout');
+    }, MAP_READY_TIMEOUT_MS);
+    return () => {
+      if (readyTimer.current) clearTimeout(readyTimer.current);
+      readyTimer.current = null;
+    };
+  }, [html, onError]);
 
   const post = useCallback((msg: unknown) => {
     if (!isReady.current) {
@@ -90,6 +108,8 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
           message?: string;
         };
         if (data.type === 'ready') {
+          if (readyTimer.current) clearTimeout(readyTimer.current);
+          readyTimer.current = null;
           isReady.current = true;
           setLoading(false);
           const queued = pending.current;
@@ -100,6 +120,8 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
         } else if (data.type === 'map_press') {
           onMapPress?.();
         } else if (data.type === 'error') {
+          if (readyTimer.current) clearTimeout(readyTimer.current);
+          readyTimer.current = null;
           setLoading(false);
           onError?.(data.message ?? 'unknown');
         }
@@ -116,6 +138,7 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
         <WebView
           ref={webviewRef}
           source={{ html, baseUrl: KAKAO_ALLOWED_ORIGIN }}
+          originWhitelist={['*']}
           style={styles.web}
           onMessage={onMessage}
           onError={() => {

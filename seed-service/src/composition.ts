@@ -102,42 +102,63 @@ export interface App {
   pendingSightings: PendingSightingStore;
 }
 
+function buildInMemoryRepos(): App["repos"] {
+  return {
+    users: new InMemoryUserRepo(),
+    taxa: new InMemoryTaxonRepo(),
+    observations: new InMemoryObservationRepo(),
+    collection: new InMemoryCollectionRepo(),
+    quests: new InMemoryQuestRepo(),
+    badges: new InMemoryBadgeRepo(),
+    credentials: new InMemoryCredentialRepo(),
+    consent: new InMemoryConsentRepo(),
+    creatures: new InMemoryCreatureRepo(),
+    garden: new InMemoryGardenRepo(),
+  };
+}
+
 export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   // --- 저장소 ---
   // DATABASE_URL이 채워져 있으면 Postgres(GPU 서버, .env.example 참고), 비어 있으면(기본)
-  // InMemory — bioclip 프로바이더와 동일한 "채워야만 켜짐" 관례(config/index.ts).
+  // InMemory. 개발 환경에서는 DB 터널이 닫혀 연결할 수 없을 때도 InMemory로 폴백하고,
+  // 프로덕션에서는 연결 실패를 그대로 올려 잘못된 상태로 부팅하지 않는다.
   let dbPool: pg.Pool | undefined;
   let repos: App["repos"];
   if (config.database.url) {
-    dbPool = new pg.Pool({ connectionString: config.database.url });
-    repos = {
-      users: new PgUserRepo(dbPool),
-      taxa: new PgTaxonRepo(dbPool),
-      observations: new PgObservationRepo(dbPool),
-      collection: new PgCollectionRepo(dbPool),
-      quests: new PgQuestRepo(dbPool),
-      badges: new PgBadgeRepo(dbPool),
-      credentials: new PgCredentialRepo(dbPool),
-      consent: new PgConsentRepo(dbPool),
-      creatures: new PgCreatureRepo(dbPool),
-      garden: new PgGardenRepo(dbPool),
-    };
-    // quest.reward_badge_id / earned_badge.badge_id가 badge_definition(id)를 FK로 참조하므로
-    // (db/schema.sql), 실제 배지 저작 데이터를 먼저 채워야 quest 업서트/배지 해금이 FK를 만족한다.
-    await upsertBadgeDefinitions(dbPool, SEED_BADGES);
+    const candidatePool = new pg.Pool({
+      connectionString: config.database.url,
+      connectionTimeoutMillis: 3_000,
+    });
+    try {
+      // 터널이 닫혀 있으면 첫 시드 쿼리까지 기다리지 않고 여기서 명확히 판별한다.
+      await candidatePool.query("SELECT 1");
+      dbPool = candidatePool;
+      repos = {
+        users: new PgUserRepo(dbPool),
+        taxa: new PgTaxonRepo(dbPool),
+        observations: new PgObservationRepo(dbPool),
+        collection: new PgCollectionRepo(dbPool),
+        quests: new PgQuestRepo(dbPool),
+        badges: new PgBadgeRepo(dbPool),
+        credentials: new PgCredentialRepo(dbPool),
+        consent: new PgConsentRepo(dbPool),
+        creatures: new PgCreatureRepo(dbPool),
+        garden: new PgGardenRepo(dbPool),
+      };
+      // quest.reward_badge_id / earned_badge.badge_id가 badge_definition(id)를 FK로 참조하므로
+      // (db/schema.sql), 실제 배지 저작 데이터를 먼저 채워야 quest 업서트/배지 해금이 FK를 만족한다.
+      await upsertBadgeDefinitions(dbPool, SEED_BADGES);
+    } catch (error) {
+      await candidatePool.end().catch(() => undefined);
+      if (config.nodeEnv === "production") throw error;
+      console.warn(
+        "[db] PostgreSQL에 연결하지 못해 개발용 InMemory 저장소로 전환합니다. " +
+          "DB 터널과 DATABASE_URL을 확인해 주세요.",
+      );
+      repos = buildInMemoryRepos();
+    }
   } else {
-    repos = {
-      users: new InMemoryUserRepo(),
-      taxa: new InMemoryTaxonRepo(),
-      observations: new InMemoryObservationRepo(),
-      collection: new InMemoryCollectionRepo(),
-      quests: new InMemoryQuestRepo(),
-      badges: new InMemoryBadgeRepo(),
-      credentials: new InMemoryCredentialRepo(),
-      consent: new InMemoryConsentRepo(),
-      creatures: new InMemoryCreatureRepo(),
-      garden: new InMemoryGardenRepo(),
-    };
+    repos = buildInMemoryRepos();
   }
 
   // --- 시드 로드 ---

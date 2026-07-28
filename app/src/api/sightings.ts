@@ -39,8 +39,7 @@ export async function uploadSighting(
 
   const { data } = await apiClient.post<SightingUploadResponse>(
     '/sightings/upload',
-    form,
-    { headers: { 'Content-Type': 'multipart/form-data' } }
+    form
   );
   return data;
 }

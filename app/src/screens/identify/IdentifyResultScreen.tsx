@@ -40,6 +40,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
   const { uploadId } = route.params;
 
   const item = useUploadQueue((s) => s.items.find((i) => i.id === uploadId));
+  const retryItem = useUploadQueue((s) => s.retryItem);
   const sightingId = item?.sightingId;
   const uploadFailed = item?.status === 'failed' && item.attempts >= MAX_ATTEMPTS;
 
@@ -86,8 +87,8 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
         emoji="📡"
         title="사진을 올리지 못했어요"
         desc="네트워크를 확인하고 다시 시도해 주세요."
-        actionLabel="닫기"
-        onAction={close}
+        actionLabel="다시 시도"
+        onAction={() => retryItem(uploadId)}
       />
     );
   } else if (!sightingId) {

@@ -10,9 +10,35 @@ export interface ScanPoint {
   y: number;
 }
 
-/** 크롭 영역 비율(터치 지점 주변). */
-const CROP_RATIO = 0.4;
+/** 크롭 영역 비율(터치 지점 주변). 너무 좁으면 작은 좌표 오차에도 피사체가 잘린다. */
+const CROP_RATIO = 0.45;
+/** BioCLIP 입력에 충분하면서 전송·디코딩 비용이 작은 프리뷰 크기. */
+const PREVIEW_IMAGE_WIDTH = 224;
 const RESULT_TTL_MS = 4500;
+
+/**
+ * CameraView는 센서 이미지와 화면 비율이 다르면 cover 방식으로 가장자리를 잘라 보여준다.
+ * 화면 터치 좌표를 사진에 단순 비율로 곱하면 그 잘린 영역만큼 어긋나므로, 실제 cover
+ * 스케일과 오프셋을 역산해 사진 픽셀 좌표로 바꾼다.
+ */
+export function previewPointToPhotoPoint(
+  screenX: number,
+  screenY: number,
+  layoutW: number,
+  layoutH: number,
+  photoW: number,
+  photoH: number
+): { x: number; y: number } {
+  const scale = Math.max(layoutW / photoW, layoutH / photoH);
+  const renderedW = photoW * scale;
+  const renderedH = photoH * scale;
+  const cropX = Math.max((renderedW - layoutW) / 2, 0);
+  const cropY = Math.max((renderedH - layoutH) / 2, 0);
+  return {
+    x: Math.min(Math.max((screenX + cropX) / scale, 0), photoW),
+    y: Math.min(Math.max((screenY + cropY) / scale, 0), photoH),
+  };
+}
 
 /**
  * F19 터치 기반 사전 위험 경고 훅.
@@ -45,21 +71,32 @@ export function usePreviewScan(cameraRef: RefObject<CameraView | null>) {
 
       try {
         const photo = await cameraRef.current.takePictureAsync({
-          quality: 0.5,
-          skipProcessing: true,
+          // skipProcessing=true면 quality가 무시되고 기기별 사진 방향도 불확실해져,
+          // 화면 터치 위치와 실제 크롭 위치가 어긋난다. 방향 보정을 유지하되 중간 품질로
+          // 압축해 후속 크롭/전송 비용을 줄인다.
+          quality: 0.55,
         });
         if (!photo) return;
 
-        // 터치 지점 주변을 크롭 → 저해상도로 축소 → base64.
+        // CameraView의 cover 크롭을 반영해 터치 지점을 사진 픽셀 좌표로 변환한 뒤,
+        // 그 주변을 모델 입력 크기로 축소한다.
+        const photoPoint = previewPointToPhotoPoint(
+          screenX,
+          screenY,
+          layoutW,
+          layoutH,
+          photo.width,
+          photo.height
+        );
         const cropW = Math.round(photo.width * CROP_RATIO);
         const cropH = Math.round(photo.height * CROP_RATIO);
-        const originX = Math.min(Math.max(normX * photo.width - cropW / 2, 0), photo.width - cropW);
-        const originY = Math.min(Math.max(normY * photo.height - cropH / 2, 0), photo.height - cropH);
+        const originX = Math.min(Math.max(photoPoint.x - cropW / 2, 0), photo.width - cropW);
+        const originY = Math.min(Math.max(photoPoint.y - cropH / 2, 0), photo.height - cropH);
 
         const context = ImageManipulator.manipulate(photo.uri);
         context
           .crop({ originX, originY, width: cropW, height: cropH })
-          .resize({ width: 160 });
+          .resize({ width: PREVIEW_IMAGE_WIDTH });
         const rendered = await context.renderAsync();
         const out = await rendered.saveAsync({ format: SaveFormat.JPEG, base64: true });
 

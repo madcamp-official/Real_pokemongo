@@ -72,32 +72,39 @@ export function useCapture(cameraRef: RefObject<CameraView | null>) {
     holdingRef.current = false;
     setIsHolding(false);
     setIsFinishing(true);
-    try {
-      // 진행 중이던 마지막 한 장이 저장될 때까지 기다린다(안 그러면 누락된다).
-      await loopRef.current;
+    // 진행 중이던 마지막 한 장이 저장될 때까지 기다린다(안 그러면 누락된다).
+    await loopRef.current;
 
-      const frames = framesRef.current;
-      framesRef.current = [];
-      setFrameCount(0);
-      if (frames.length === 0) return null;
+    const frames = framesRef.current;
+    framesRef.current = [];
+    setFrameCount(0);
+    if (frames.length === 0) return null;
 
-      // 위치정보 수집이 꺼져 있으면 권한 요청조차 하지 않는다. 실패해도(권한 거부 등)
-      // 무시하고 촬영은 살린다 — 어느 쪽이든 핀만 안 남을 뿐이다.
-      const coord = locationCollectionEnabled
-        ? await requestLocationAndGet().catch(() => null)
-        : null;
-      const uploadId = enqueue({
-        frameUris: frames,
-        hasLocation: !!coord,
-        coord: coord ?? undefined,
-        fromGallery: false,
-      });
-      if (isGuest) incrementGuestSighting();
-      return uploadId;
-    } finally {
-      setIsFinishing(false);
-    }
+    // 위치정보 수집이 꺼져 있으면 권한 요청조차 하지 않는다. 실패해도(권한 거부 등)
+    // 무시하고 촬영은 살린다 — 어느 쪽이든 핀만 안 남을 뿐이다.
+    const coord = locationCollectionEnabled
+      ? await requestLocationAndGet().catch(() => null)
+      : null;
+    const uploadId = enqueue({
+      frameUris: frames,
+      hasLocation: !!coord,
+      coord: coord ?? undefined,
+      fromGallery: false,
+    });
+    if (isGuest) incrementGuestSighting();
+    return uploadId;
   }, [enqueue, isGuest, incrementGuestSighting, locationCollectionEnabled]);
 
-  return { isHolding, isFinishing, frameCount, startCapture, endCapture };
+  const finishCaptureTransition = useCallback(() => {
+    setIsFinishing(false);
+  }, []);
+
+  return {
+    isHolding,
+    isFinishing,
+    frameCount,
+    startCapture,
+    endCapture,
+    finishCaptureTransition,
+  };
 }
