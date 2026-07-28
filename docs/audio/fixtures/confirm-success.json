@@ -1,0 +1,10 @@
+{
+  "observation_id": "observation-audio-fixture-001",
+  "modality": "audio",
+  "species_id": "taxon-hypsipetes-amaurotis",
+  "dex_updated": true,
+  "reward": {
+    "xp": 10,
+    "quest_ids": []
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "audio_sighting_id": "audio-sighting-fixture-001",
+  "status": "ready",
+  "quality": {
+    "usable": true,
+    "duration_ms": 8120,
+    "active_duration_ms": 4210,
+    "snr_db": 17.4,
+    "clipping_ratio": 0.001,
+    "silence_ratio": 0.22,
+    "speech_ratio": 0.0,
+    "feedback_codes": [],
+    "valid_segments": [
+      {
+        "start_ms": 1100,
+        "end_ms": 5300,
+        "quality_score": 0.87
+      }
+    ]
+  },
+  "expires_at": "2026-07-29T12:00:00Z"
+}

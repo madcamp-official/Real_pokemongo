@@ -1,0 +1,5 @@
+{
+  "error": "network_unavailable",
+  "message": "인터넷 연결을 확인하고 다시 시도해 주세요.",
+  "retryable": true
+}

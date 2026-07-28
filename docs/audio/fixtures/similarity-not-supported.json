@@ -1,0 +1,6 @@
+{
+  "error": "similarity_not_supported_for_species",
+  "message": "이 종은 아직 비교할 참조 소리가 충분하지 않아요.",
+  "retryable": false,
+  "trace_id": "trace-fixture-similarity-001"
+}

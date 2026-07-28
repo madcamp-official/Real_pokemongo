@@ -1,0 +1,19 @@
+{
+  "audio_sighting_id": "audio-sighting-fixture-001",
+  "candidates": [
+    {
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "common_name_ko": "직박구리",
+      "scientific_name": "Hypsipetes amaurotis",
+      "confidence": 0.87,
+      "confidence_level": "high",
+      "start_ms": 1100,
+      "end_ms": 5300,
+      "is_dangerous": false
+    }
+  ],
+  "unknown": false,
+  "needs_user_confirmation": true,
+  "model_version": "birdnet@audio-mvp-1.0.0",
+  "location_prior_used": false
+}
