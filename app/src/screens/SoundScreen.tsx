@@ -12,10 +12,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
+import { useAudioPlayer } from 'expo-audio';
 import {
   confirmAudioIdentification,
   deleteAudioSighting,
   identifyAudioSighting,
+  getSpeciesSounds,
   scoreAudioSimilarity,
   uploadAudioSighting,
   type UploadAudioSightingParams,
@@ -513,9 +515,54 @@ function ResultPanel({
       <View style={styles.actions}>
         <PrimaryButton label="이 종으로 기록하기" onPress={onConfirm} />
         <SecondaryButton label="소리 비교하기" onPress={onScore} />
+        {selected && <ReferenceSoundButton speciesId={selected.species_id} />}
         <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>다시 녹음</Text></Pressable>
       </View>
     </View>
+  );
+}
+
+/** 참조 음원만 재생한다. 사용자 녹음은 앱에서 재생·영구 보관하지 않는다. */
+function ReferenceSoundButton({ speciesId }: { speciesId: string }) {
+  const [source, setSource] = useState<string | null>(null);
+  const [playWhenReady, setPlayWhenReady] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const player = useAudioPlayer(source);
+
+  useEffect(() => {
+    if (!source || !playWhenReady) return;
+    player.seekTo(0);
+    player.play();
+    setPlayWhenReady(false);
+  }, [playWhenReady, player, source]);
+
+  const play = async () => {
+    if (source) {
+      player.seekTo(0);
+      player.play();
+      return;
+    }
+    setLoading(true);
+    try {
+      const sounds = await getSpeciesSounds(speciesId);
+      const clip = sounds.clips[0];
+      if (!sounds.supported_for_similarity || !clip) {
+        Alert.alert('참조 소리 준비 중', '이 종의 참조 소리는 아직 준비되지 않았어요.');
+        return;
+      }
+      setPlayWhenReady(true);
+      setSource(clip.playback_url);
+    } catch {
+      Alert.alert('참조 소리 오류', '참조 소리를 불러오지 못했어요. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Pressable onPress={() => void play()} disabled={loading} style={styles.referenceButton} accessibilityRole="button">
+      <Text style={styles.referenceText}>{loading ? '참조 소리 불러오는 중…' : '참조 소리 듣기'}</Text>
+    </Pressable>
   );
 }
 
@@ -606,6 +653,8 @@ const styles = StyleSheet.create({
   actions: { gap: 10, marginTop: 4 },
   retryButton: { alignItems: 'center', paddingVertical: 10 },
   retryText: { color: colors.textSecondary, fontSize: 14, fontWeight: '800' },
+  referenceButton: { alignSelf: 'stretch', alignItems: 'center', paddingVertical: 13, borderRadius: 22, backgroundColor: colors.funFactBg },
+  referenceText: { color: colors.textPrimary, fontSize: 14, fontWeight: '900' },
   loadingOverlay: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(58,51,48,0.18)' },
   loadingHidden: { opacity: 0 },
   loadingCard: { width: 220, alignItems: 'center', gap: 14, borderRadius: 22, backgroundColor: colors.surface, padding: 24, shadowColor: '#3A3330', shadowOpacity: 0.18, shadowRadius: 16, elevation: 5 },
