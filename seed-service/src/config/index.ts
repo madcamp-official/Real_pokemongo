@@ -118,6 +118,9 @@ export interface AppConfig {
        * .env.example에 채우지 않는다). 없으면 헤더 자체를 안 붙인다. */
       token?: string;
     };
+    /** 8단계: 라이선스 참조 음원(영구, TTL 없음) + 사전 계산된 임베딩을 두는 베이스
+     * 디렉터리. ReferenceMediaStore/ReferenceEmbeddingStore가 각각 하위 폴더로 나눠 쓴다. */
+    referenceDir: string;
   };
 }
 
@@ -198,6 +201,7 @@ export function loadConfig(): AppConfig {
         timeoutMs: envNumber("AUDIO_MODEL_TIMEOUT_MS", 15000),
         token: env("AUDIO_MODEL_SERVICE_TOKEN") || undefined,
       },
+      referenceDir: env("AUDIO_REFERENCE_DIR") ?? "./data/audio-reference",
     },
   };
 }

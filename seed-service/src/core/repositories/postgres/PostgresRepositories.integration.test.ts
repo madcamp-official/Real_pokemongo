@@ -21,11 +21,13 @@ import {
   PgCreatureRepo,
   PgAudioSightingRepo,
   PgAudioIdentificationResultRepo,
+  PgSpeciesSoundReferenceRepo,
 } from "./PostgresRepositories.js";
 import type { User, Taxon, Observation, CollectionEntry, Creature } from "../../domain/types.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
 import type { AudioSighting } from "../../audio/audioTypes.js";
 import type { AudioIdentificationResult } from "../../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../../audio/reference/referenceTypes.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const skip = DATABASE_URL ? false : "DATABASE_URL 미설정 — SSH 터널을 연 뒤 수동 실행(파일 상단 주석 참고)";
@@ -320,6 +322,57 @@ test("PgAudioSightingRepo: 7단계 claimConfirmation은 원자적 CAS, finalizeC
     await sightingRepo.deleteByUser(userId);
     await observations.deleteByUser(userId);
   });
+});
+
+test("PgSpeciesSoundReferenceRepo: 8단계 — listApproved는 approved만, upsertMany는 재적재 시 덮어쓴다", { skip }, async () => {
+  const repo = new PgSpeciesSoundReferenceRepo(pool!);
+  const taxonId = "taxon-hypsipetes-amaurotis" as SpeciesSoundReference["taxonId"];
+
+  const approved: SpeciesSoundReference = {
+    id: `it-test-ref-${randomUUID()}`,
+    taxonId,
+    mediaRef: "local://it-test.wav",
+    callType: "call",
+    durationMs: 5000,
+    sourceUrl: "https://xeno-canto.org/9999999/download",
+    creator: "통합테스트",
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    attribution: "통합테스트 via xeno-canto.org (XC9999999)",
+    qualityStatus: "approved",
+    referenceSetVersion: "kr-bird-reference@2026-07",
+    embeddingRef: "it-test-embedding.json",
+    embeddingModelVersion: "birdnet-acoustic-2.4-pb",
+  };
+  const pending: SpeciesSoundReference = {
+    ...approved,
+    id: `it-test-ref-pending-${randomUUID()}`,
+    qualityStatus: "pending",
+  };
+
+  try {
+    await repo.upsertMany([approved, pending]);
+
+    const found = await repo.listApproved(taxonId);
+    const foundIds = found.map((r) => r.id);
+    assert.ok(foundIds.includes(approved.id), "approved 행은 listApproved에 나와야 함");
+    assert.ok(!foundIds.includes(pending.id), "pending 행은 listApproved에 나오면 안 됨");
+
+    const fetched = await repo.get(approved.id);
+    assert.equal(fetched?.embeddingRef, "it-test-embedding.json");
+    assert.equal(fetched?.durationMs, 5000);
+
+    // 재적재(같은 id로 다시 upsert) — 사람이 clips.csv를 고치고 다시 돌리는 상황을 흉내낸다.
+    await repo.upsertMany([{ ...approved, durationMs: 6000, qualityStatus: "rejected" }]);
+    const refetched = await repo.get(approved.id);
+    assert.equal(refetched?.durationMs, 6000, "재적재 시 값이 덮어써져야 함");
+    assert.equal(refetched?.qualityStatus, "rejected");
+  } finally {
+    // FK(species_sound_reference.taxon_id → taxon)만 있고 삭제 API는 없다 — 통합테스트용
+    // id라 실서비스 데이터와 안 섞이지만, 정리 차원에서 직접 지운다.
+    await pool!.query("DELETE FROM species_sound_reference WHERE id = ANY($1)", [
+      [approved.id, pending.id],
+    ]);
+  }
 });
 
 test("PgCollectionRepo + PgCreatureRepo: 종당 개체 1마리 UNIQUE 제약이 실제로 걸린다", { skip }, async () => {

@@ -28,6 +28,8 @@ import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
 import { BOND_MAX } from "../core/garden/bondRules.js";
 import type { AudioSighting, AudioConfirmResult } from "../core/audio/audioTypes.js";
 import type { AudioIdentificationOutcome } from "../core/audio/identification/audioIdentificationTypes.js";
+import type { SimilaritySupportedOutcome } from "../core/audio/similarity/SimilarityGateway.js";
+import type { SpeciesSoundReference } from "../core/audio/reference/referenceTypes.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
 /** `app/src/types/api.ts`의 TaxonGroup — 도감 필터 UI가 쓰는 5종 분류. */
@@ -595,5 +597,51 @@ export function audioConfirmResultToResponse(result: AudioConfirmResult) {
       xp: result.reward.xp,
       quest_ids: result.reward.questIds,
     },
+  };
+}
+
+// ── 소리 기능(오디오) 8단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §4의 `POST /audio/similarity/score` 성공 응답 —
+ * `fixtures/similarity-success.json`과 필드 1:1 대응. */
+export function audioSimilarityScoreToResponse(
+  audioSightingId: string,
+  speciesId: string,
+  outcome: SimilaritySupportedOutcome,
+) {
+  return {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    score: outcome.score,
+    grade: outcome.grade,
+    score_reliability: outcome.scoreReliability,
+    matched_segment: { start_ms: outcome.matchedSegment.startMs, end_ms: outcome.matchedSegment.endMs },
+    feedback_codes: outcome.feedbackCodes,
+    model_version: outcome.modelVersion,
+    reference_set_version: outcome.referenceSetVersion,
+  };
+}
+
+/** `docs/audio/API_CONTRACT.md` §5의 `GET /species/:species_id/sounds` 성공 응답.
+ * `playbackUrlFor`는 라우트가 만든 단기 서명 URL 생성 함수(순수 함수 원칙 유지 — 서명은
+ * 시크릿이 필요해 이 파일이 직접 하지 않는다). */
+export function speciesSoundsToResponse(
+  speciesId: string,
+  refs: SpeciesSoundReference[],
+  playbackUrlFor: (ref: SpeciesSoundReference) => string,
+) {
+  const approved = refs.filter((r) => r.qualityStatus === "approved");
+  return {
+    species_id: speciesId,
+    supported_for_similarity: approved.length > 0,
+    reference_set_version: approved[0]?.referenceSetVersion ?? "",
+    clips: approved.map((r) => ({
+      id: r.id,
+      call_type: r.callType,
+      duration_ms: r.durationMs,
+      playback_url: playbackUrlFor(r),
+      attribution: r.attribution,
+      license: r.license,
+      source_url: r.sourceUrl,
+    })),
   };
 }

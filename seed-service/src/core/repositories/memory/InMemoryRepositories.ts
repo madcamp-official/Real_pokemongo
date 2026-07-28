@@ -27,6 +27,7 @@ import type { GardenLayout } from "../../garden/gardenTypes.js";
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
 import type { AudioSighting, AudioConfirmResult } from "../../audio/audioTypes.js";
 import type { AudioIdentificationResult } from "../../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../../audio/reference/referenceTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -40,6 +41,7 @@ import type {
   GardenRepository,
   AudioSightingRepository,
   AudioIdentificationResultRepository,
+  SpeciesSoundReferenceRepository,
 } from "../ports.js";
 
 export class InMemoryUserRepo implements UserRepository {
@@ -350,5 +352,21 @@ export class InMemoryAudioIdentificationResultRepo implements AudioIdentificatio
   }
   async get(audioSightingId: AudioSightingId) {
     return this.m.get(audioSightingId) ?? null;
+  }
+}
+
+/** 8단계: 종별 라이선스 참조 음원. */
+export class InMemorySpeciesSoundReferenceRepo implements SpeciesSoundReferenceRepository {
+  private m = new Map<string, SpeciesSoundReference>();
+  async listApproved(taxonId: TaxonId) {
+    return [...this.m.values()].filter(
+      (r) => r.taxonId === taxonId && r.qualityStatus === "approved",
+    );
+  }
+  async get(id: string) {
+    return this.m.get(id) ?? null;
+  }
+  async upsertMany(refs: SpeciesSoundReference[]) {
+    for (const r of refs) this.m.set(r.id, r);
   }
 }

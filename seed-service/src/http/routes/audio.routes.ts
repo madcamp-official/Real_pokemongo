@@ -15,11 +15,14 @@ import {
   audioSightingToUploadResponse,
   audioIdentificationOutcomeToResponse,
   audioConfirmResultToResponse,
+  audioSimilarityScoreToResponse,
+  speciesSoundsToResponse,
 } from "../mappers.js";
 import { UnsupportedAudioFormatError } from "../../core/audio/AudioSignature.js";
 import { AudioConversionError } from "../../core/audio/AudioConverter.js";
-import { asAudioSightingId, asObservationId } from "../../core/domain/ids.js";
+import { asAudioSightingId, asObservationId, asTaxonId } from "../../core/domain/ids.js";
 import type { AudioSighting } from "../../core/audio/audioTypes.js";
+import { signMediaToken, verifyMediaToken } from "../../core/media/mediaToken.js";
 
 const identifyBodySchema = {
   type: "object",
@@ -45,6 +48,21 @@ interface ConfirmBody {
   confirmation_id: string;
 }
 
+const similarityScoreBodySchema = {
+  type: "object",
+  required: ["audio_sighting_id", "species_id", "mode"],
+  properties: {
+    audio_sighting_id: { type: "string", minLength: 1 },
+    species_id: { type: "string", minLength: 1 },
+    mode: { type: "string" },
+  },
+} as const;
+interface SimilarityScoreBody {
+  audio_sighting_id: string;
+  species_id: string;
+  mode: string;
+}
+
 /** `docs/audio/API_CONTRACT.md` "Common rules"의 에러 응답 형태. */
 function audioError(
   error: string,
@@ -60,6 +78,7 @@ export function registerAudioRoutes(
   server: FastifyInstance,
   app: App,
   authenticate: AuthenticateHandler,
+  jwtSecret: string,
 ): void {
   server.post("/audio/sightings/upload", { preHandler: authenticate }, async (request, reply) => {
     const ctx = requireAuthContext(request);
@@ -289,6 +308,118 @@ export function registerAudioRoutes(
       });
 
       return reply.code(200).send(audioConfirmResultToResponse(confirmResult));
+    },
+  );
+
+  server.post<{ Body: SimilarityScoreBody }>(
+    "/audio/similarity/score",
+    { preHandler: authenticate, schema: { body: similarityScoreBodySchema } },
+    async (request, reply) => {
+      const ctx = requireAuthContext(request);
+      if (request.body.mode !== "ambient") {
+        return reply
+          .code(400)
+          .send(audioError("audio_invalid_format", "mode는 'ambient'여야 합니다(MVP 고정값)."));
+      }
+
+      const sighting = await app.repos.audioSightings.get(asAudioSightingId(request.body.audio_sighting_id));
+      // STATE_MACHINE.md: score는 quality_checked(ready) 이상, confirmed/rejected/만료/소유권
+      // 실패는 전부 이 endpoint에서도 불허 — identify와 정확히 같은 게이트를 쓴다(score는
+      // confirm과 달리 재생/충돌 개념이 없어 "confirmed도 여기선 그냥 404"가 맞다 — 이미
+      // 확정된 세션을 다시 채점해도 의미가 없고 계약에 별도 규칙도 없음).
+      const expired = sighting ? new Date(sighting.expiresAt).getTime() <= Date.now() : false;
+      if (!sighting || sighting.userId !== ctx.userId || expired || sighting.status !== "ready") {
+        return reply.code(404).send(audioError("not_found", "오디오 세션을 찾을 수 없습니다."));
+      }
+
+      const taxon = await app.repos.taxa.get(asTaxonId(request.body.species_id));
+      if (!taxon) {
+        return reply
+          .code(400)
+          .send(audioError("invalid_species_id", "존재하지 않는 종입니다."));
+      }
+
+      const wavBytes = sighting.storagePath ? await app.audioTempStore.read(sighting.storagePath) : null;
+      if (!wavBytes) {
+        return reply
+          .code(503)
+          .send(audioError("audio_processor_unavailable", "오디오 파일을 읽을 수 없습니다.", { retryable: true }));
+      }
+
+      try {
+        const outcome = await app.similarity.score({
+          wavBytes,
+          taxonId: taxon.id,
+          quality: {
+            snrDb: sighting.quality.snrDb,
+            activeDurationMs: sighting.quality.activeDurationMs,
+            durationMs: sighting.quality.durationMs,
+          },
+        });
+        if (!outcome.supported) {
+          return reply
+            .code(422)
+            .send(
+              audioError(
+                "similarity_not_supported_for_species",
+                "이 종은 아직 비교할 참조 소리가 충분하지 않아요.",
+                { retryable: false },
+              ),
+            );
+        }
+        return reply
+          .code(200)
+          .send(audioSimilarityScoreToResponse(sighting.id, taxon.id, outcome));
+      } catch {
+        // doc03 "모델 오류는 5xx로 반환" — identify와 동일한 원칙(삼키지 않고 503).
+        return reply
+          .code(503)
+          .send(audioError("audio_processor_unavailable", "유사도 모델 서비스에 연결할 수 없습니다.", { retryable: true }));
+      }
+    },
+  );
+
+  server.get<{ Params: { speciesId: string } }>(
+    "/species/:speciesId/sounds",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      // API_CONTRACT.md "Common rules": "All endpoints require the existing authenticated
+      // user session" — 사진 파이프라인의 공개 /species/:id/card와 다르게 이 엔드포인트는
+      // (오디오 계약 소속이라) 인증을 요구한다.
+      const taxonId = asTaxonId(request.params.speciesId);
+      const taxon = await app.repos.taxa.get(taxonId);
+      if (!taxon) {
+        return reply.code(404).send({ error: "not_found", message: "해당 종을 찾을 수 없습니다." });
+      }
+      const refs = await app.repos.speciesSoundReferences.listApproved(taxonId);
+      return speciesSoundsToResponse(taxon.id, refs, (ref) => {
+        const mt = signMediaToken(ref.id, jwtSecret);
+        return `/audio/reference/${ref.id}?mt=${mt}`;
+      });
+    },
+  );
+
+  // 참조 음원 실제 바이트 재생 — mediaToken.ts와 같은 패턴(S3 presigned URL 방식): 발급
+  // 시점(위 /species/:id/sounds, 인증 필요)에서 소유권이 아니라 "공개 라이선스 콘텐츠
+  // 열람 허용"을 확인하고, 여기서는 로그인 여부를 다시 묻지 않고 서명·만료만 확인한다.
+  server.get<{ Params: { refId: string }; Querystring: { mt?: string } }>(
+    "/audio/reference/:refId",
+    async (request, reply) => {
+      const { refId } = request.params;
+      const mt = request.query.mt;
+      if (!mt || !verifyMediaToken(mt, refId, jwtSecret)) {
+        return reply.code(401).send({ error: "unauthorized" });
+      }
+      const ref = await app.repos.speciesSoundReferences.get(refId);
+      if (!ref || ref.qualityStatus !== "approved") {
+        return reply.code(404).send({ error: "not_found" });
+      }
+      const bytes = await app.referenceMediaStore.read(ref.mediaRef);
+      if (!bytes) {
+        return reply.code(404).send({ error: "not_found" });
+      }
+      reply.header("Content-Type", "audio/wav");
+      return reply.send(bytes);
     },
   );
 }

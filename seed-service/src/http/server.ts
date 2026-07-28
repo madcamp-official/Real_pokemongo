@@ -78,7 +78,7 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   registerVisionRoutes(server, app);
   registerMapRoutes(server, app, authenticate);
   registerPhotoRoutes(server, app, authenticate, jwtSecret);
-  registerAudioRoutes(server, app, authenticate);
+  registerAudioRoutes(server, app, authenticate, jwtSecret);
 
   // 전역 에러 매핑 — core/auth/Authorization.ts의 원칙("소유권 없음/미존재는 같은 404,
   // 자원 존재 여부를 누설하지 않는다")을 HTTP 계층에서도 그대로 지킨다. 이걸 안 걸면

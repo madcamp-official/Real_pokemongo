@@ -36,6 +36,7 @@ import type { GardenLayout, GardenTile, CreaturePlacement, TileType } from "../.
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
 import type { AudioSighting, AudioQuality, AudioConfirmResult } from "../../audio/audioTypes.js";
 import type { AudioIdentificationResult, AudioIdentificationCandidate } from "../../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../../audio/reference/referenceTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -49,6 +50,7 @@ import type {
   GardenRepository,
   AudioSightingRepository,
   AudioIdentificationResultRepository,
+  SpeciesSoundReferenceRepository,
 } from "../ports.js";
 
 type Pool = pg.Pool;
@@ -1035,5 +1037,82 @@ function rowToAudioIdentificationResult(row: any): AudioIdentificationResult {
     modelVersion: row.model_version,
     locationPriorUsed: row.location_prior_used,
     createdAt: new Date(row.created_at).toISOString(),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 소리 기능(오디오) 8단계 — species_sound_reference
+// ---------------------------------------------------------------------------
+export class PgSpeciesSoundReferenceRepo implements SpeciesSoundReferenceRepository {
+  constructor(private pool: Pool) {}
+
+  async listApproved(taxonId: TaxonId): Promise<SpeciesSoundReference[]> {
+    const r = await this.pool.query(
+      `SELECT * FROM species_sound_reference WHERE taxon_id = $1 AND quality_status = 'approved'`,
+      [taxonId],
+    );
+    return r.rows.map(rowToSpeciesSoundReference);
+  }
+
+  async get(id: string): Promise<SpeciesSoundReference | null> {
+    const r = await this.pool.query(`SELECT * FROM species_sound_reference WHERE id = $1`, [id]);
+    return r.rows[0] ? rowToSpeciesSoundReference(r.rows[0]) : null;
+  }
+
+  async upsertMany(refs: SpeciesSoundReference[]): Promise<void> {
+    for (const ref of refs) {
+      await this.pool.query(
+        `INSERT INTO species_sound_reference
+           (id, taxon_id, media_ref, call_type, duration_ms, source_url, creator, license,
+            attribution, quality_status, reference_set_version, embedding_ref, embedding_model_version)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+         ON CONFLICT (id) DO UPDATE SET
+           taxon_id = EXCLUDED.taxon_id,
+           media_ref = EXCLUDED.media_ref,
+           call_type = EXCLUDED.call_type,
+           duration_ms = EXCLUDED.duration_ms,
+           source_url = EXCLUDED.source_url,
+           creator = EXCLUDED.creator,
+           license = EXCLUDED.license,
+           attribution = EXCLUDED.attribution,
+           quality_status = EXCLUDED.quality_status,
+           reference_set_version = EXCLUDED.reference_set_version,
+           embedding_ref = EXCLUDED.embedding_ref,
+           embedding_model_version = EXCLUDED.embedding_model_version`,
+        [
+          ref.id,
+          ref.taxonId,
+          ref.mediaRef,
+          ref.callType,
+          ref.durationMs,
+          ref.sourceUrl,
+          ref.creator,
+          ref.license,
+          ref.attribution,
+          ref.qualityStatus,
+          ref.referenceSetVersion,
+          ref.embeddingRef ?? null,
+          ref.embeddingModelVersion ?? null,
+        ],
+      );
+    }
+  }
+}
+
+function rowToSpeciesSoundReference(row: any): SpeciesSoundReference {
+  return {
+    id: row.id,
+    taxonId: row.taxon_id as TaxonId,
+    mediaRef: row.media_ref,
+    callType: row.call_type,
+    durationMs: row.duration_ms,
+    sourceUrl: row.source_url,
+    creator: row.creator,
+    license: row.license,
+    attribution: row.attribution,
+    qualityStatus: row.quality_status,
+    referenceSetVersion: row.reference_set_version,
+    embeddingRef: row.embedding_ref ?? undefined,
+    embeddingModelVersion: row.embedding_model_version ?? undefined,
   };
 }

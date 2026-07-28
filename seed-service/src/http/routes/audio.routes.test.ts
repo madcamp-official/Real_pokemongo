@@ -13,7 +13,10 @@ import { buildApp, type App } from "../../composition.js";
 import { loadConfig, type AppConfig } from "../../config/index.js";
 import { buildHttpServer } from "../server.js";
 import { makeRealAudio, makeRealSpeech } from "../../core/audio/fixtures.js";
-import { asAudioSightingId } from "../../core/domain/ids.js";
+import { asAudioSightingId, asTaxonId } from "../../core/domain/ids.js";
+import { signMediaToken } from "../../core/media/mediaToken.js";
+import type { SpeciesSoundReference } from "../../core/audio/reference/referenceTypes.js";
+import type { TaxonId } from "../../core/domain/types.js";
 import type { FastifyInstance } from "fastify";
 
 function testConfig(): AppConfig {
@@ -613,4 +616,259 @@ test("POST /audio/identify/confirm: 서로 다른 confirmation_id로 동시에 �
 
   const observations = await app.repos.observations.listByUser(userId as never);
   assert.equal(observations.length, 1, "동시 요청이어도 관찰은 정확히 1건이어야 함");
+});
+
+// ── 8단계: GET /species/:id/sounds, GET /audio/reference/:refId, POST /audio/similarity/score ──
+function refRow(overrides: Partial<SpeciesSoundReference> & { id: string; taxonId: TaxonId }): SpeciesSoundReference {
+  return {
+    callType: "call",
+    durationMs: 5000,
+    sourceUrl: "https://xeno-canto.org/9999999/download",
+    creator: "테스트 녹음자",
+    license: "https://creativecommons.org/licenses/by/4.0/",
+    attribution: "테스트 녹음자 via xeno-canto.org (XC9999999)",
+    qualityStatus: "approved",
+    referenceSetVersion: "kr-bird-reference@2026-07",
+    mediaRef: "",
+    ...overrides,
+  };
+}
+
+/** 승인된 참조 클립 1건을 실제로 만든다 — 진짜 오디오 바이트(재생 라우트 검증용)와 진짜
+ * 임베딩(유사도 채점 검증용)을 각각 스토어에 저장하고, DB 행을 upsert한다. */
+async function seedApprovedReference(
+  app: App,
+  id: string,
+  taxonId: string,
+  embedding: number[],
+  wavBytes: Buffer,
+): Promise<void> {
+  const mediaRef = await app.referenceMediaStore.save(wavBytes);
+  const embeddingRef = await app.referenceEmbeddingStore.save(embedding);
+  await app.repos.speciesSoundReferences.upsertMany([
+    refRow({ id, taxonId: asTaxonId(taxonId), mediaRef, embeddingRef }),
+  ]);
+}
+
+test("GET /species/:speciesId/sounds: 인증 없으면 401", async () => {
+  const { server } = await testServer();
+  const res = await server.inject({ method: "GET", url: "/species/taxon-hypsipetes-amaurotis/sounds" });
+  assert.equal(res.statusCode, 401);
+});
+
+test("GET /species/:speciesId/sounds: 존재하지 않는 종은 404", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/species/taxon-does-not-exist/sounds",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 404);
+});
+
+test("GET /species/:speciesId/sounds: 승인된 참조가 없으면 supported_for_similarity=false, clips=[]", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await server.inject({
+    method: "GET",
+    url: "/species/taxon-hypsipetes-amaurotis/sounds",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.species_id, "taxon-hypsipetes-amaurotis");
+  assert.equal(body.supported_for_similarity, false);
+  assert.deepEqual(body.clips, []);
+});
+
+test("GET /species/:speciesId/sounds: 승인된 참조가 있으면 계약 형태(clips[].id/call_type/duration_ms/attribution/license/source_url/playback_url)로 나온다", async () => {
+  const { server, app } = await testServer();
+  const { token } = await signup(server);
+  await seedApprovedReference(
+    app,
+    "ref-hypsipetes-001",
+    "taxon-hypsipetes-amaurotis",
+    [1, 0],
+    Buffer.from("fake-wav-bytes"),
+  );
+
+  const res = await server.inject({
+    method: "GET",
+    url: "/species/taxon-hypsipetes-amaurotis/sounds",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.supported_for_similarity, true);
+  assert.equal(body.reference_set_version, "kr-bird-reference@2026-07");
+  assert.equal(body.clips.length, 1);
+  const clip = body.clips[0];
+  assert.equal(clip.id, "ref-hypsipetes-001");
+  assert.equal(clip.call_type, "call");
+  assert.equal(clip.duration_ms, 5000);
+  assert.equal(clip.attribution, "테스트 녹음자 via xeno-canto.org (XC9999999)");
+  assert.equal(clip.license, "https://creativecommons.org/licenses/by/4.0/");
+  assert.ok(String(clip.playback_url).includes("mt="), "단기 서명 토큰이 붙어야 함");
+});
+
+test("GET /audio/reference/:refId: mt 없이 요청하면 401", async () => {
+  const { server, app } = await testServer();
+  await seedApprovedReference(app, "ref-x-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("hello"));
+  const res = await server.inject({ method: "GET", url: "/audio/reference/ref-x-001" });
+  assert.equal(res.statusCode, 401);
+});
+
+test("GET /audio/reference/:refId: 다른 클립용 서명 토큰을 재사용하면 401(클립 id에 고정됨)", async () => {
+  const { server, app, cfg } = await testServer();
+  await seedApprovedReference(app, "ref-x-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("hello"));
+  const wrongMt = signMediaToken("ref-other-clip", cfg.auth.jwtSecret || "test-secret-not-for-production");
+  const res = await server.inject({ method: "GET", url: `/audio/reference/ref-x-001?mt=${wrongMt}` });
+  assert.equal(res.statusCode, 401);
+});
+
+test("GET /audio/reference/:refId: 승인된 클립을 /sounds가 준 실제 playback_url로 재생하면 200과 실제 바이트", async () => {
+  const { server, app } = await testServer();
+  const { token } = await signup(server);
+  const wavBytes = Buffer.from("real-fake-wav-bytes-for-playback-test");
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], wavBytes);
+
+  const soundsRes = await server.inject({
+    method: "GET",
+    url: "/species/taxon-hypsipetes-amaurotis/sounds",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  const playbackUrl = soundsRes.json().clips[0].playback_url as string;
+
+  const res = await server.inject({ method: "GET", url: playbackUrl });
+  assert.equal(res.statusCode, 200);
+  assert.deepEqual(res.rawPayload, wavBytes);
+});
+
+// --- POST /audio/similarity/score ---
+async function callSimilarityScore(
+  server: FastifyInstance,
+  token: string | undefined,
+  body: { audio_sighting_id: string; species_id: string; mode?: string },
+) {
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  return server.inject({
+    method: "POST",
+    url: "/audio/similarity/score",
+    headers,
+    payload: { mode: "ambient", ...body },
+  });
+}
+
+test("POST /audio/similarity/score: 인증 없으면 401", async () => {
+  const { server } = await testServer();
+  const res = await callSimilarityScore(server, undefined, {
+    audio_sighting_id: randomUUID(),
+    species_id: "taxon-hypsipetes-amaurotis",
+  });
+  assert.equal(res.statusCode, 401);
+});
+
+test("POST /audio/similarity/score: 존재하지 않는 세션은 404 not_found", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await callSimilarityScore(server, token, {
+    audio_sighting_id: randomUUID(),
+    species_id: "taxon-hypsipetes-amaurotis",
+  });
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/similarity/score: mode가 ambient가 아니면 400", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const res = await callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+    mode: "practice",
+  });
+  assert.equal(res.statusCode, 400);
+});
+
+test("POST /audio/similarity/score: 존재하지 않는 species_id는 400 invalid_species_id", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const res = await callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-does-not-exist",
+  });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "invalid_species_id");
+});
+
+test("POST /audio/similarity/score: 승인된 참조가 없는 종은 422 similarity_not_supported_for_species", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const res = await callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+  });
+  assert.equal(res.statusCode, 422);
+  assert.equal(res.json().error, "similarity_not_supported_for_species");
+});
+
+test("POST /audio/similarity/score: 정상 채점은 200과 계약 형태를 돌려주고 관찰/도감/퀘스트/보상에 아무 영향을 주지 않는다", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token, userId } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () =>
+    new Response(
+      JSON.stringify({
+        model_version: "birdnet-acoustic-2.4-pb",
+        quality: { duration_s: 3, sample_rate: 48000, segment_duration_s: 3 },
+        segments: [{ start_s: 0, end_s: 3, candidates: [], embedding: [1, 0] }],
+      }),
+      { status: 200 },
+    )) as typeof fetch;
+
+  const res = await withMockedFetch(fakeFetch, () => callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+  }));
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.audio_sighting_id, sightingId);
+  assert.equal(body.species_id, "taxon-hypsipetes-amaurotis");
+  assert.equal(body.score, 100);
+  assert.equal(body.grade, "strong_match");
+  assert.ok(["high", "medium", "low"].includes(body.score_reliability));
+  assert.deepEqual(body.matched_segment, { start_ms: 0, end_ms: 3000 });
+  assert.deepEqual(body.feedback_codes, []);
+  assert.equal(body.model_version, "birdnet-acoustic-2.4-pb");
+  assert.equal(body.reference_set_version, "kr-bird-reference@2026-07");
+
+  // ACCEPTANCE.md 시나리오 8: "Similarity scoring: Score shown; no product mutation".
+  const observations = await app.repos.observations.listByUser(userId as never);
+  assert.equal(observations.length, 0, "유사도 채점은 관찰을 만들면 안 됨");
+});
+
+test("POST /audio/similarity/score: 모델 서비스 오류는 503 audio_processor_unavailable", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () => new Response("internal error", { status: 500 })) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+  }));
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().error, "audio_processor_unavailable");
 });

@@ -27,6 +27,7 @@ import type { EarnedBadge } from "../rewards/rewardTypes.js";
 import type { GardenLayout } from "../garden/gardenTypes.js";
 import type { AudioSighting, AudioConfirmResult } from "../audio/audioTypes.js";
 import type { AudioIdentificationResult } from "../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../audio/reference/referenceTypes.js";
 
 // 삭제 계약(체크리스트 §5.6 — 삭제권 이행):
 // 사용자 데이터를 담는 모든 저장소는 삭제 메서드를 구현해야 한다. 프로덕션 DB 어댑터를
@@ -176,4 +177,19 @@ export interface AudioSightingRepository {
 export interface AudioIdentificationResultRepository {
   upsert(result: AudioIdentificationResult): Promise<void>;
   get(audioSightingId: AudioSightingId): Promise<AudioIdentificationResult | null>;
+}
+
+/**
+ * 8단계: 종별 라이선스 참조 음원(species_sound_reference, 5단계가 스키마만 만들어둠).
+ * 사람 검수(quality_status pending→approved/rejected)가 실제로 끝나기 전까진
+ * listApproved()가 항상 빈 배열을 돌려준다 — 그게 정직한 현재 상태다(research/
+ * audio-reference-pool/README.md 참고).
+ */
+export interface SpeciesSoundReferenceRepository {
+  /** 유사도 계산에 실제로 쓸 수 있는(quality_status='approved') 참조 클립만. */
+  listApproved(taxonId: TaxonId): Promise<SpeciesSoundReference[]>;
+  get(id: string): Promise<SpeciesSoundReference | null>;
+  /** 적재 스크립트(ingest_approved_clips.ts) 전용 — 같은 id로 다시 부르면 덮어쓴다(재적재
+   * 멱등성, 사람이 clips.csv를 고치고 다시 돌릴 수 있어야 하므로). */
+  upsertMany(refs: SpeciesSoundReference[]): Promise<void>;
 }

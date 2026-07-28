@@ -22,6 +22,7 @@ import {
   InMemoryGardenRepo,
   InMemoryAudioSightingRepo,
   InMemoryAudioIdentificationResultRepo,
+  InMemorySpeciesSoundReferenceRepo,
 } from "./core/repositories/memory/InMemoryRepositories.js";
 import {
   PgUserRepo,
@@ -36,6 +37,7 @@ import {
   PgGardenRepo,
   PgAudioSightingRepo,
   PgAudioIdentificationResultRepo,
+  PgSpeciesSoundReferenceRepo,
   upsertBadgeDefinitions,
 } from "./core/repositories/postgres/PostgresRepositories.js";
 import type {
@@ -51,6 +53,7 @@ import type {
   GardenRepository,
   AudioSightingRepository,
   AudioIdentificationResultRepository,
+  SpeciesSoundReferenceRepository,
 } from "./core/repositories/ports.js";
 import { AudioConverter } from "./core/audio/AudioConverter.js";
 import { AudioTempStore } from "./core/audio/AudioTempStore.js";
@@ -58,6 +61,10 @@ import { AudioUploadService } from "./core/audio/AudioUploadService.js";
 import { AudioSessionCleanupService } from "./core/audio/AudioSessionCleanupService.js";
 import { BirdNetAudioProvider } from "./core/audio/identification/BirdNetAudioProvider.js";
 import { AudioIdentificationGateway } from "./core/audio/identification/AudioIdentificationGateway.js";
+import { ReferenceMediaStore } from "./core/audio/reference/ReferenceMediaStore.js";
+import { ReferenceEmbeddingStore } from "./core/audio/reference/ReferenceEmbeddingStore.js";
+import { BirdNetEmbeddingProvider } from "./core/audio/similarity/BirdNetEmbeddingProvider.js";
+import { SimilarityGateway } from "./core/audio/similarity/SimilarityGateway.js";
 import { LocalDiskMediaStore } from "./core/media/LocalDiskMediaStore.js";
 import { PendingSightingStore } from "./core/observation/PendingSightingStore.js";
 import { IdentificationGateway } from "./core/identification/IdentificationGateway.js";
@@ -98,6 +105,7 @@ export interface App {
     garden: GardenRepository;
     audioSightings: AudioSightingRepository;
     audioIdentificationResults: AudioIdentificationResultRepository;
+    speciesSoundReferences: SpeciesSoundReferenceRepository;
   };
   /** DATABASE_URL이 채워져 실Postgres로 붙었을 때만 존재. graceful shutdown 대상(serve.ts). */
   dbPool?: pg.Pool;
@@ -122,6 +130,12 @@ export interface App {
   audioCleanup: AudioSessionCleanupService;
   /** 6단계: 소리 동정 API. */
   audioIdentification: AudioIdentificationGateway;
+  /** 8단계: 참조 음원(영구) 저장소 — 적재 스크립트/GET /species/:id/sounds 재생 라우트가 씀. */
+  referenceMediaStore: ReferenceMediaStore;
+  /** 8단계: 참조 클립 사전계산 임베딩 저장소. */
+  referenceEmbeddingStore: ReferenceEmbeddingStore;
+  /** 8단계: 유사도 채점(POST /audio/similarity/score). */
+  similarity: SimilarityGateway;
 }
 
 function buildInMemoryRepos(): App["repos"] {
@@ -138,6 +152,7 @@ function buildInMemoryRepos(): App["repos"] {
     garden: new InMemoryGardenRepo(),
     audioSightings: new InMemoryAudioSightingRepo(),
     audioIdentificationResults: new InMemoryAudioIdentificationResultRepo(),
+    speciesSoundReferences: new InMemorySpeciesSoundReferenceRepo(),
   };
 }
 
@@ -170,6 +185,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
         garden: new PgGardenRepo(dbPool),
         audioSightings: new PgAudioSightingRepo(dbPool),
         audioIdentificationResults: new PgAudioIdentificationResultRepo(dbPool),
+        speciesSoundReferences: new PgSpeciesSoundReferenceRepo(dbPool),
       };
       // quest.reward_badge_id / earned_badge.badge_id가 badge_definition(id)를 FK로 참조하므로
       // (db/schema.sql), 실제 배지 저작 데이터를 먼저 채워야 quest 업서트/배지 해금이 FK를 만족한다.
@@ -277,6 +293,18 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
   const birdNetProvider = new BirdNetAudioProvider(config.audio.model);
   const audioIdentification = new AudioIdentificationGateway(birdNetProvider, repos.taxa);
 
+  // --- 소리 기능 8단계 ---
+  // config.audio.model을 그대로 재사용한다 — 같은 CAMP-3 모델 서비스, 같은 엔드포인트를
+  // 부르는 별도 프로바이더일 뿐(BirdNetEmbeddingProvider.ts 상단 주석 참고).
+  const referenceMediaStore = new ReferenceMediaStore(`${config.audio.referenceDir}/media`);
+  const referenceEmbeddingStore = new ReferenceEmbeddingStore(`${config.audio.referenceDir}/embeddings`);
+  const embeddingProvider = new BirdNetEmbeddingProvider(config.audio.model);
+  const similarity = new SimilarityGateway(
+    embeddingProvider,
+    repos.speciesSoundReferences,
+    referenceEmbeddingStore,
+  );
+
   return {
     config,
     repos,
@@ -297,5 +325,8 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     audioTempStore,
     audioCleanup,
     audioIdentification,
+    referenceMediaStore,
+    referenceEmbeddingStore,
+    similarity,
   };
 }
