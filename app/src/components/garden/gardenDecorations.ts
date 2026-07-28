@@ -25,8 +25,8 @@ export interface DecorationPlacement {
 }
 
 export const DECORATIONS: DecorationDefinition[] = [
-  { id: 'flower-bed', name: '꽃밭', icon: '🌷', requiredSpecies: 1, requiredLevel: 1, width: 96, height: 62 },
-  { id: 'fence', name: '울타리', icon: '🪵', requiredSpecies: 2, requiredLevel: 1, width: 112, height: 54 },
+  // 작은 꽃밭·울타리는 정원 외곽 일러스트와 역할이 겹쳐 신규 목록에서 제외한다.
+  // DecorationId는 유지해 예전 로컬 저장 데이터를 깨뜨리지 않되 화면에는 렌더하지 않는다.
   { id: 'pond', name: '연못', icon: '💧', requiredSpecies: 3, requiredLevel: 1, width: 174, height: 105 },
   { id: 'fruit-tree', name: '열매나무', icon: '🌳', requiredSpecies: 4, requiredLevel: 2, width: 104, height: 138 },
   { id: 'bench', name: '벤치', icon: '🪑', requiredSpecies: 5, requiredLevel: 3, width: 118, height: 76 },

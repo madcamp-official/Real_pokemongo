@@ -53,8 +53,8 @@ export default function DexScreen() {
             <View style={{ height: 8 }} />
           </View>
         }
-        renderItem={({ item }) => (
-          <SpeciesGridCard entry={item} onPress={openCard} />
+        renderItem={({ item, index }) => (
+          <SpeciesGridCard entry={item} index={index} onPress={openCard} />
         )}
         ListEmptyComponent={
           dexQuery.isLoading ? (

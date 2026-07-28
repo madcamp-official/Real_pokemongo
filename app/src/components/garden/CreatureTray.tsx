@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   PanResponder,
   Pressable,
@@ -123,14 +123,32 @@ export function CreatureTray({
   onDragEnd,
 }: Props) {
   const [tab, setTab] = useState<'friends' | 'decorations'>('friends');
-  const message =
-    tab === 'friends'
-      ? creatures.length > 0
-        ? '친구를 끌어 정원에 놓아보세요'
-        : '모든 친구가 정원에서 쉬고 있어요'
-      : decorations.some((item) => item.unlocked)
-        ? '해금한 장식을 끌어 정원을 채워보세요'
-        : '도감을 채우면 첫 장식이 열려요';
+  const [expanded, setExpanded] = useState(false);
+  const hasAvailableItem = creatures.length > 0 || decorations.some((item) => item.unlocked);
+
+  // 새 친구나 장식이 생겼을 때 한 번 자동으로 열어 발견을 놓치지 않게 한다.
+  useEffect(() => {
+    if (hasAvailableItem) setExpanded(true);
+  }, [hasAvailableItem]);
+
+  if (!expanded) {
+    return (
+      <Pressable
+        onPress={() => setExpanded(true)}
+        accessibilityRole="button"
+        accessibilityLabel="정원 배치 목록 열기"
+        style={({ pressed }) => [styles.launcher, pressed && styles.pressed]}
+      >
+        <Text style={styles.launcherIcon}>🐾</Text>
+        <Text style={styles.launcherText}>배치 목록</Text>
+        {creatures.length > 0 && (
+          <View style={styles.countBadge}>
+            <Text style={styles.countText}>{creatures.length}</Text>
+          </View>
+        )}
+      </Pressable>
+    );
+  }
 
   return (
     <View style={styles.tray}>
@@ -149,7 +167,6 @@ export function CreatureTray({
         </Pressable>
       </View>
       <View style={styles.content}>
-        <Text style={styles.message} numberOfLines={1}>{message}</Text>
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -177,6 +194,14 @@ export function CreatureTray({
               ))}
         </ScrollView>
       </View>
+      <Pressable
+        onPress={() => setExpanded(false)}
+        accessibilityRole="button"
+        accessibilityLabel="정원 배치 목록 접기"
+        style={({ pressed }) => [styles.closeButton, pressed && styles.pressed]}
+      >
+        <Text style={styles.closeIcon}>⌄</Text>
+      </Pressable>
     </View>
   );
 }
@@ -187,11 +212,12 @@ const styles = StyleSheet.create({
     left: 14,
     right: 14,
     bottom: 10,
-    height: 76,
+    height: 70,
     flexDirection: 'row',
     backgroundColor: 'rgba(255,252,239,0.94)',
     borderRadius: 20,
-    padding: 7,
+    paddingHorizontal: 8,
+    paddingVertical: 7,
     borderWidth: 2,
     borderColor: '#FFFFFF',
     shadowColor: '#425D30',
@@ -199,6 +225,38 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
+  launcher: {
+    position: 'absolute',
+    left: 16,
+    bottom: 12,
+    height: 44,
+    paddingLeft: 12,
+    paddingRight: 14,
+    borderRadius: 22,
+    flexDirection: 'row',
+    gap: 7,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,252,239,0.96)',
+    borderWidth: 1.5,
+    borderColor: '#FFFFFF',
+    shadowColor: '#425D30',
+    shadowOpacity: 0.22,
+    shadowRadius: 8,
+    shadowOffset: { width: 0, height: 3 },
+    elevation: 7,
+  },
+  launcherIcon: { fontSize: 18 },
+  launcherText: { fontSize: 12, fontWeight: '900', color: '#53634A' },
+  countBadge: {
+    minWidth: 20,
+    height: 20,
+    borderRadius: 10,
+    paddingHorizontal: 5,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#6F955B',
+  },
+  countText: { color: '#FFFFFF', fontSize: 10, fontWeight: '900' },
   tabColumn: { flexDirection: 'row', gap: 5, alignItems: 'center', paddingRight: 8 },
   tabButton: {
     width: 37,
@@ -210,10 +268,21 @@ const styles = StyleSheet.create({
   },
   activeTab: { backgroundColor: '#FFC65B' },
   tabIcon: { fontSize: 18 },
-  content: { flex: 1, minWidth: 0 },
-  message: { height: 18, fontSize: 10, fontWeight: '800', color: '#65705B' },
-  trayRow: { gap: 8, paddingRight: 8, alignItems: 'center' },
-  chip: { width: 48, alignItems: 'center', gap: 1 },
+  content: { flex: 1, minWidth: 0, justifyContent: 'center' },
+  trayRow: { gap: 7, paddingRight: 10, paddingBottom: 2, alignItems: 'center' },
+  closeButton: {
+    width: 32,
+    height: 32,
+    marginLeft: 4,
+    alignSelf: 'center',
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#E8E4D3',
+  },
+  closeIcon: { marginTop: -5, fontSize: 23, fontWeight: '900', color: '#64705A' },
+  pressed: { opacity: 0.72, transform: [{ scale: 0.96 }] },
+  chip: { width: 72, alignItems: 'center', gap: 1 },
   lockedChip: { opacity: 0.52 },
   chipThumb: {
     width: 38,
@@ -224,5 +293,14 @@ const styles = StyleSheet.create({
   },
   decorThumb: { backgroundColor: '#E8F0D6' },
   decorIcon: { fontSize: 22 },
-  chipName: { maxWidth: 50, fontSize: 8, fontWeight: '800', color: colors.textPrimary },
+  chipName: {
+    width: 72,
+    minHeight: 13,
+    lineHeight: 12,
+    paddingBottom: 1,
+    textAlign: 'center',
+    fontSize: 9,
+    fontWeight: '800',
+    color: colors.textPrimary,
+  },
 });
