@@ -20,6 +20,13 @@ import {
   mockMapPins,
   mockExploredRegions,
 } from '@/mocks/mockData';
+import {
+  mockAudioConfirm,
+  mockAudioIdentify,
+  mockAudioSimilarity,
+  mockAudioUploadSuccess,
+  mockSpeciesSounds,
+} from '@/mocks/audioFixtures';
 
 function speciesIdFromUrl(url: string): string {
   const m = url.match(/\/species\/([^/]+)\/card/);
@@ -59,6 +66,13 @@ function parseBody(config: InternalAxiosRequestConfig): Record<string, unknown> 
 
 // [메서드, URL 정규식, 응답 생성기]
 const routes: Array<[string, RegExp, Handler]> = [
+  // Audio MVP — app/src/mocks/audioFixtures.ts는 docs/audio/fixtures와 같은 계약을 따른다.
+  ['POST', /\/audio\/sightings\/upload$/, () => mockAudioUploadSuccess],
+  ['POST', /\/audio\/identify\/confirm$/, () => mockAudioConfirm],
+  ['POST', /\/audio\/identify$/, () => mockAudioIdentify],
+  ['POST', /\/audio\/similarity\/score$/, () => mockAudioSimilarity],
+  ['GET', /\/species\/[^/]+\/sounds$/, () => mockSpeciesSounds],
+  ['DELETE', /\/audio\/sightings\/[^/]+$/, () => ({})],
   ['GET', /\/dex\/completion$/, () => mockDexCompletion],
   ['GET', /\/dex/, () => mockDex],
   ['GET', /\/species\/[^/]+\/card/, (config) => getMockSpeciesCard(speciesIdFromUrl(config.url ?? ''))],

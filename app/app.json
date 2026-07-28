@@ -52,6 +52,15 @@
       ],
       "expo-secure-store",
       [
+        "expo-audio",
+        {
+          "microphonePermission": "주변 생물의 소리를 녹음해 도감에서 찾아보기 위해 마이크를 사용합니다.",
+          "recordAudioAndroid": true,
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
         "expo-screen-orientation",
         {
           "initialOrientation": "PORTRAIT_UP"
