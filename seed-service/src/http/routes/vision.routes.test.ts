@@ -54,7 +54,7 @@ test("POST /vision/preview-scan: 인증 없이도 200(공개 엔드포인트)", 
 test("POST /vision/preview-scan: 위험 종(양봉꿀벌)이면 is_dangerous=true", async () => {
   const { app, server } = await testServer();
   app.mock.enqueue([
-    { scientificName: "Apis mellifera", vernacularName: "양봉꿀벌 (서양종꿀벌)", rank: "species", confidence: 0.9 },
+    { scientificName: "Apis mellifera", vernacularName: "양봉꿀벌", rank: "species", confidence: 0.9 },
   ]);
   const res = await server.inject({
     method: "POST",
@@ -64,7 +64,7 @@ test("POST /vision/preview-scan: 위험 종(양봉꿀벌)이면 is_dangerous=tru
   assert.equal(res.statusCode, 200);
   const body = res.json();
   assert.equal(body.is_dangerous, true);
-  assert.equal(body.species_guess, "양봉꿀벌 (서양종꿀벌)");
+  assert.equal(body.species_guess, "양봉꿀벌");
 });
 
 test("POST /vision/preview-scan: 안전 종(서양민들레)이면 is_dangerous=false", async () => {

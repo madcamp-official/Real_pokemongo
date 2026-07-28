@@ -28,7 +28,7 @@ export const SEED_TAXA: Taxon[] = [
   {
     id: asTaxonId("taxon-honeybee"),
     sciName: "Apis mellifera",
-    korName: "양봉꿀벌 (서양종꿀벌)",
+    korName: "양봉꿀벌",
     aliases: ["wing", "날개"],
     rank: "species",
     group: "insect",
