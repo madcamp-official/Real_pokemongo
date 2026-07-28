@@ -27,8 +27,8 @@ export default function DexScreen() {
 
   const filtered = useMemo(() => {
     const items = dexQuery.data ?? [];
-    if (filter === '전체') return items;
-    return items.filter((e) => e.group === filter);
+    const scoped = filter === '전체' ? items : items.filter((e) => e.group === filter);
+    return [...scoped].sort((a, b) => a.name.localeCompare(b.name, 'ko'));
   }, [dexQuery.data, filter]);
 
   const openCard = (entry: DexEntry) => {
