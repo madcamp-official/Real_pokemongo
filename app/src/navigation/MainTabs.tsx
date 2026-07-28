@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import type { RootTabParamList } from '@/navigation/types';
 import CameraScreen from '@/screens/CameraScreen';
+import SoundScreen from '@/screens/SoundScreen';
 import DexScreen from '@/screens/DexScreen';
 import GardenScreen from '@/screens/GardenScreen';
 import MapScreen from '@/screens/MapScreen';
@@ -33,6 +34,7 @@ export function MainTabs() {
     >
       <Tab.Screen name="Map" component={MapScreen} />
       <Tab.Screen name="Camera" component={CameraScreen} />
+      <Tab.Screen name="Sound" component={SoundScreen} />
       <Tab.Screen name="Dex" component={DexScreen} />
       <Tab.Screen name="Garden" component={GardenScreen} />
       <Tab.Screen name="Rewards" component={RewardsScreen} />
