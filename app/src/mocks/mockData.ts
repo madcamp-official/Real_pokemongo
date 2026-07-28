@@ -212,11 +212,11 @@ export const mockGardenLayout: GardenLayout = {
 };
 
 export const mockTileCompatibility: TileCompatibility = {
-  곤충: ['잔디', '꽃밭'],
-  양서류: ['물웅덩이', '잔디'],
-  식물: ['흙', '꽃밭'],
-  조류: ['잔디', '돌'],
-  기타: ['흙', '잔디', '돌'],
+  곤충: ['잔디', '꽃밭', '흙', '돌'],
+  양서류: ['물웅덩이', '잔디', '흙'],
+  식물: ['흙', '꽃밭', '잔디'],
+  조류: ['잔디', '돌', '꽃밭', '흙'],
+  기타: ['흙', '잔디', '돌', '꽃밭', '물웅덩이'],
 };
 
 const STATUS_MESSAGES = [

@@ -15,6 +15,7 @@ export function CapturingLoader({ visible, label = '담는 중...' }: Props) {
 
   useEffect(() => {
     if (!visible) return;
+    spin.setValue(0);
     const loop = Animated.loop(
       Animated.timing(spin, {
         toValue: 1,
@@ -33,7 +34,10 @@ export function CapturingLoader({ visible, label = '담는 중...' }: Props) {
 
   return (
     <View style={styles.backdrop}>
-      <Animated.View style={[styles.ring, { transform: [{ rotate }] }]} />
+      <View style={styles.ringWrap}>
+        <View style={styles.ringTrack} />
+        <Animated.View style={[styles.ringSpinner, { transform: [{ rotate }] }]} />
+      </View>
       <Text style={styles.label}>{label}</Text>
     </View>
   );
@@ -50,14 +54,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  ring: {
+  ringWrap: {
     width: 56,
     height: 56,
+    marginBottom: 16,
+  },
+  ringTrack: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
     borderRadius: 28,
     borderWidth: 5,
-    borderColor: 'rgba(255,255,255,0.25)',
+    borderColor: 'rgba(255,255,255,0.34)',
+  },
+  ringSpinner: {
+    position: 'absolute',
+    top: 0,
+    right: 0,
+    bottom: 0,
+    left: 0,
+    borderRadius: 28,
+    borderWidth: 5,
+    borderColor: 'transparent',
     borderTopColor: '#fff',
-    marginBottom: 16,
+    borderRightColor: 'rgba(255,255,255,0.82)',
   },
   label: { color: '#fff', fontSize: 16, fontWeight: '600' },
 });

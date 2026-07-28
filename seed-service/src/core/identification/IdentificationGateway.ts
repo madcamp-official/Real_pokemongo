@@ -76,20 +76,34 @@ export class IdentificationGateway {
   }
 
   async identify(input: IdentifyInput): Promise<IdentificationOutcome> {
-    const provider = this.selectProvider(input);
-    if (!provider) {
+    const providers = this.selectProviders(input);
+    if (providers.length === 0) {
       return this.unknownOutcome(
         "no-provider",
         "지금은 동정할 수 없어요. 잠시 뒤 다시 시도해요.",
       );
     }
 
-    let raw;
-    try {
-      raw = await provider.identify(input);
-    } catch {
-      // 실패/타임아웃 → 좌절 없는 마무리(§7 마지막 행)
-      return this.unknownOutcome(provider.name, "다음에 또 찾아보자! 😊");
+    // 설정된 첫 프로바이더가 일시 장애여도 다음 프로바이더를 시도한다. 예를 들어
+    // BioCLIP SSH 터널이 끊겼을 때 여기서 즉시 unknown을 반환하면, 같은 게이트웨이를
+    // 공유하는 터치 스캔과 촬영 동정이 동시에 전부 죽는다.
+    let raw = null;
+    let lastProviderName = providers[0]!.name;
+    for (const provider of providers) {
+      lastProviderName = provider.name;
+      try {
+        raw = await provider.identify(input);
+        break;
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `[identification] ${provider.name} 실패 — 다음 프로바이더를 시도합니다: ${reason}`,
+        );
+      }
+    }
+    if (!raw) {
+      // 모든 프로바이더 실패/타임아웃 → 좌절 없는 마무리(§7 마지막 행)
+      return this.unknownOutcome(lastProviderName, "다음에 또 찾아보자! 😊");
     }
 
     const resolved = await this.resolveCandidates(raw.candidates);
@@ -176,15 +190,14 @@ export class IdentificationGateway {
 
   // --- 내부 --------------------------------------------------------------
 
-  /** 대상군을 지원하고 설정된(키가 있는) 첫 프로바이더 선택. */
-  private selectProvider(input: IdentifyInput): IdentificationProvider | null {
+  /** 대상군을 지원하고 설정된(키가 있는) 프로바이더를 우선순위대로 선택. */
+  private selectProviders(input: IdentifyInput): IdentificationProvider[] {
     const hint = input.groupHint;
     const usable = this.providers.filter((p) => p.isConfigured());
     if (hint) {
-      const match = usable.find((p) => p.supports.includes(hint));
-      if (match) return match;
+      return usable.filter((p) => p.supports.includes(hint));
     }
-    return usable[0] ?? null;
+    return usable;
   }
 
   private async resolveCandidates(

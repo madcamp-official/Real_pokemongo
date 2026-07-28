@@ -175,7 +175,27 @@ test("조건 2(혼동 종): 알려지지 않은 쌍은 margin이 작아도 강�
   assert.equal(out.tier, "high", "혼동 쌍 목록에 없는 종끼리는 margin이 작아도 강등하면 안 됨");
 });
 
-test("프로바이더가 예외를 던져도 안전하게 unknown으로 마무리한다", async () => {
+test("첫 프로바이더가 예외를 던지면 다음 프로바이더로 폴백한다", async () => {
+  const repo = new InMemoryTaxonRepo();
+  await repo.upsertMany([
+    taxon({ id: "dandelion", sciName: "Taraxacum officinale", korName: "민들레" }),
+  ]);
+  const throwing = new MockProvider();
+  throwing.identify = async () => {
+    throw new Error("vendor down");
+  };
+  const fallback = new MockProvider();
+  fallback.enqueue([
+    { scientificName: "Taraxacum officinale", rank: "species", confidence: 0.93 },
+  ]);
+  const gateway = new IdentificationGateway([throwing, fallback], repo);
+  const out = await gateway.identify({ images: IMG, groupHint: "plant" });
+  assert.equal(out.tier, "high");
+  assert.equal(out.top?.displayName, "민들레");
+  assert.equal(fallback.identifyCalls, 1);
+});
+
+test("모든 프로바이더가 예외를 던지면 안전하게 unknown으로 마무리한다", async () => {
   const repo = new InMemoryTaxonRepo();
   const throwing = new MockProvider();
   throwing.identify = async () => {

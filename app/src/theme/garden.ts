@@ -42,11 +42,13 @@ export function screenToTile(
   px: number,
   py: number,
   viewportWidth = GRID_WIDTH,
-  viewportHeight = GRID_HEIGHT
+  viewportHeight = GRID_HEIGHT,
+  allowedCoordinates?: ReadonlySet<string>
 ): { row: number; col: number } | null {
   let best: { row: number; col: number; distance: number } | null = null;
   for (let row = 0; row < GRID_N; row++) {
     for (let col = 0; col < GRID_N; col++) {
+      if (allowedCoordinates && !allowedCoordinates.has(`${row},${col}`)) continue;
       const point = gardenPointPercent(row, col);
       const sx = (point.x / 100) * viewportWidth;
       const sy = (point.y / 100) * viewportHeight;
@@ -54,7 +56,10 @@ export function screenToTile(
       if (!best || distance < best.distance) best = { row, col, distance };
     }
   }
-  return best && best.distance <= Math.max(42, viewportWidth * 0.045)
+  // 넓은 2D 배경에서는 손가락을 정확히 슬롯 중앙에 놓지 않아도 가장 가까운
+  // 호환 자리로 자연스럽게 스냅한다. 후보가 제한된 생물도 빈 공간에 쉽게 놓인다.
+  const snapRadius = Math.max(70, Math.min(112, viewportWidth * 0.08));
+  return best && best.distance <= snapRadius
     ? { row: best.row, col: best.col }
     : null;
 }

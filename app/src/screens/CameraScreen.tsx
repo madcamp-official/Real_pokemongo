@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
-import { useNavigation } from '@react-navigation/native';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { CameraView, useCameraPermissions } from 'expo-camera';
@@ -44,7 +44,14 @@ export default function CameraScreen() {
   const zoomRef = useRef(0);
   const pinchStartZoom = useRef(0);
 
-  const { isHolding, isFinishing, frameCount, startCapture, endCapture } = useCapture(cameraRef);
+  const {
+    isHolding,
+    isFinishing,
+    frameCount,
+    startCapture,
+    endCapture,
+    finishCaptureTransition,
+  } = useCapture(cameraRef);
   const { scanning, point, result, scanAt, clear } = usePreviewScan(cameraRef);
   const [previewSize, setPreviewSize] = useState({ w: 0, h: 0 });
 
@@ -55,6 +62,18 @@ export default function CameraScreen() {
   const incrementGuestSighting = useAuthStore((s) => s.incrementGuestSighting);
 
   const guestLimitReached = isGuest && guestSightingCount >= GUEST_SIGHTING_LIMIT;
+
+  // 촬영 성공 시 결과 화면이 실제로 덮을 때까지 로더를 유지한다. 결과 화면으로
+  // 이동하며 Camera 탭이 blur 된 뒤에만 상태를 정리해 전환 중 빈 프레임을 없앤다.
+  useFocusEffect(
+    useCallback(
+      () => () => {
+        finishCaptureTransition();
+      },
+      [finishCaptureTransition]
+    )
+  );
+
   const goBack = () => navigation.navigate('Map');
   const setCameraZoom = (value: number) => {
     // expo-camera는 0~1 범위를 사용한다. 너무 큰 확대는 피사체 찾기를 어렵게 하므로 3배 근처로 제한한다.
@@ -131,10 +150,11 @@ export default function CameraScreen() {
     );
   }
 
-  const openIdentify = (uploadId: string) => {
-    navigation
-      .getParent<NativeStackNavigationProp<RootStackParamList>>()
-      ?.navigate('IdentifyResult', { uploadId });
+  const openIdentify = (uploadId: string): boolean => {
+    const parent = navigation.getParent<NativeStackNavigationProp<RootStackParamList>>();
+    if (!parent) return false;
+    parent.navigate('IdentifyResult', { uploadId });
+    return true;
   };
 
   const onShutterPressIn = () => {
@@ -148,9 +168,10 @@ export default function CameraScreen() {
   const onShutterPressOut = () => {
     void endCapture()
       .then((uploadId) => {
-        if (uploadId) openIdentify(uploadId);
+        if (!uploadId || !openIdentify(uploadId)) finishCaptureTransition();
       })
       .catch(() => {
+        finishCaptureTransition();
         // 촬영 마무리 실패는 조용히 넘긴다 — 다시 누르면 재시도된다.
         // (미처리 프라미스로 새면 개발 빌드에서 빨간 에러 오버레이가 뜬다)
       });

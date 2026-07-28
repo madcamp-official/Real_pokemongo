@@ -40,6 +40,8 @@ interface UploadQueueState {
   ) => string;
   removeItem: (id: string) => void;
   clearCompleted: () => void;
+  retryItem: (id: string) => void;
+  retryAllFailed: () => void;
   processQueue: () => Promise<void>;
 }
 
@@ -75,6 +77,28 @@ export const useUploadQueue = create<UploadQueueState>()(
 
       clearCompleted: () =>
         set((s) => ({ items: s.items.filter((i) => i.status !== 'done') })),
+
+      retryItem: (id) => {
+        set((s) => ({
+          items: s.items.map((i) =>
+            i.id === id
+              ? { ...i, status: 'pending', attempts: 0, error: undefined }
+              : i
+          ),
+        }));
+        void get().processQueue();
+      },
+
+      retryAllFailed: () => {
+        set((s) => ({
+          items: s.items.map((i) =>
+            i.status === 'failed'
+              ? { ...i, status: 'pending', attempts: 0, error: undefined }
+              : i
+          ),
+        }));
+        void get().processQueue();
+      },
 
       processQueue: async () => {
         if (get().isProcessing) return;

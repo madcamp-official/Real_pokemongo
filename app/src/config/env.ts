@@ -15,14 +15,19 @@ function resolveDevHost(): string | null {
   const candidates = [
     Constants.expoConfig?.hostUri,
     Constants.expoGoConfig?.debuggerHost,
-    Constants.expoGoConfig?.packagerOpts?.hostType,
   ];
 
   for (const candidate of candidates) {
     if (typeof candidate !== 'string') continue;
-    // "10.0.1.5:8081/path" 또는 "10.0.1.5:8081" → "10.0.1.5"
-    const host = candidate.split('/')[0]?.split(':')[0];
-    if (host && host !== 'localhost' && host !== '127.0.0.1') return host;
+    try {
+      // hostUri/debuggerHost는 보통 "10.0.1.5:8081" 형태지만 런타임에 따라
+      // scheme/path가 붙을 수도 있다. URL 파서로 안전하게 hostname만 꺼낸다.
+      const url = new URL(candidate.includes('://') ? candidate : `http://${candidate}`);
+      const host = url.hostname;
+      if (host && host !== 'localhost' && host !== '127.0.0.1' && host !== '::1') return host;
+    } catch {
+      // 해석할 수 없는 런타임 메타데이터는 다음 후보로 넘긴다.
+    }
   }
   return null;
 }
