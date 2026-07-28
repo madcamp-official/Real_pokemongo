@@ -7,8 +7,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, dirname } from "node:path";
 import { randomUUID } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { buildApp, type App } from "../../composition.js";
 import { loadConfig, type AppConfig } from "../../config/index.js";
 import { buildHttpServer } from "../server.js";
@@ -332,9 +334,9 @@ test("POST /audio/identify: 만료된 세션은 404 not_found", async () => {
 });
 
 test("POST /audio/identify: 정상 동정은 200과 계약 형태(candidates/confidence_level/model_version)를 돌려준다", async () => {
-  const { server, cfg } = await testServer();
+  const { server, app, cfg } = await testServer();
   cfg.audio.model.endpoint = "http://fake-birdnet-test";
-  const { token } = await signup(server);
+  const { token, userId } = await signup(server);
   const sightingId = await uploadReadySighting(server, token);
 
   const fakeFetch = fakeBirdNetResponse([
@@ -355,6 +357,10 @@ test("POST /audio/identify: 정상 동정은 200과 계약 형태(candidates/con
   assert.equal(body.candidates[0].confidence_level, "high");
   assert.equal(body.candidates[0].is_dangerous, false);
   assert.equal(body.unknown_reason, undefined, "unknown=false면 unknown_reason 필드가 없어야 함");
+
+  // API_CONTRACT.md Common rules: "POST /audio/identify ... must not change observations".
+  const observations = await app.repos.observations.listByUser(userId as never);
+  assert.equal(observations.length, 0, "동정만으로는 관찰을 만들면 안 됨");
 });
 
 test("POST /audio/identify: 지원 종이 하나도 안 나오면 200 unknown=true", async () => {
@@ -383,6 +389,25 @@ test("POST /audio/identify: 모델 서비스 오류는 503 audio_processor_unava
   const sightingId = await uploadReadySighting(server, token);
 
   const fakeFetch = (async () => new Response("internal error", { status: 500 })) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().error, "audio_processor_unavailable");
+  assert.equal(res.json().retryable, true);
+});
+
+test("POST /audio/identify: 모델 서비스 타임아웃(AbortError)도 5xx 오류와 같은 503으로 처리한다", async () => {
+  // 일반 5xx(위 테스트)와 코드 경로가 다르다 — fetch가 응답을 받는 게 아니라 AbortSignal.timeout이
+  // 던지는 DOMException("AbortError")를 그대로 통과시켜야 한다(BirdNetAudioProvider.test.ts의
+  // 단위 테스트와 동일한 실패 유형을 라우트 레벨까지 따라가서 확인).
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const fakeFetch = (async () => {
+    throw new DOMException("The operation was aborted", "AbortError");
+  }) as typeof fetch;
   const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
 
   assert.equal(res.statusCode, 503);
@@ -873,6 +898,25 @@ test("POST /audio/similarity/score: 모델 서비스 오류는 503 audio_process
   assert.equal(res.json().error, "audio_processor_unavailable");
 });
 
+test("POST /audio/similarity/score: 모델 서비스 타임아웃(AbortError)도 5xx 오류와 같은 503으로 처리한다", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () => {
+    throw new DOMException("The operation was aborted", "AbortError");
+  }) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+  }));
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().error, "audio_processor_unavailable");
+});
+
 // ── 9단계: GET /audio/health ────────────────────────────────────────────
 test("GET /audio/health: 모델 미설정 + 승인된 참조 없음(기본 테스트 환경)은 인증 없이도 503과 ready=false", async () => {
   const { server } = await testServer();
@@ -913,4 +957,176 @@ test("GET /audio/health: 모델이 설정됐지만 /ready가 실패 응답이면
 
   assert.equal(res.statusCode, 503);
   assert.equal(res.json().model.reachable, false);
+});
+
+// ── 10단계: fixture 계약 테스트 ──────────────────────────────────────────
+/**
+ * 지금까지(6~9단계)는 각 스테이지에서 사람이 `docs/audio/fixtures/*.json`을 눈으로 대조해
+ * 응답 형태를 맞췄을 뿐, 그 fixture 파일들을 실제로 읽어서 코드가 자동으로 검증하는 테스트는
+ * 없었다 — 즉 누군가 나중에 fixture를 고치거나 매퍼를 리팩터링해도 아무 테스트도 실패하지
+ * 않을 수 있었다. doc03 10단계 완료 기준 "fixture 계약 테스트 통과"에 대응해, 실제
+ * `docs/audio/fixtures/*.json` 파일을 읽어 실응답과 "키 집합 + 타입"을 재귀적으로 비교한다.
+ * 리터럴 값(예: similarity의 score=78)까지 재현하진 않는다 — 그건 계약이 보장하는 바가
+ * 아니고(`similarityScoring.test.ts` 주석 참고), 이 테스트의 목적은 "구조가 fixture와
+ * 어긋나면 즉시 잡아낸다"이지 "예시값을 그대로 재현한다"가 아니다.
+ * `error-network.json`은 대상에서 제외 — API_CONTRACT.md: "trace_id can be omitted when no
+ * server request was made, such as a device-only network error", 즉 서버를 아예 호출하지
+ * 않는 클라이언트(doc02 앱 트랙) 전용 에러라 seed-service가 만들어낼 응답이 아니다.
+ */
+const fixturesDir = join(dirname(fileURLToPath(import.meta.url)), "../../../../docs/audio/fixtures");
+
+function loadFixture(name: string): unknown {
+  return JSON.parse(readFileSync(join(fixturesDir, name), "utf8"));
+}
+
+// AudioQuality.snrDb는 도메인 타입 자체가 number | null이다(무음/대비부족이면 null —
+// AudioQualityAnalyzer.ts) — fixture 예시가 우연히 숫자든 null이든, 이 필드만은 항상
+// 둘 다 허용해야 정확하다(어느 한쪽만 예로 든 fixture 값의 타입에 억지로 맞추지 않는다).
+const NULLABLE_NUMBER_FIELDS = new Set(["snr_db"]);
+
+function assertContractShape(actual: unknown, fixture: unknown, path: string): void {
+  const key = path.slice(path.lastIndexOf(".") + 1);
+  if (NULLABLE_NUMBER_FIELDS.has(key)) {
+    assert.ok(actual === null || typeof actual === "number", `${path}: null 또는 number여야 함`);
+    return;
+  }
+  if (Array.isArray(fixture)) {
+    assert.ok(Array.isArray(actual), `${path}: 배열이어야 함`);
+    if (fixture.length > 0 && (actual as unknown[]).length > 0) {
+      assertContractShape((actual as unknown[])[0], fixture[0], `${path}[0]`);
+    }
+    return;
+  }
+  if (fixture !== null && typeof fixture === "object") {
+    assert.ok(actual !== null && typeof actual === "object", `${path}: 객체여야 함`);
+    const fixtureKeys = Object.keys(fixture as Record<string, unknown>).sort();
+    const actualKeys = Object.keys(actual as Record<string, unknown>).sort();
+    assert.deepEqual(actualKeys, fixtureKeys, `${path}: 키 집합이 fixture와 달라짐`);
+    for (const k of fixtureKeys) {
+      assertContractShape(
+        (actual as Record<string, unknown>)[k],
+        (fixture as Record<string, unknown>)[k],
+        `${path}.${k}`,
+      );
+    }
+    return;
+  }
+  if (fixture === null) {
+    assert.equal(actual, null, `${path}: null이어야 함`);
+    return;
+  }
+  assert.equal(typeof actual, typeof fixture, `${path}: 타입이 fixture와 달라짐(${typeof actual} !== ${typeof fixture})`);
+}
+
+test("계약 fixture: upload-success.json과 실제 업로드 응답의 구조가 일치한다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const res = await upload(server, token, audio, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(res.statusCode, 200);
+  assertContractShape(res.json(), loadFixture("upload-success.json"), "upload-success");
+});
+
+test("계약 fixture: upload-quality-rejected.json과 실제 거부 응답의 구조가 일치한다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
+  const res = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(res.statusCode, 422);
+  assertContractShape(res.json(), loadFixture("upload-quality-rejected.json"), "upload-quality-rejected");
+});
+
+test("계약 fixture: identify-high-confidence.json과 실제 동정 응답의 구조가 일치한다", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.87 }] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+  assert.equal(res.statusCode, 200);
+  assertContractShape(res.json(), loadFixture("identify-high-confidence.json"), "identify-high-confidence");
+});
+
+test("계약 fixture: identify-multiple-candidates.json과 실제 동정 응답의 구조가 일치한다", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const fakeFetch = fakeBirdNetResponse([
+    {
+      start_s: 0,
+      end_s: 3,
+      candidates: [
+        { sci_name: "Passer montanus", label: "Eurasian Tree Sparrow", score: 0.62 },
+        { sci_name: "Pica serica", label: "Oriental Magpie", score: 0.41 },
+      ],
+    },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.json().candidates.length, 2, "테스트 전제(medium+low 두 후보)가 깨짐");
+  assertContractShape(res.json(), loadFixture("identify-multiple-candidates.json"), "identify-multiple-candidates");
+});
+
+test("계약 fixture: identify-unknown.json과 실제 미지원 응답의 구조가 일치한다", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Not A Real Bird", label: "?", score: 0.99 }] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+  assert.equal(res.statusCode, 200);
+  assertContractShape(res.json(), loadFixture("identify-unknown.json"), "identify-unknown");
+});
+
+test("계약 fixture: confirm-success.json과 실제 확정 응답의 구조가 일치한다", async () => {
+  const { server, cfg } = await testServer();
+  const { token } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 200);
+  assertContractShape(res.json(), loadFixture("confirm-success.json"), "confirm-success");
+});
+
+test("계약 fixture: similarity-success.json과 실제 채점 응답의 구조가 일치한다", async () => {
+  const { server, app, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  await seedApprovedReference(app, "ref-hypsipetes-001", "taxon-hypsipetes-amaurotis", [1, 0], Buffer.from("x"));
+
+  const fakeFetch = (async () =>
+    new Response(
+      JSON.stringify({
+        model_version: "birdnet-acoustic-2.4-pb",
+        quality: { duration_s: 3, sample_rate: 48000, segment_duration_s: 3 },
+        segments: [{ start_s: 0, end_s: 3, candidates: [], embedding: [1, 0] }],
+      }),
+      { status: 200 },
+    )) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () =>
+    callSimilarityScore(server, token, { audio_sighting_id: sightingId, species_id: "taxon-hypsipetes-amaurotis" }),
+  );
+  assert.equal(res.statusCode, 200);
+  assertContractShape(res.json(), loadFixture("similarity-success.json"), "similarity-success");
+});
+
+test("계약 fixture: similarity-not-supported.json과 실제 미지원 종 에러 응답의 구조가 일치한다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+  const res = await callSimilarityScore(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+  });
+  assert.equal(res.statusCode, 422);
+  assertContractShape(res.json(), loadFixture("similarity-not-supported.json"), "similarity-not-supported");
 });

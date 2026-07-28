@@ -69,6 +69,14 @@ test("embed: HTTP 에러 응답이면 명시적으로 throw한다", async () => 
   await assert.rejects(() => withMockedFetch(fakeFetch, () => provider.embed(Buffer.from("x"))));
 });
 
+test("embed: 네트워크/타임아웃 에러가 나면 그대로 throw한다(게이트웨이가 처리) — BirdNetAudioProvider와 대칭", async () => {
+  const fakeFetch = (async () => {
+    throw new DOMException("The operation was aborted", "AbortError");
+  }) as typeof fetch;
+  const provider = new BirdNetEmbeddingProvider({ endpoint: "http://127.0.0.1:8932", timeoutMs: 1 });
+  await assert.rejects(() => withMockedFetch(fakeFetch, () => provider.embed(Buffer.from("x"))));
+});
+
 test("embed: endpoint 미설정이면 fetch도 안 하고 즉시 throw한다", async () => {
   const provider = new BirdNetEmbeddingProvider({ endpoint: "" });
   await assert.rejects(() => provider.embed(Buffer.from("x")));
