@@ -12,14 +12,12 @@ export function registerQuestRoutes(
   authenticate: AuthenticateHandler,
 ): void {
   // 프론트는 항상 ?active=true로 부른다(app/src/api/quests.ts) — 지금 활성 기간인 퀘스트만
-  // 보여준다는 뜻이라, QuestRepository.listActive()가 이미 그 목록이다(만료/로테이션은
-  // QuestEngine.isActiveAt이 관찰 적용 시 판단하는 것과 별개로, 여기선 활성 기간만 거른다).
+  // 보여준다는 뜻이라, QuestEngine.listVisibleQuests가 이미 그 목록이다(활성 기간 +
+  // 실제 오늘 날짜 기준 계절 필터 + 오늘의 데일리 퀘스트 생성까지 한 곳에서 처리 —
+  // applyObservation이 관찰 적용 시 쓰는 것과 동일한 단일 진실 원천).
   server.get("/quests", { preHandler: authenticate }, async (request) => {
     const ctx = requireAuthContext(request);
-    const now = new Date().toISOString();
-    const quests = (await app.repos.quests.listActive()).filter(
-      (q) => q.activeFrom <= now && (!q.activeTo || q.activeTo >= now),
-    );
+    const quests = await app.quests.listVisibleQuests(new Date());
     return Promise.all(
       quests.map(async (quest) => {
         const progress = await app.repos.quests.getProgress(ctx.userId, quest.id);
