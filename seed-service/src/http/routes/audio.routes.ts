@@ -8,13 +8,18 @@
  * sightings.routes.ts와 같은 얇은-라우트/두꺼운-서비스 분리).
  */
 import { randomUUID } from "node:crypto";
-import type { FastifyInstance } from "fastify";
+import type { FastifyInstance, FastifyReply } from "fastify";
 import type { App } from "../../composition.js";
 import { requireAuthContext, type AuthenticateHandler } from "../auth.js";
-import { audioSightingToUploadResponse, audioIdentificationOutcomeToResponse } from "../mappers.js";
+import {
+  audioSightingToUploadResponse,
+  audioIdentificationOutcomeToResponse,
+  audioConfirmResultToResponse,
+} from "../mappers.js";
 import { UnsupportedAudioFormatError } from "../../core/audio/AudioSignature.js";
 import { AudioConversionError } from "../../core/audio/AudioConverter.js";
-import { asAudioSightingId } from "../../core/domain/ids.js";
+import { asAudioSightingId, asObservationId } from "../../core/domain/ids.js";
+import type { AudioSighting } from "../../core/audio/audioTypes.js";
 
 const identifyBodySchema = {
   type: "object",
@@ -23,6 +28,21 @@ const identifyBodySchema = {
 } as const;
 interface IdentifyBody {
   audio_sighting_id: string;
+}
+
+const confirmBodySchema = {
+  type: "object",
+  required: ["audio_sighting_id", "species_id", "confirmation_id"],
+  properties: {
+    audio_sighting_id: { type: "string", minLength: 1 },
+    species_id: { type: "string", minLength: 1 },
+    confirmation_id: { type: "string", minLength: 1 },
+  },
+} as const;
+interface ConfirmBody {
+  audio_sighting_id: string;
+  species_id: string;
+  confirmation_id: string;
 }
 
 /** `docs/audio/API_CONTRACT.md` "Common rules"의 에러 응답 형태. */
@@ -180,4 +200,123 @@ export function registerAudioRoutes(
       }
     },
   );
+
+  server.post<{ Body: ConfirmBody }>(
+    "/audio/identify/confirm",
+    { preHandler: authenticate, schema: { body: confirmBodySchema } },
+    async (request, reply) => {
+      const ctx = requireAuthContext(request);
+      const sighting = await app.repos.audioSightings.get(asAudioSightingId(request.body.audio_sighting_id));
+
+      // 미존재/남의 것/만료/품질거부(rejected)는 identify와 같은 404로 합친다 — rejected는
+      // 애초에 동정을 거친 적이 없어 확정할 후보 스냅샷 자체가 없다. 'confirmed'는 여기서
+      // 걸러내지 않는다 — 이미 확정된 세션의 재요청(멱등 재생/충돌 판정)은 아래
+      // confirmationId 분기가 처리한다(API_CONTRACT.md §3 "같은 confirmation_id는 원본 응답").
+      const expired = sighting ? new Date(sighting.expiresAt).getTime() <= Date.now() : false;
+      if (!sighting || sighting.userId !== ctx.userId || expired || sighting.status === "rejected") {
+        return reply.code(404).send(audioError("not_found", "오디오 세션을 찾을 수 없습니다."));
+      }
+
+      // confirmationId가 이미 설정돼 있다 = 누군가(같거나 다른 요청)가 이미 확정을 클레임했다.
+      // status가 아직 'ready'(finalize 직전 경합)든 'confirmed'(완료)든 이 분기가 처리한다.
+      if (sighting.confirmationId) {
+        return respondForClaimedSighting(sighting, request.body.confirmation_id, reply);
+      }
+
+      const result = await app.repos.audioIdentificationResults.get(sighting.id);
+      if (!result) {
+        return reply
+          .code(400)
+          .send(audioError("not_identified_yet", "먼저 /audio/identify를 호출하세요."));
+      }
+      const chosen = result.candidates.find((c) => c.speciesId === request.body.species_id);
+      if (!chosen) {
+        return reply
+          .code(400)
+          .send(audioError("invalid_species_id", "동정 후보에 없는 종입니다."));
+      }
+
+      // 원자적 클레임 — WHERE confirmation_id IS NULL이라 동시에 도착한 여러 확정 요청 중
+      // 정확히 하나만 성공한다(ACCEPTANCE.md 시나리오 7 "3회 반복해도 관찰 1건").
+      const claimed = await app.repos.audioSightings.claimConfirmation(
+        sighting.id,
+        request.body.confirmation_id,
+      );
+      if (!claimed) {
+        const fresh = await app.repos.audioSightings.get(sighting.id);
+        // claimConfirmation이 false를 반환했다는 건 누군가 먼저 confirmationId를 설정했다는
+        // 뜻이라 fresh.confirmationId는 항상 존재한다(데이터 불일치가 아닌 한).
+        if (!fresh?.confirmationId) {
+          return reply
+            .code(503)
+            .send(audioError("audio_processor_unavailable", "확정 처리 중 문제가 발생했습니다.", { retryable: true }));
+        }
+        return respondForClaimedSighting(fresh, request.body.confirmation_id, reply);
+      }
+
+      const taxon = await app.repos.taxa.get(chosen.speciesId);
+      if (!taxon) {
+        // 클레임은 이미 확보했지만(confirmationId 설정됨) 아래에서 관찰 기록에 실패한 채로
+        // 응답하는 셈 — taxon 소실은 동정 후보에 있던 종이 그새 지워진 데이터 불일치라
+        // 클라이언트 잘못이 아니다. finalizeConfirmation을 못 부르므로 이 세션은 confirmationId만
+        // 설정된 채 남아, 같은 confirmation_id 재시도가 다시 여기로 와 또 503을 준다(재시도
+        // 가능한 상태로 남김 — 관찰이 생기지 않았으므로 무결성은 깨지지 않는다).
+        return reply
+          .code(503)
+          .send(audioError("audio_processor_unavailable", "종 정보를 찾을 수 없습니다.", { retryable: true }));
+      }
+
+      const recorded = await app.flow.recordIdentification(ctx, {
+        taxon,
+        rank: taxon.rank,
+        confidence: chosen.confidence,
+        source: "birdnet",
+        media: [],
+        modality: "audio",
+        now: new Date(),
+      });
+
+      const observationId = asObservationId(recorded.observationId);
+      const confirmResult = {
+        observationId,
+        speciesId: chosen.speciesId,
+        dexUpdated: Boolean(recorded.newlyUnlockedTaxonId),
+        reward: { xp: recorded.xpGained, questIds: recorded.completedQuestIds },
+      };
+      await app.repos.audioSightings.finalizeConfirmation(sighting.id, {
+        observationId,
+        result: confirmResult,
+      });
+
+      return reply.code(200).send(audioConfirmResultToResponse(confirmResult));
+    },
+  );
+}
+
+/** confirmationId가 이미 설정된 세션에 대한 응답 분기 — 처음 게이트에서든(이미 confirmed),
+ * 클레임 경합에서 졌을 때든 같은 판단 로직을 재사용한다. */
+function respondForClaimedSighting(
+  sighting: AudioSighting,
+  requestedConfirmationId: string,
+  reply: FastifyReply,
+) {
+  if (sighting.confirmationId !== requestedConfirmationId) {
+    // API_CONTRACT.md §3: "409 already_confirmed는 다른 confirmation_id가 이미 확정된
+    // 세션을 확정하려 할 때만 쓴다."
+    return reply.code(409).send({
+      error: "already_confirmed",
+      message: "이미 다른 요청으로 확정된 세션입니다.",
+      retryable: false,
+      trace_id: `trace_${randomUUID()}`,
+    });
+  }
+  if (sighting.confirmResult) {
+    // 같은 confirmation_id — 관찰/보상을 다시 만들지 않고 원본 성공 응답을 그대로 재생한다.
+    return reply.code(200).send(audioConfirmResultToResponse(sighting.confirmResult));
+  }
+  // 클레임은 됐지만(confirmationId 설정) 아직 finalize 전 — 다른 요청이 지금 막 처리 중이거나
+  // 이전 시도가 도중에 실패해 멈춘 상태. 관찰이 생겼는지 알 수 없으므로 재시도를 유도한다.
+  return reply
+    .code(503)
+    .send(audioError("audio_processor_unavailable", "확정 처리 중입니다. 잠시 후 다시 시도하세요.", { retryable: true }));
 }

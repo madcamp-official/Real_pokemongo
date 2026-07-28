@@ -26,7 +26,7 @@ import { xpToNextLevel, type LevelCurve } from "../core/rewards/rewardTypes.js";
 import type { GardenLayout as DomainGardenLayout } from "../core/garden/gardenTypes.js";
 import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
 import { BOND_MAX } from "../core/garden/bondRules.js";
-import type { AudioSighting } from "../core/audio/audioTypes.js";
+import type { AudioSighting, AudioConfirmResult } from "../core/audio/audioTypes.js";
 import type { AudioIdentificationOutcome } from "../core/audio/identification/audioIdentificationTypes.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
@@ -578,4 +578,22 @@ export function audioIdentificationOutcomeToResponse(
   };
   if (outcome.unknown) body.unknown_reason = outcome.unknownReason;
   return body;
+}
+
+// ── 소리 기능(오디오) 7단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §3의 `POST /audio/identify/confirm` 성공 응답 —
+ * `fixtures/confirm-success.json`과 필드 1:1 대응. 새로 만든 결과든(최초 확정) 저장해둔
+ * 스냅샷을 재생하는 것이든(멱등 재요청) 이 함수 하나로 직렬화한다 — 둘 다 같은
+ * `AudioConfirmResult` 모양이라 응답이 항상 동일하다는 걸 타입으로 보장한다. */
+export function audioConfirmResultToResponse(result: AudioConfirmResult) {
+  return {
+    observation_id: result.observationId,
+    modality: "audio" as const,
+    species_id: result.speciesId,
+    dex_updated: result.dexUpdated,
+    reward: {
+      xp: result.reward.xp,
+      quest_ids: result.reward.questIds,
+    },
+  };
 }

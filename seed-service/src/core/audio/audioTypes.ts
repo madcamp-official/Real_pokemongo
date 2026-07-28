@@ -4,7 +4,7 @@
  * 표현일 뿐이라, 여기 필드를 늘리거나 이름을 바꾸려면 계약 자체를 먼저 바꿔야 한다
  * (CHANGE_REQUESTS.md 경유 — `03_소리기능_서버_GPU_구현계획_팀원.md` 2장 "수정 금지" 목록).
  */
-import type { AudioSightingId, ObservationId, UserId } from "../domain/types.js";
+import type { AudioSightingId, ObservationId, TaxonId, UserId } from "../domain/types.js";
 
 /** `docs/audio/API_CONTRACT.md` "Quality object"의 blocking feedback_codes. */
 export type AudioFeedbackCode =
@@ -44,7 +44,21 @@ export interface AudioQuality {
   validSegments: AudioQualityValidSegment[];
 }
 
-export type AudioSightingStatus = "ready" | "rejected";
+export type AudioSightingStatus = "ready" | "rejected" | "confirmed";
+
+/** `POST /audio/identify/confirm` 성공 응답의 도메인 표현 — `reward`는 D단계 보상 체계(관찰
+ * 기본 XP + 완료된 퀘스트 id)의 스냅샷. 확정 시점에만 참인 값(dexUpdated/xp)이라 재생(멱등
+ * 재요청) 응답을 나중에 다시 계산하면 안 된다 — 그대로 저장해서 그대로 돌려준다. */
+export interface AudioConfirmReward {
+  xp: number;
+  questIds: string[];
+}
+export interface AudioConfirmResult {
+  observationId: ObservationId;
+  speciesId: TaxonId;
+  dexUpdated: boolean;
+  reward: AudioConfirmReward;
+}
 
 /**
  * `audio_sighting` 테이블 행의 도메인 표현. PendingSighting(사진, 인메모리)과 달리
@@ -75,4 +89,10 @@ export interface AudioSighting {
   /** 이 세션으로 만들어진 관찰(있으면). 한 세션 확정 1회를 보증하는 자리 — 7단계가 채운다.
    * 그 전까지는 항상 undefined. */
   confirmedObservationId?: ObservationId;
+  /** 확정을 "클레임"한 confirmation_id(원자적 compare-and-swap 마커). 이게 설정돼 있으면
+   * status와 무관하게 확정 진행 중/완료 상태 — 같은 값이면 재생, 다른 값이면 409. */
+  confirmationId?: string;
+  /** confirmationId가 설정된 뒤 실제로 관찰이 만들어지면 채워지는 응답 스냅샷. 클레임 직후~
+   * 완료 사이(정상적으론 매우 짧음)엔 confirmationId만 있고 이건 아직 undefined일 수 있다. */
+  confirmResult?: AudioConfirmResult;
 }

@@ -396,3 +396,221 @@ test("POST /audio/identify: 모델 서비스가 아예 설정 안 됐으면(기�
   assert.equal(res.statusCode, 503);
   assert.equal(res.json().error, "audio_processor_unavailable");
 });
+
+// ── 7단계: POST /audio/identify/confirm ──────────────────────────────────
+async function uploadIdentifiedSighting(
+  server: FastifyInstance,
+  cfg: AppConfig,
+  token: string,
+): Promise<{ audioSightingId: string; speciesId: string }> {
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const audioSightingId = await uploadReadySighting(server, token);
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.87 }] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, audioSightingId));
+  assert.equal(res.statusCode, 200, "테스트 전제(정상 동정)가 깨짐: " + JSON.stringify(res.json()));
+  return { audioSightingId, speciesId: res.json().candidates[0].species_id as string };
+}
+
+function callConfirm(
+  server: FastifyInstance,
+  token: string | undefined,
+  body: { audio_sighting_id: string; species_id: string; confirmation_id: string },
+) {
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  return server.inject({ method: "POST", url: "/audio/identify/confirm", headers, payload: body });
+}
+
+test("POST /audio/identify/confirm: 인증 없으면 401", async () => {
+  const { server } = await testServer();
+  const res = await callConfirm(server, undefined, {
+    audio_sighting_id: randomUUID(),
+    species_id: "taxon-hypsipetes-amaurotis",
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 401);
+});
+
+test("POST /audio/identify/confirm: 존재하지 않는 세션은 404 not_found", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: randomUUID(),
+    species_id: "taxon-hypsipetes-amaurotis",
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify/confirm: 남의 세션은 같은 404 not_found", async () => {
+  const { server, cfg } = await testServer();
+  const { token: ownerToken } = await signup(server);
+  const { token: otherToken } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, ownerToken);
+
+  const res = await callConfirm(server, otherToken, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify/confirm: 품질 거부(rejected)된 세션은 404 not_found", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
+  const uploadRes = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(uploadRes.statusCode, 422);
+  const sightingId = uploadRes.json().audio_sighting_id as string;
+
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: sightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify/confirm: 만료된 세션은 404 not_found", async () => {
+  const { server, app, cfg } = await testServer();
+  const { token } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+
+  const id = asAudioSightingId(audioSightingId);
+  const sighting = await app.repos.audioSightings.get(id);
+  assert.ok(sighting);
+  await app.repos.audioSightings.create({
+    ...sighting!,
+    expiresAt: new Date(Date.now() - 60_000).toISOString(),
+  });
+
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify/confirm: 아직 /audio/identify를 안 한 세션은 400 not_identified_yet", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audioSightingId = await uploadReadySighting(server, token);
+
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: "taxon-hypsipetes-amaurotis",
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "not_identified_yet");
+});
+
+test("POST /audio/identify/confirm: 후보 스냅샷에 없는 종을 확정하려 하면 400 invalid_species_id(위조 방지)", async () => {
+  const { server, cfg } = await testServer();
+  const { token } = await signup(server);
+  const { audioSightingId } = await uploadIdentifiedSighting(server, cfg, token);
+
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: "taxon-does-not-exist",
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "invalid_species_id");
+});
+
+test("POST /audio/identify/confirm: 정상 확정은 200과 계약 형태(observation_id/species_id/dex_updated/reward)를 돌려주고, 관찰 1건과 보상을 만든다", async () => {
+  const { server, app, cfg } = await testServer();
+  const { token, userId } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+
+  const res = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(typeof body.observation_id, "string");
+  assert.equal(body.modality, "audio");
+  assert.equal(body.species_id, speciesId);
+  assert.equal(body.dex_updated, true, "이 유저의 첫 해금이므로 true여야 함");
+  assert.equal(body.reward.xp, 10, "첫 해금 관찰의 기본 XP");
+  assert.deepEqual(body.reward.quest_ids, []);
+
+  const observations = await app.repos.observations.listByUser(userId as never);
+  assert.equal(observations.length, 1);
+  assert.equal(observations[0]!.modality, "audio");
+  assert.equal(observations[0]!.taxonId, speciesId);
+  assert.deepEqual(observations[0]!.media, []);
+});
+
+test("POST /audio/identify/confirm: 같은 confirmation_id로 3번 반복해도 관찰과 보상은 정확히 1번만 생긴다(멱등)", async () => {
+  const { server, app, cfg } = await testServer();
+  const { token, userId } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+  const confirmationId = randomUUID();
+  const body = { audio_sighting_id: audioSightingId, species_id: speciesId, confirmation_id: confirmationId };
+
+  const res1 = await callConfirm(server, token, body);
+  const res2 = await callConfirm(server, token, body);
+  const res3 = await callConfirm(server, token, body);
+
+  assert.equal(res1.statusCode, 200);
+  assert.equal(res2.statusCode, 200);
+  assert.equal(res3.statusCode, 200);
+  assert.deepEqual(res1.json(), res2.json(), "재요청은 원본 응답을 그대로 재생해야 함");
+  assert.deepEqual(res1.json(), res3.json());
+
+  const observations = await app.repos.observations.listByUser(userId as never);
+  assert.equal(observations.length, 1, "관찰은 정확히 1건이어야 함(ACCEPTANCE.md 시나리오 7)");
+});
+
+test("POST /audio/identify/confirm: 다른 confirmation_id로 이미 확정된 세션을 다시 확정하려 하면 409 already_confirmed", async () => {
+  const { server, cfg } = await testServer();
+  const { token } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+
+  const first = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(first.statusCode, 200);
+
+  const second = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(), // 다른 confirmation_id
+  });
+  assert.equal(second.statusCode, 409);
+  assert.equal(second.json().error, "already_confirmed");
+});
+
+test("POST /audio/identify/confirm: 서로 다른 confirmation_id로 동시에 확정 요청이 와도 정확히 하나만 성공하고 관찰은 1건만 생긴다(경쟁 방지)", async () => {
+  // claimConfirmation()의 원자적 compare-and-swap(WHERE/if confirmation_id IS NULL)을
+  // 실제 동시성(Promise.all)으로 검증 — 순차 재시도 테스트와 달리 세 요청이 진짜로
+  // 겹쳐서 도착했을 때도 같은 보장이 성립하는지 확인한다.
+  const { server, app, cfg } = await testServer();
+  const { token, userId } = await signup(server);
+  const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
+
+  const [r1, r2, r3] = await Promise.all([
+    callConfirm(server, token, { audio_sighting_id: audioSightingId, species_id: speciesId, confirmation_id: randomUUID() }),
+    callConfirm(server, token, { audio_sighting_id: audioSightingId, species_id: speciesId, confirmation_id: randomUUID() }),
+    callConfirm(server, token, { audio_sighting_id: audioSightingId, species_id: speciesId, confirmation_id: randomUUID() }),
+  ]);
+  const statusCodes = [r1.statusCode, r2.statusCode, r3.statusCode].sort();
+  assert.deepEqual(statusCodes, [200, 409, 409], "정확히 하나만 성공해야 함");
+
+  const observations = await app.repos.observations.listByUser(userId as never);
+  assert.equal(observations.length, 1, "동시 요청이어도 관찰은 정확히 1건이어야 함");
+});

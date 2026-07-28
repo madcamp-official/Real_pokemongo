@@ -25,7 +25,7 @@ import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
 import type { GardenLayout } from "../../garden/gardenTypes.js";
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
-import type { AudioSighting } from "../../audio/audioTypes.js";
+import type { AudioSighting, AudioConfirmResult } from "../../audio/audioTypes.js";
 import type { AudioIdentificationResult } from "../../audio/identification/audioIdentificationTypes.js";
 import type {
   UserRepository,
@@ -320,6 +320,25 @@ export class InMemoryAudioSightingRepo implements AudioSightingRepository {
   }
   async deleteById(id: AudioSightingId) {
     this.m.delete(id);
+  }
+  async claimConfirmation(id: AudioSightingId, confirmationId: string) {
+    const s = this.m.get(id);
+    if (!s || s.confirmationId) return false;
+    this.m.set(id, { ...s, confirmationId });
+    return true;
+  }
+  async finalizeConfirmation(
+    id: AudioSightingId,
+    params: { observationId: ObservationId; result: AudioConfirmResult },
+  ) {
+    const s = this.m.get(id);
+    if (!s) return;
+    this.m.set(id, {
+      ...s,
+      status: "confirmed",
+      confirmedObservationId: params.observationId,
+      confirmResult: params.result,
+    });
   }
 }
 

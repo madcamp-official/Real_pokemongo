@@ -34,7 +34,7 @@ import type { Quest, QuestProgress, QuestCriteria } from "../../quest/questTypes
 import type { EarnedBadge, BadgeDefinition } from "../../rewards/rewardTypes.js";
 import type { GardenLayout, GardenTile, CreaturePlacement, TileType } from "../../garden/gardenTypes.js";
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
-import type { AudioSighting, AudioQuality } from "../../audio/audioTypes.js";
+import type { AudioSighting, AudioQuality, AudioConfirmResult } from "../../audio/audioTypes.js";
 import type { AudioIdentificationResult, AudioIdentificationCandidate } from "../../audio/identification/audioIdentificationTypes.js";
 import type {
   UserRepository,
@@ -917,9 +917,43 @@ export class PgAudioSightingRepo implements AudioSightingRepository {
   async deleteById(id: AudioSightingId): Promise<void> {
     await this.pool.query(`DELETE FROM audio_sighting WHERE id = $1`, [id]);
   }
+
+  // 7단계 — API_CONTRACT.md §3 "confirm" 멱등성. WHERE confirmation_id IS NULL이 원자적
+  // compare-and-swap — 동시에 도착한 서로 다른 확정 요청 중 정확히 하나만 이 UPDATE로
+  // 1행을 바꾼다(rowCount로 판정, 애플리케이션 레벨 락 불필요).
+  async claimConfirmation(id: AudioSightingId, confirmationId: string): Promise<boolean> {
+    const r = await this.pool.query(
+      `UPDATE audio_sighting SET confirmation_id = $2 WHERE id = $1 AND confirmation_id IS NULL`,
+      [id, confirmationId],
+    );
+    return (r.rowCount ?? 0) > 0;
+  }
+
+  async finalizeConfirmation(
+    id: AudioSightingId,
+    params: { observationId: ObservationId; result: AudioConfirmResult },
+  ): Promise<void> {
+    await this.pool.query(
+      `UPDATE audio_sighting
+         SET status = 'confirmed', confirmed_observation_id = $2, confirm_result_json = $3
+       WHERE id = $1`,
+      [
+        id,
+        params.observationId,
+        JSON.stringify({
+          speciesId: params.result.speciesId,
+          dexUpdated: params.result.dexUpdated,
+          reward: params.result.reward,
+        }),
+      ],
+    );
+  }
 }
 
 function rowToAudioSighting(row: any): AudioSighting {
+  const confirmSnapshot = row.confirm_result_json as
+    | { speciesId: string; dexUpdated: boolean; reward: { xp: number; questIds: string[] } }
+    | null;
   return {
     id: row.id as AudioSightingId,
     userId: row.user_id as UserId,
@@ -936,6 +970,16 @@ function rowToAudioSighting(row: any): AudioSighting {
     createdAt: new Date(row.created_at).toISOString(),
     expiresAt: new Date(row.expires_at).toISOString(),
     confirmedObservationId: row.confirmed_observation_id ?? undefined,
+    confirmationId: row.confirmation_id ?? undefined,
+    confirmResult:
+      confirmSnapshot && row.confirmed_observation_id
+        ? {
+            observationId: row.confirmed_observation_id as ObservationId,
+            speciesId: confirmSnapshot.speciesId as TaxonId,
+            dexUpdated: confirmSnapshot.dexUpdated,
+            reward: confirmSnapshot.reward,
+          }
+        : undefined,
   };
 }
 

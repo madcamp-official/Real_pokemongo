@@ -267,6 +267,61 @@ test("PgAudioIdentificationResultRepo: candidates_json이 왕복되고, 재동�
   });
 });
 
+test("PgAudioSightingRepo: 7단계 claimConfirmation은 원자적 CAS, finalizeConfirmation은 status/스냅샷을 실제로 남긴다", { skip }, async () => {
+  await withUser(async (userId) => {
+    const sightingRepo = new PgAudioSightingRepo(pool!);
+    const observations = new PgObservationRepo(pool!);
+    const sighting = newAudioSightingRow(userId);
+    await sightingRepo.create(sighting);
+
+    const observation: Observation = {
+      id: randomUUID() as Observation["id"],
+      userId,
+      taxonId: "taxon-hypsipetes-amaurotis" as Observation["taxonId"],
+      taxonRank: "species",
+      timestamp: new Date().toISOString(),
+      modality: "audio",
+      region: null,
+      preciseCoord: null,
+      media: [],
+      confidence: 0.87,
+      source: "birdnet",
+    };
+    await observations.save(observation);
+
+    // 클레임: 첫 호출만 성공해야 한다(WHERE confirmation_id IS NULL 원자성 확인).
+    const claimed1 = await sightingRepo.claimConfirmation(sighting.id, "conf-1");
+    assert.equal(claimed1, true);
+    const claimed2 = await sightingRepo.claimConfirmation(sighting.id, "conf-2");
+    assert.equal(claimed2, false, "이미 클레임된 세션은 다른 confirmation_id로도 재클레임 불가");
+
+    const afterClaim = await sightingRepo.get(sighting.id);
+    assert.equal(afterClaim?.confirmationId, "conf-1", "먼저 성공한 confirmation_id가 남아야 함");
+    assert.equal(afterClaim?.confirmResult, undefined, "finalize 전이라 스냅샷은 아직 없어야 함");
+    assert.equal(afterClaim?.status, "ready", "finalize 전에는 status가 그대로 ready");
+
+    await sightingRepo.finalizeConfirmation(sighting.id, {
+      observationId: observation.id,
+      result: {
+        observationId: observation.id,
+        speciesId: observation.taxonId as NonNullable<Observation["taxonId"]>,
+        dexUpdated: true,
+        reward: { xp: 10, questIds: ["quest-a"] },
+      },
+    });
+
+    const finalized = await sightingRepo.get(sighting.id);
+    assert.equal(finalized?.status, "confirmed");
+    assert.equal(finalized?.confirmedObservationId, observation.id);
+    assert.equal(finalized?.confirmResult?.speciesId, "taxon-hypsipetes-amaurotis");
+    assert.equal(finalized?.confirmResult?.dexUpdated, true);
+    assert.deepEqual(finalized?.confirmResult?.reward, { xp: 10, questIds: ["quest-a"] });
+
+    await sightingRepo.deleteByUser(userId);
+    await observations.deleteByUser(userId);
+  });
+});
+
 test("PgCollectionRepo + PgCreatureRepo: 종당 개체 1마리 UNIQUE 제약이 실제로 걸린다", { skip }, async () => {
   await withUser(async (userId) => {
     const taxa = new PgTaxonRepo(pool!);

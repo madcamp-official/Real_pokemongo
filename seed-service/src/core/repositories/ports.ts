@@ -25,7 +25,7 @@ import type {
 import type { Quest, QuestProgress } from "../quest/questTypes.js";
 import type { EarnedBadge } from "../rewards/rewardTypes.js";
 import type { GardenLayout } from "../garden/gardenTypes.js";
-import type { AudioSighting } from "../audio/audioTypes.js";
+import type { AudioSighting, AudioConfirmResult } from "../audio/audioTypes.js";
 import type { AudioIdentificationResult } from "../audio/identification/audioIdentificationTypes.js";
 
 // 삭제 계약(체크리스트 §5.6 — 삭제권 이행):
@@ -152,6 +152,21 @@ export interface AudioSightingRepository {
   findExpired(now: Date, limit: number): Promise<AudioSighting[]>;
   /** TTL 스윕이 파일 정리까지 끝난 뒤 행을 지울 때 씀. */
   deleteById(id: AudioSightingId): Promise<void>;
+  /**
+   * 7단계: 확정을 원자적으로 "클레임"한다(compare-and-swap, `confirmation_id IS NULL`일 때만
+   * 성공). true면 이 호출이 클레임에 성공했다는 뜻 — 호출부가 이어서 관찰을 기록하고
+   * finalizeConfirmation()으로 마무리해야 한다. false면 이미 누군가(같거나 다른
+   * confirmation_id) 클레임을 가져갔다는 뜻 — 호출부는 다시 get()해서 sighting.confirmationId를
+   * 요청 값과 비교해 재생(200)/충돌(409)을 판단한다. 동시에 도착한 서로 다른 확정 요청 중
+   * 정확히 하나만 관찰을 만드는 것을 보장하는 유일한 지점(ACCEPTANCE.md 시나리오 7).
+   */
+  claimConfirmation(id: AudioSightingId, confirmationId: string): Promise<boolean>;
+  /** claimConfirmation()으로 클레임을 따낸 뒤, 실제로 관찰을 기록하고 나서 결과를 확정
+   * 저장한다. status를 'confirmed'로 바꿔 이후 /audio/identify(재동정)를 막는다. */
+  finalizeConfirmation(
+    id: AudioSightingId,
+    params: { observationId: ObservationId; result: AudioConfirmResult },
+  ): Promise<void>;
 }
 
 /**
