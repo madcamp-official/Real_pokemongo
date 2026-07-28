@@ -1,11 +1,16 @@
 import { Image, type ImageSourcePropType } from 'react-native';
 import { CreatureArt } from '@/components/species/CreatureArt';
-import { VespaFlutterArt } from '@/components/garden/VespaFlutterArt';
+import {
+  GardenIllustratedArt,
+  hasGardenIllustratedArt,
+} from '@/components/garden/GardenIllustratedArt';
 import { WingedInsectFlutterArt } from '@/components/garden/WingedInsectFlutterArt';
 
 interface Props {
   speciesId: string;
   size?: number;
+  /** 홈가든 월드의 살아 있는 스프라이트에서만 날개 애니메이션을 허용한다. */
+  animateWinged?: boolean;
 }
 
 /**
@@ -15,10 +20,10 @@ interface Props {
  * 도감 등 다른 화면의 식별용 벡터 아트와 분리해, 홈 가든의 미술 톤을 독립적으로
  * 조정할 수 있게 한다.
  */
-export function GardenCreatureArt({ speciesId, size = 72 }: Props) {
+export function GardenCreatureArt({ speciesId, size = 72, animateWinged = false }: Props) {
   const normalizedSpeciesId = normalizeId(speciesId);
-  if (normalizedSpeciesId === 'vespa-mandarinia') {
-    return <VespaFlutterArt size={size} />;
+  if (hasGardenIllustratedArt(speciesId)) {
+    return <GardenIllustratedArt speciesId={speciesId} size={size} />;
   }
 
   const source = GARDEN_ART[normalizedSpeciesId];
@@ -26,7 +31,7 @@ export function GardenCreatureArt({ speciesId, size = 72 }: Props) {
     return <CreatureArt speciesId={speciesId} size={size} />;
   }
 
-  if (WINGED_INSECT_SPECIES.has(normalizedSpeciesId)) {
+  if (animateWinged && WINGED_INSECT_SPECIES.has(normalizedSpeciesId)) {
     return <WingedInsectFlutterArt source={source} size={size} />;
   }
 
@@ -42,7 +47,7 @@ export function GardenCreatureArt({ speciesId, size = 72 }: Props) {
 
 /** 홈 가든에 배치 가능한 검수 완료 종인지 확인한다. */
 export function hasGardenCreatureArt(speciesId: string): boolean {
-  return normalizeId(speciesId) in GARDEN_ART;
+  return hasGardenIllustratedArt(speciesId) || normalizeId(speciesId) in GARDEN_ART;
 }
 
 /** 넓은 비행 이동과 날갯짓을 적용할 수 있는 곤충인지 확인한다. */
@@ -116,14 +121,12 @@ const RUMEX_CRISPUS = require('../../../assets/species/garden-v2/game/rumex-cris
 const CLEMATIS_APIIFOLIA = require('../../../assets/species/garden-v2/game/clematis-apiifolia.png') as ImageSourcePropType;
 const CAREX_SIDEROSTICTA = require('../../../assets/species/garden-v2/game/carex-siderosticta.png') as ImageSourcePropType;
 const HYPSIPETES_AMAUROTIS = require('../../../assets/species/garden-v2/game/hypsipetes-amaurotis.png') as ImageSourcePropType;
-const PASSER_MONTANUS = require('../../../assets/species/garden-v2/game/passer-montanus.png') as ImageSourcePropType;
 const STREPTOPELIA_ORIENTALIS = require('../../../assets/species/garden-v2/game/streptopelia-orientalis.png') as ImageSourcePropType;
 const ARDEA_CINEREA = require('../../../assets/species/garden-v2/game/ardea-cinerea.png') as ImageSourcePropType;
 const CORVUS_MACRORHYNCHOS = require('../../../assets/species/garden-v2/game/corvus-macrorhynchos.png') as ImageSourcePropType;
 const PICA_SERICA = require('../../../assets/species/garden-v2/game/pica-serica.png') as ImageSourcePropType;
 const PHOENICURUS_AUROREUS = require('../../../assets/species/garden-v2/game/phoenicurus-auroreus.png') as ImageSourcePropType;
 const LARUS_CRASSIROSTRIS = require('../../../assets/species/garden-v2/game/larus-crassirostris.png') as ImageSourcePropType;
-const ANAS_PLATYRHYNCHOS = require('../../../assets/species/garden-v2/game/anas-platyrhynchos.png') as ImageSourcePropType;
 const ANAS_POECILORHYNCHA_LEGACY = require('../../../assets/species/garden-v2/game/anas-poecilorhyncha-legacy.png') as ImageSourcePropType;
 const PARUS_MAJOR_LEGACY = require('../../../assets/species/garden-v2/game/parus-major-legacy.png') as ImageSourcePropType;
 const ARDEA_ALBA = require('../../../assets/species/garden-v2/game/ardea-alba.png') as ImageSourcePropType;
@@ -153,7 +156,6 @@ const LIGUSTRUM_OBTUSIFOLIUM_V3 = require('../../../assets/species/garden-v3/gam
 const EUREMA_MANDARINA = require('../../../assets/species/garden-v4/game/eurema-mandarina.png') as ImageSourcePropType;
 const OEDALEUS_INFERNALIS = require('../../../assets/species/garden-v4/game/oedaleus-infernalis.png') as ImageSourcePropType;
 const EPHEMERA_ORIENTALIS = require('../../../assets/species/garden-v4/game/ephemera-orientalis.png') as ImageSourcePropType;
-const VESPA_MANDARINIA = require('../../../assets/species/garden-v4/game/vespa-mandarinia.png') as ImageSourcePropType;
 const ERIGERON_ANNUUS = require('../../../assets/species/garden-v4/game/erigeron-annuus.png') as ImageSourcePropType;
 const COMMELINA_COMMUNIS = require('../../../assets/species/garden-v4/game/commelina-communis.png') as ImageSourcePropType;
 const HUMULUS_SCANDENS = require('../../../assets/species/garden-v4/game/humulus-scandens.png') as ImageSourcePropType;
@@ -193,8 +195,6 @@ const CARBULA_PUTONI = require('../../../assets/species/garden-v5/game/carbula-p
 // 홈 가든 v6: v5에서 공용 아트로 표시했던 네 종의 전용 일러스트.
 const APIS_MELLIFERA = require('../../../assets/species/garden-v6/game/apis-mellifera.png') as ImageSourcePropType;
 const PIERIS_RAPAE = require('../../../assets/species/garden-v6/game/pieris-rapae.png') as ImageSourcePropType;
-const HARMONIA_AXYRIDIS = require('../../../assets/species/garden-v6/game/harmonia-axyridis.png') as ImageSourcePropType;
-const COCCINELLA_SEPTEMPUNCTATA = require('../../../assets/species/garden-v6/game/coccinella-septempunctata.png') as ImageSourcePropType;
 
 const GARDEN_ART: Record<string, ImageSourcePropType> = {
   // v2 식물
@@ -225,7 +225,6 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
   'eurema-mandarina': EUREMA_MANDARINA,
   'oedaleus-infernalis': OEDALEUS_INFERNALIS,
   'ephemera-orientalis': EPHEMERA_ORIENTALIS,
-  'vespa-mandarinia': VESPA_MANDARINIA,
 
   // v4 신규 식물
   'erigeron-annuus': ERIGERON_ANNUUS,
@@ -268,14 +267,12 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
 
   // v2 조류 — 새 일러스트가 준비된 종은 v1보다 이 버전을 우선한다.
   'hypsipetes-amaurotis': HYPSIPETES_AMAUROTIS,
-  'passer-montanus': PASSER_MONTANUS,
   'streptopelia-orientalis': STREPTOPELIA_ORIENTALIS,
   'ardea-cinerea': ARDEA_CINEREA,
   'corvus-macrorhynchos': CORVUS_MACRORHYNCHOS,
   'pica-serica': PICA_SERICA,
   'phoenicurus-auroreus': PHOENICURUS_AUROREUS,
   'larus-crassirostris': LARUS_CRASSIROSTRIS,
-  'anas-platyrhynchos': ANAS_PLATYRHYNCHOS,
   // 과거/다른 분류 체계에서 내려오는 ID도 같은 방식으로 표시한다.
   'anas-poecilorhyncha': ANAS_POECILORHYNCHA_LEGACY,
   'parus-major': PARUS_MAJOR_LEGACY,
@@ -295,16 +292,10 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
   dandelion: DANDELION,
   dayflower: DAYFLOWER,
 
-  // 곤충 — v6에서 더 다듬어진 그림이 나온 세 종은 실제 taxon ID(각각 taxon-ladybug,
-  // taxon-cabbage-white, taxon-honeybee → 아래 정규화된 키)가 그대로 v6 그림을 가리키게
-  // 한다. sciName 슬러그(apis-mellifera 등)를 별도 키로 두면 어떤 taxon ID로도 이 키에
-  // 도달할 수 없어(정규화 결과가 항상 honeybee/ladybug/cabbage-white다) 그림이 영원히
-  // 안 쓰이는 죽은 항목이 된다 — 실기기 테스트로 실제 발견된 문제. 칠성무당벌레만
-  // taxon ID 자체가 학명 기반(taxon-coccinella-septempunctata)이라 별도 키가 필요하다.
-  ladybug: HARMONIA_AXYRIDIS,
+  // 곤충 — 꿀벌·배추흰나비는 기존 전용 PNG를 유지하고, 무당벌레 두 종은
+  // GardenIllustratedArt의 그림자 없는 게임 일러스트를 사용한다.
   'cabbage-white': PIERIS_RAPAE,
   honeybee: APIS_MELLIFERA,
-  'coccinella-septempunctata': COCCINELLA_SEPTEMPUNCTATA,
 
   // 초기 mock ID 호환 — 같은 종을 가리키므로 위와 동일한 v6 그림을 쓴다.
   butterfly: PIERIS_RAPAE,

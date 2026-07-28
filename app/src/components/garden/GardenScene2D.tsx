@@ -27,7 +27,15 @@ import {
 } from '@/components/garden/gardenDecorations';
 import { gardenPointPercent } from '@/theme/garden';
 
-const GARDEN_BACKGROUND = require('../../../assets/garden/garden-starter-world-v1.png');
+const GARDEN_BACKGROUND_LEVEL_1 = require('../../../assets/garden/garden-fence-level1.png');
+const GARDEN_BACKGROUND_LEVEL_3 = require('../../../assets/garden/garden-fence-level3.png');
+const GARDEN_BACKGROUND_LEVEL_5 = require('../../../assets/garden/garden-fence-level5.png');
+
+function gardenBackgroundForLevel(level: number) {
+  if (level >= 5) return GARDEN_BACKGROUND_LEVEL_5;
+  if (level >= 3) return GARDEN_BACKGROUND_LEVEL_3;
+  return GARDEN_BACKGROUND_LEVEL_1;
+}
 
 // 나무·관목은 정원의 지형을 이루는 오브젝트이므로 일반 초화류보다 크게 보인다.
 // DB 응답의 taxon- 접두사 유무와 상관없이 판별한다.
@@ -47,8 +55,9 @@ function isTreeSpecies(speciesId: string): boolean {
   return TREE_SPECIES.has(speciesId.replace(/^(taxon-|sp_)/, '').replace(/_/g, '-'));
 }
 
-export const GARDEN_WORLD_WIDTH = 1400;
-export const GARDEN_WORLD_HEIGHT = 596;
+// 원본 배경 비율을 유지하면서 논리 월드를 넓혀, 확대 상태에서도 이동 여유를 확보한다.
+export const GARDEN_WORLD_WIDTH = 1680;
+export const GARDEN_WORLD_HEIGHT = 714;
 
 export interface GardenTransform {
   translateX: number;
@@ -111,7 +120,7 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
   const startScale = useSharedValue(0.82);
   const viewportWidth = useSharedValue(1);
   const viewportHeight = useSharedValue(1);
-  const didInitialize = useRef(false);
+  const lastViewport = useRef<{ width: number; height: number } | null>(null);
 
   const reportTransform = (x: number, y: number, nextScale: number) =>
     onTransformChange({ translateX: x, translateY: y, scale: nextScale });
@@ -171,8 +180,17 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
     const { width, height } = event.nativeEvent.layout;
     viewportWidth.value = width;
     viewportHeight.value = height;
-    if (didInitialize.current) return;
-    didInitialize.current = true;
+    const previous = lastViewport.current;
+    if (
+      previous &&
+      Math.abs(previous.width - width) < 1 &&
+      Math.abs(previous.height - height) < 1
+    ) {
+      return;
+    }
+    lastViewport.current = { width, height };
+    // 화면 회전 뒤에도 월드가 viewport를 완전히 덮도록 cover scale을 다시 계산한다.
+    // 최초 portrait layout만 기억하면 landscape 전환 뒤 좌우에 빈 배경 경계가 남는다.
     const initialScale = Math.max(0.82, width / GARDEN_WORLD_WIDTH, height / GARDEN_WORLD_HEIGHT);
     const initialX = (width - GARDEN_WORLD_WIDTH * initialScale) / 2;
     const initialY = (height - GARDEN_WORLD_HEIGHT * initialScale) / 2;
@@ -186,7 +204,7 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
     <View ref={ref} collapsable={false} style={styles.viewport} onLayout={handleLayout}>
       <GestureDetector gesture={Gesture.Simultaneous(pan, pinch)}>
         <Animated.View style={[styles.world, worldStyle]}>
-          <Image source={GARDEN_BACKGROUND} resizeMode="stretch" style={styles.background} />
+          <Image source={gardenBackgroundForLevel(level)} resizeMode="stretch" style={styles.background} />
 
           {isDragging &&
             tiles.map((tile) => {
@@ -264,25 +282,11 @@ export const GardenScene2D = forwardRef<View, Props>(function GardenScene2D(
               />
             );
           })}
-
-          {level < 3 && <LockedZone side="left" requiredLevel={3} />}
-          {level < 5 && <LockedZone side="right" requiredLevel={5} />}
         </Animated.View>
       </GestureDetector>
     </View>
   );
 });
-
-function LockedZone({ side, requiredLevel }: { side: 'left' | 'right'; requiredLevel: number }) {
-  return (
-    <View pointerEvents="none" style={[styles.lockedZone, side === 'left' ? styles.lockedLeft : styles.lockedRight]}>
-      <View style={styles.lockBadge}>
-        <Text style={styles.lockIcon}>🔒</Text>
-        <Text style={styles.lockText}>Lv.{requiredLevel}</Text>
-      </View>
-    </View>
-  );
-}
 
 function GardenSprite({
   creatureId,
@@ -311,8 +315,24 @@ function GardenSprite({
   const isInsect = group === '곤충';
   const isTree = isTreeSpecies(speciesId);
   const isWingedInsect = isInsect && hasWingedInsectArt(speciesId);
-  const artSize = isTree ? 178 : isPlant ? 78 : group === '조류' ? 74 : isInsect ? 48 : 62;
-  const motionDuration = isPlant ? 2100 : isInsect ? 1650 : 2900;
+  const normalizedSpeciesId = speciesId
+    .replace(/^(taxon-|sp_)/, '')
+    .replace(/_/g, '-');
+  const isLargeInsect = normalizedSpeciesId === 'vespa-mandarinia';
+  // 실제 비례를 그대로 쓰지는 않되, 곤충이 조류와 비슷하게 보이지 않도록
+  // 분류군별 상한을 둔다.
+  const artSize = isTree
+    ? 168
+    : isPlant
+      ? 72
+      : group === '조류'
+        ? 68
+        : isInsect
+          ? isLargeInsect
+            ? 40
+            : 34
+          : 56;
+  const motionDuration = isPlant ? 3200 : isInsect ? 3600 : 4200;
   const anchorWidth = isTree ? 190 : 100;
   const anchorHeight = isTree ? 190 : 102;
   const flightPath = useMemo(() => {
@@ -327,29 +347,29 @@ function GardenSprite({
     const direction = unit(1) > 0.5 ? 1 : -1;
     return [
       {
-        x: direction * (7 + unit(2) * 5),
-        y: -(3 + unit(3) * 3),
-        duration: 4200 + unit(4) * 1400,
+        x: direction * (3 + unit(2) * 2),
+        y: -(1 + unit(3) * 1.5),
+        duration: 6200 + unit(4) * 1600,
       },
       {
-        x: -direction * (6 + unit(5) * 5),
-        y: 2 + unit(6) * 4,
-        duration: 4600 + unit(7) * 1500,
+        x: -direction * (3 + unit(5) * 2),
+        y: 1 + unit(6) * 1.5,
+        duration: 6600 + unit(7) * 1700,
       },
       {
-        x: direction * (8 + unit(8) * 5),
-        y: -(2 + unit(9) * 4),
-        duration: 4400 + unit(10) * 1600,
+        x: direction * (3 + unit(8) * 2),
+        y: -(1 + unit(9) * 1.5),
+        duration: 6400 + unit(10) * 1800,
       },
       {
-        x: -direction * (7 + unit(11) * 5),
-        y: -(3 + unit(12) * 3),
-        duration: 4800 + unit(13) * 1400,
+        x: -direction * (3 + unit(11) * 2),
+        y: -(1 + unit(12) * 1.5),
+        duration: 6900 + unit(13) * 1600,
       },
       {
         x: 0,
         y: 0,
-        duration: 4500 + unit(14) * 1400,
+        duration: 6500 + unit(14) * 1700,
       },
     ];
   }, [creatureId]);
@@ -380,13 +400,13 @@ function GardenSprite({
         RNAnimated.sequence([
           RNAnimated.timing(motion, {
             toValue: 1,
-            duration: 1500,
+            duration: 2600,
             easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
           RNAnimated.timing(motion, {
             toValue: 0,
-            duration: 1900,
+            duration: 3100,
             easing: Easing.inOut(Easing.sin),
             useNativeDriver: true,
           }),
@@ -439,21 +459,21 @@ function GardenSprite({
         {
           translateY: motion.interpolate({
             inputRange: [0, 1],
-            outputRange: [-1, 1.5],
+            outputRange: [-0.5, 0.8],
           }),
         },
         {
           rotate: motion.interpolate({
             inputRange: [0, 1],
-            outputRange: ['-0.6deg', '0.6deg'],
+            outputRange: ['-0.3deg', '0.3deg'],
           }),
         },
       ]
     : isPlant
-    ? [{ rotate: motion.interpolate({ inputRange: [0, 1], outputRange: ['-1deg', '1deg'] }) }]
+    ? [{ rotate: motion.interpolate({ inputRange: [0, 1], outputRange: ['-0.6deg', '0.6deg'] }) }]
     : [
-        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: isInsect ? [-3, 4] : [-2, 3] }) },
-        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: isInsect ? [0, -2, 0] : [0, -1.5, 0] }) },
+        { translateX: motion.interpolate({ inputRange: [0, 1], outputRange: isInsect ? [-1, 1.5] : [-1, 1.5] }) },
+        { translateY: motion.interpolate({ inputRange: [0, 0.5, 1], outputRange: isInsect ? [0, -0.8, 0] : [0, -0.7, 0] }) },
       ];
 
   return (
@@ -483,7 +503,7 @@ function GardenSprite({
           pressed && !isTree && styles.spritePressed,
         ]}
       >
-        <GardenCreatureArt speciesId={speciesId} size={artSize} />
+        <GardenCreatureArt speciesId={speciesId} size={artSize} animateWinged />
       </Pressable>
     </RNAnimated.View>
   );
@@ -504,28 +524,6 @@ const styles = StyleSheet.create({
     width: GARDEN_WORLD_WIDTH,
     height: GARDEN_WORLD_HEIGHT,
   },
-  lockedZone: {
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    width: '22%',
-    backgroundColor: 'rgba(36,65,48,0.40)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  lockedLeft: { left: 0 },
-  lockedRight: { right: 0 },
-  lockBadge: {
-    paddingHorizontal: 16,
-    paddingVertical: 9,
-    borderRadius: 20,
-    backgroundColor: 'rgba(255,250,225,0.90)',
-    flexDirection: 'row',
-    gap: 7,
-    alignItems: 'center',
-  },
-  lockIcon: { fontSize: 18 },
-  lockText: { fontSize: 15, fontWeight: '900', color: '#5D563D' },
   dropTarget: {
     position: 'absolute',
     width: 40,

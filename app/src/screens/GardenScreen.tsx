@@ -3,6 +3,7 @@ import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import * as ScreenOrientation from 'expo-screen-orientation';
+import { StatusBar } from 'expo-status-bar';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { fetchDex } from '@/api/dex';
@@ -15,6 +16,7 @@ import {
   type GardenCreatureMeta,
   type GardenTransform,
 } from '@/components/garden/GardenScene2D';
+import { getGardenFenceBounds } from '@/components/garden/GardenFenceBounds';
 import { CreatureTray, type OwnedCreature } from '@/components/garden/CreatureTray';
 import { CreatureStatusSheet } from '@/components/garden/CreatureStatusSheet';
 import {
@@ -41,6 +43,7 @@ export default function GardenScreen() {
   useFocusEffect(
     useCallback(() => {
       void ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.LANDSCAPE);
+      StatusBar.setHidden(true, 'fade');
       introOpacity.setValue(1);
       const introTimer = setTimeout(() => {
         Animated.timing(introOpacity, {
@@ -51,6 +54,7 @@ export default function GardenScreen() {
       }, 2400);
       return () => {
         clearTimeout(introTimer);
+        StatusBar.setHidden(false, 'fade');
         void ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
       };
     }, [introOpacity])
@@ -195,9 +199,13 @@ export default function GardenScreen() {
     if (decoration) {
       const x = (worldX / GARDEN_WORLD_WIDTH) * 100;
       const y = (worldY / GARDEN_WORLD_HEIGHT) * 100;
-      if (x < 2 || x > 98 || y < 8 || y > 94) return;
-      if ((level < 3 && x < 22) || (level < 5 && x > 78)) {
-        flashWarn('아직 열리지 않은 정원 구역이에요');
+      const fence = getGardenFenceBounds(level);
+      const minX = ((fence.left + 38) / GARDEN_WORLD_WIDTH) * 100;
+      const maxX = ((fence.right - 38) / GARDEN_WORLD_WIDTH) * 100;
+      const minY = ((fence.top + 54) / GARDEN_WORLD_HEIGHT) * 100;
+      const maxY = ((fence.bottom - 62) / GARDEN_WORLD_HEIGHT) * 100;
+      if (x < minX || x > maxX || y < minY || y > maxY) {
+        flashWarn('장식은 정원 울타리 안쪽에 놓아주세요');
         return;
       }
       placeDecoration(decoration.id, x, y);
@@ -298,18 +306,14 @@ export default function GardenScreen() {
           <Text style={styles.hudIcon}>‹</Text>
         </Pressable>
         <View style={styles.hudStat}>
-          <Text style={styles.hudEmoji}>🌱</Text>
+          <Text style={styles.hudLabel}>레벨</Text>
           <Text style={styles.hudNumber}>{level}</Text>
         </View>
         <View style={styles.hudDivider} />
         <View style={styles.hudStat}>
-          <Text style={styles.hudEmoji}>📚</Text>
+          <Text style={styles.hudLabel}>도감</Text>
           <Text style={styles.hudNumber}>{discoveredCount}</Text>
         </View>
-        <View style={styles.hudDivider} />
-        <Pressable onPress={() => navigation.navigate('Settings')} style={styles.hudButton}>
-          <Text style={styles.settingsIcon}>⚙</Text>
-        </Pressable>
       </View>
 
       <Animated.View pointerEvents="none" style={[styles.intro, { opacity: introOpacity }]}>
@@ -386,16 +390,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   hudIcon: { fontSize: 27, lineHeight: 29, fontWeight: '900', color: '#4E5A42' },
-  settingsIcon: { fontSize: 18 },
   hudStat: {
-    minWidth: 43,
-    paddingHorizontal: 5,
+    minWidth: 58,
+    paddingHorizontal: 7,
     flexDirection: 'row',
     gap: 3,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  hudEmoji: { fontSize: 15 },
+  hudLabel: { fontSize: 10, fontWeight: '800', color: '#7A704F' },
   hudNumber: { fontSize: 13, fontWeight: '900', color: '#5D5339' },
   hudDivider: { width: 1, height: 20, backgroundColor: 'rgba(91,81,53,0.16)' },
   intro: {

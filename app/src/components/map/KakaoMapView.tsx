@@ -11,8 +11,10 @@ const MAP_READY_TIMEOUT_MS = 12_000;
 export interface KakaoMapViewHandle {
   setPins: (pins: MapPin[]) => void;
   setCenter: (lat: number, lng: number) => void;
+  /** 카카오맵 레벨(작을수록 확대). */
+  setZoomLevel: (level: number) => void;
   /** 현재 위치 점 + "나만의 탐험 구역" 점선 원(미터 단위 반지름). */
-  setMe: (lat: number, lng: number, zoneRadiusM: number) => void;
+  setMe: (lat: number, lng: number, zoneRadiusM: number, zoneLabel?: string) => void;
 }
 
 interface Props {
@@ -21,6 +23,8 @@ interface Props {
   onMapPress?: () => void;
   /** 지도 페이지가 끝내 못 뜬 경우 — 상위에서 안내 UI를 띄운다. */
   onError?: (message: string) => void;
+  /** 현재 좌표를 짧은 장소명으로 역지오코딩한 결과. */
+  onLocationLabel?: (label: string) => void;
 }
 
 /**
@@ -32,7 +36,7 @@ interface Props {
  * 서버가 종별 비주얼을 따로 관리하지 않게 하려는 의도(단일 출처는 theme/species).
  */
 export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function KakaoMapView(
-  { onPinPress, onMapPress, onError },
+  { onPinPress, onMapPress, onError, onLocationLabel },
   ref
 ) {
   const webviewRef = useRef<WebView>(null);
@@ -90,11 +94,21 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
       setPins: (pins: MapPin[]) =>
         post({
           type: 'set_pins',
-          pins: pins.map((p) => ({ ...p, emoji: getSpeciesVisual(p.species_id).emoji })),
+          pins: pins.map((p) => {
+            const visual = getSpeciesVisual(p.species_id);
+            return {
+              ...p,
+              // 매핑이 없는 종을 ❓로 표시하면 이미지 로드 실패처럼 보인다.
+              // 그 경우 종 이름 첫 글자를 쓰는 고유 마커로 자연스럽게 폴백한다.
+              emoji: visual.emoji === '❓' ? '' : visual.emoji,
+              marker_label: p.species_name.trim().slice(0, 1) || '새',
+            };
+          }),
         }),
       setCenter: (lat: number, lng: number) => post({ type: 'set_center', lat, lng }),
-      setMe: (lat: number, lng: number, zoneRadiusM: number) =>
-        post({ type: 'set_me', lat, lng, zone_radius: zoneRadiusM }),
+      setZoomLevel: (level: number) => post({ type: 'set_level', level }),
+      setMe: (lat: number, lng: number, zoneRadiusM: number, zoneLabel?: string) =>
+        post({ type: 'set_me', lat, lng, zone_radius: zoneRadiusM, zone_label: zoneLabel }),
     }),
     [post]
   );
@@ -106,6 +120,7 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
           type: string;
           species_id?: string;
           message?: string;
+          label?: string;
         };
         if (data.type === 'ready') {
           if (readyTimer.current) clearTimeout(readyTimer.current);
@@ -119,6 +134,8 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
           onPinPress(data.species_id);
         } else if (data.type === 'map_press') {
           onMapPress?.();
+        } else if (data.type === 'location_label' && data.label) {
+          onLocationLabel?.(data.label);
         } else if (data.type === 'error') {
           if (readyTimer.current) clearTimeout(readyTimer.current);
           readyTimer.current = null;
@@ -129,7 +146,7 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
         // 지도 페이지가 보낸 메시지 파싱 실패는 무시 — 앱 흐름을 깨면 안 됨.
       }
     },
-    [onPinPress, onMapPress, onError]
+    [onPinPress, onMapPress, onError, onLocationLabel]
   );
 
   return (

@@ -105,6 +105,9 @@ test("GET /map.html: 인증 없이도 200, 카카오 SDK 스크립트와 키가 
   assert.equal(res.statusCode, 200);
   assert.match(res.headers["content-type"] as string, /text\/html/);
   assert.match(res.body, /dapi\.kakao\.com\/v2\/maps\/sdk\.js\?appkey=test-kakao-key/);
+  assert.match(res.body, /pin-initial/);
+  assert.match(res.body, /function displayPosition/);
+  assert.doesNotMatch(res.body, /pin-card/);
 });
 
 test("GET /map/pins: 인증 없으면 401", async () => {
