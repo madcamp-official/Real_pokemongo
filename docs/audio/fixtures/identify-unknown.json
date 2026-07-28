@@ -1,0 +1,9 @@
+{
+  "audio_sighting_id": "audio-sighting-fixture-001",
+  "candidates": [],
+  "unknown": true,
+  "unknown_reason": "NO_SUPPORTED_BIRD_MATCH",
+  "needs_user_confirmation": false,
+  "model_version": "birdnet@audio-mvp-1.0.0",
+  "location_prior_used": false
+}

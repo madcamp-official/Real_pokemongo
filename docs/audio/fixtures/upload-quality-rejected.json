@@ -1,0 +1,18 @@
+{
+  "audio_sighting_id": "audio-sighting-fixture-rejected-001",
+  "status": "rejected",
+  "quality": {
+    "usable": false,
+    "duration_ms": 7340,
+    "active_duration_ms": 6920,
+    "snr_db": null,
+    "clipping_ratio": 0.0,
+    "silence_ratio": 0.04,
+    "speech_ratio": 0.91,
+    "feedback_codes": [
+      "SPEECH_DETECTED"
+    ],
+    "valid_segments": []
+  },
+  "expires_at": "2026-07-29T12:00:00Z"
+}

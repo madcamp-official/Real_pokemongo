@@ -1,0 +1,14 @@
+{
+  "audio_sighting_id": "audio-sighting-fixture-001",
+  "species_id": "taxon-hypsipetes-amaurotis",
+  "score": 78,
+  "grade": "very_similar",
+  "score_reliability": "high",
+  "matched_segment": {
+    "start_ms": 1100,
+    "end_ms": 5300
+  },
+  "feedback_codes": [],
+  "model_version": "birdnet@audio-mvp-1.0.0",
+  "reference_set_version": "kr-bird-reference@2026-07"
+}
