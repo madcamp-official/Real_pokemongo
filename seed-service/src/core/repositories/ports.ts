@@ -20,10 +20,13 @@ import type {
   ConsentRecord,
   Creature,
   CreatureId,
+  AudioSightingId,
 } from "../domain/types.js";
 import type { Quest, QuestProgress } from "../quest/questTypes.js";
 import type { EarnedBadge } from "../rewards/rewardTypes.js";
 import type { GardenLayout } from "../garden/gardenTypes.js";
+import type { AudioSighting } from "../audio/audioTypes.js";
+import type { AudioIdentificationResult } from "../audio/identification/audioIdentificationTypes.js";
 
 // 삭제 계약(체크리스트 §5.6 — 삭제권 이행):
 // 사용자 데이터를 담는 모든 저장소는 삭제 메서드를 구현해야 한다. 프로덕션 DB 어댑터를
@@ -122,4 +125,40 @@ export interface GardenRepository {
   saveLayout(userId: UserId, layout: GardenLayout): Promise<void>;
   /** 삭제권 이행(§5.6) — 삭제된 타일 행 수(배치는 타일 FK로 함께 지워짐). */
   deleteByUser(userId: UserId): Promise<number>;
+}
+
+/**
+ * 소리 기능 3단계: 업로드~변환 완료 세션(audio_sighting). PendingSightingStore와 달리
+ * 정식 Repository 포트로 formalize한 이유는 core/audio/audioTypes.ts 상단 주석 참고
+ * (DB 영속 + 24시간 TTL이 요구사항이라 사진의 인메모리 세션 패턴을 재사용할 수 없음).
+ */
+export interface AudioSightingRepository {
+  create(sighting: AudioSighting): Promise<void>;
+  /** 소유권 확인은 호출부 책임(Authorization.ts 원칙과 동일 — 존재 여부를 누설하지 않기
+   * 위해 "없음"과 "남의 것"을 라우트 레벨에서 같은 404로 합친다). */
+  get(id: AudioSightingId): Promise<AudioSighting | null>;
+  /** 업로드 재시도 멱등성 판정용 — (userId, clientRecordingId) 유일 제약과 짝을 이룬다. */
+  findByClientRecordingId(
+    userId: UserId,
+    clientRecordingId: string,
+  ): Promise<AudioSighting | null>;
+  /** 삭제권 이행(§5.6). */
+  deleteByUser(userId: UserId): Promise<number>;
+  /** 삭제권 이행(§5.6) — DataRightsService가 행을 지우기 전에 storagePath를 모아 실제
+   * 오디오 파일까지 파기하기 위해 필요(사진과 달리 오디오는 지울 실제 스토리지가 이미 있음). */
+  listByUser(userId: UserId): Promise<AudioSighting[]>;
+  /** 5단계 TTL 스윕용 — expires_at이 now 이하인 세션들(AudioSessionCleanupService.ts).
+   * limit은 한 스윕에서 한 번에 처리할 상한(운영 안전장치, 기본은 호출부가 정함). */
+  findExpired(now: Date, limit: number): Promise<AudioSighting[]>;
+  /** TTL 스윕이 파일 정리까지 끝난 뒤 행을 지울 때 씀. */
+  deleteById(id: AudioSightingId): Promise<void>;
+}
+
+/**
+ * 6단계: `/audio/identify` 결과 스냅샷(5단계가 스키마만 만들어둔 audio_identification_result
+ * 실제 배선). PK가 audioSightingId 하나뿐이라 재동정은 upsert(덮어쓰기)다.
+ */
+export interface AudioIdentificationResultRepository {
+  upsert(result: AudioIdentificationResult): Promise<void>;
+  get(audioSightingId: AudioSightingId): Promise<AudioIdentificationResult | null>;
 }

@@ -94,6 +94,31 @@ export interface AppConfig {
      * 같은 관례). */
     kakaoJsKey?: string;
   };
+
+  /** 소리 기능 3단계(업로드와 변환). `.env.example`의 AUDIO_* 값과 1:1 대응. */
+  audio: {
+    /** 입출력 임시 파일 + 변환된 WAV를 두는 디렉터리. */
+    tempDir: string;
+    /** 업로드 원본 최대 크기(바이트) — doc 03 3단계 "최대 10 MB". */
+    maxBytes: number;
+    /** 허용 최대 길이(초) — doc 03 3단계 "길이 최대 15초". */
+    maxDurationSeconds: number;
+    /** ffmpeg 변환 자식 프로세스 하드 타임아웃(ms) — "변환기 보호"의 시간 제한. */
+    conversionTimeoutMs: number;
+    /** 미확정 세션 TTL(시간) — doc 03 5단계 "미확정 세션은 최대 24시간". */
+    ttlHours: number;
+    /** TTL 스윕(AudioSessionCleanupService) 주기(ms) — doc 03 5단계 "삭제 작업". */
+    cleanupIntervalMs: number;
+    /** 6단계: BirdNET 기반 audio-model-service(CAMP-3, 127.0.0.1:8932). BioCLIP과 동일한
+     * 온/오프 관례 — endpoint가 비어있으면(기본) 이 프로바이더는 꺼진 상태다. */
+    model: {
+      endpoint: string;
+      timeoutMs: number;
+      /** 있으면 요청에 실어 보낸다(지금은 같은 서버 안에서만 통하는 저위험 값 — 값 자체는
+       * .env.example에 채우지 않는다). 없으면 헤더 자체를 안 붙인다. */
+      token?: string;
+    };
+  };
 }
 
 export function loadConfig(): AppConfig {
@@ -158,6 +183,21 @@ export function loadConfig(): AppConfig {
     },
     map: {
       kakaoJsKey: env("KAKAO_MAP_JS_KEY"),
+    },
+    audio: {
+      tempDir: env("AUDIO_TEMP_DIR") ?? "./data/audio-temp",
+      maxBytes: envNumber("AUDIO_MAX_BYTES", 10 * 1024 * 1024),
+      maxDurationSeconds: envNumber("AUDIO_MAX_DURATION_SECONDS", 15),
+      conversionTimeoutMs: envNumber("AUDIO_ANALYSIS_TIMEOUT_MS", 15000),
+      ttlHours: envNumber("AUDIO_TEMP_TTL_HOURS", 24),
+      cleanupIntervalMs: envNumber("AUDIO_CLEANUP_INTERVAL_MS", 60 * 60 * 1000),
+      model: {
+        // bioclip과 동일한 온/오프 관례(위 156번째 줄 주석 참고) — 기본값을 채우면 GPU
+        // 서버 없는 테스트 환경에서도 항상 켜진 것으로 오인돼 매 요청이 실패한다.
+        endpoint: env("AUDIO_MODEL_SERVICE_URL") ?? "",
+        timeoutMs: envNumber("AUDIO_MODEL_TIMEOUT_MS", 15000),
+        token: env("AUDIO_MODEL_SERVICE_TOKEN") || undefined,
+      },
     },
   };
 }

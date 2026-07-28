@@ -13,10 +13,14 @@
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
 import { buildApp, type App } from "../../composition.js";
 import { loadConfig } from "../../config/index.js";
 import { AuthorizationError, type AuthContext } from "../../core/auth/Authorization.js";
 import { makeCleanJpeg } from "../../core/media/fixtures.js";
+import { makeRealAudio } from "../../core/audio/fixtures.js";
 import { asMediaRef, newUserId } from "../../core/domain/ids.js";
 
 function testConfig() {
@@ -25,6 +29,7 @@ function testConfig() {
   cfg.identification.plantId.apiKey = undefined;
   cfg.identification.plantNet.apiKey = undefined;
   cfg.identification.freeDailyLimit = 0;
+  cfg.audio.tempDir = join(tmpdir(), `seed-service-audio-datarights-${randomUUID()}`);
   return cfg;
 }
 
@@ -47,6 +52,15 @@ async function seedUserWithData(app: App, ctx: AuthContext) {
     tiles: [{ row: 0, col: 0, type: "grass" }],
     placements: creatures[0] ? [{ row: 0, col: 0, creatureId: creatures[0].id }] : [],
   });
+  // 5단계: 오디오 세션도 사용자 데이터라 삭제권 대상 — 실제 파일까지 남겨서 파기 검증한다.
+  const audioBytes = await makeRealAudio({ seconds: 4, format: "wav" });
+  await app.audioUpload.upload({
+    userId: ctx.userId,
+    clientRecordingId: randomUUID(),
+    audioBytes,
+    clientDurationMs: 4000,
+    recordedAt: new Date().toISOString(),
+  });
 }
 
 /** 그 계정의 데이터가 모든 저장소에 몇 건씩 있는지. */
@@ -62,6 +76,7 @@ async function footprint(app: App, userId: AuthContext["userId"]) {
     // 계약 참고)을 돌려주므로 tiles 길이로는 "실제 저장했는지"를 못 가른다. placements는
     // 가상 기본값이 항상 빈 배열이라, 이걸로만 실제 저장 여부를 판별할 수 있다.
     gardenPlacements: (await app.repos.garden.getLayout(userId)).placements.length,
+    audioSightings: (await app.repos.audioSightings.listByUser(userId)).length,
   };
 }
 
@@ -80,8 +95,13 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   const before = await footprint(app, ctx.userId);
   assert.ok(
     before.observations >= 2 && before.collection >= 2 && before.badges >= 1 &&
-      before.creatures >= 2 && before.gardenPlacements >= 1,
+      before.creatures >= 2 && before.gardenPlacements >= 1 && before.audioSightings >= 1,
   );
+
+  // 삭제 전에 오디오 파일이 실제로 디스크에 있는지 확인(파기 검증의 기준점).
+  const [audioSightingBefore] = await app.repos.audioSightings.listByUser(ctx.userId);
+  const audioStoragePath = audioSightingBefore!.storagePath!;
+  assert.ok(await app.audioTempStore.read(audioStoragePath), "파기 전엔 오디오 파일이 있어야 함");
 
   const report = await app.dataRights.eraseUserData(ctx);
 
@@ -93,6 +113,7 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   assert.equal(after.badges, 0);
   assert.equal(after.creatures, 0);
   assert.equal(after.gardenPlacements, 0);
+  assert.equal(after.audioSightings, 0);
 
   // 리포트가 실제 삭제 건수를 정확히 보고.
   assert.equal(report.deleted.observations, before.observations);
@@ -100,8 +121,11 @@ test("삭제 완전성: 회원 탈퇴 시 내 계정 데이터가 모든 저장�
   assert.equal(report.deleted.creatures, before.creatures);
   assert.equal(report.deleted.gardenTiles, 1, "seedUserWithData가 심어둔 타일 1개");
   assert.equal(report.deleted.profile, true);
+  assert.equal(report.deleted.audioSightings, before.audioSightings);
   // 미디어 blob 파기 대상이 수집됨.
   assert.equal(report.mediaRefsToPurge.length, before.observations);
+  // 5단계: 오디오는 사진과 달리 TODO가 아니라 실제로 파일까지 지워졌어야 한다.
+  assert.equal(await app.audioTempStore.read(audioStoragePath), null, "파기 후엔 오디오 파일도 없어야 함");
 });
 
 test("과잉 삭제 방지: 다른 계정 데이터는 절대 지워지지 않는다", async () => {
@@ -121,6 +145,11 @@ test("과잉 삭제 방지: 다른 계정 데이터는 절대 지워지지 않�
   assert.ok(b.collection >= 2, "다른 계정 도감 유지");
   assert.ok(b.creatures >= 2, "다른 계정 개체 유지");
   assert.ok(b.gardenPlacements >= 1, "다른 계정 정원 배치 유지");
+  assert.ok(b.audioSightings >= 1, "다른 계정 오디오 세션 유지");
+
+  // 다른 계정의 오디오 파일도 실제로 그대로 있어야 한다.
+  const [audioSightingB] = await app.repos.audioSightings.listByUser(ctxB.userId);
+  assert.ok(await app.audioTempStore.read(audioSightingB!.storagePath!), "다른 계정 오디오 파일 유지");
 });
 
 test("위조된 계정으로는 삭제도 내보내기도 할 수 없다", async () => {

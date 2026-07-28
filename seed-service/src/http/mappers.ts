@@ -26,6 +26,8 @@ import { xpToNextLevel, type LevelCurve } from "../core/rewards/rewardTypes.js";
 import type { GardenLayout as DomainGardenLayout } from "../core/garden/gardenTypes.js";
 import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
 import { BOND_MAX } from "../core/garden/bondRules.js";
+import type { AudioSighting } from "../core/audio/audioTypes.js";
+import type { AudioIdentificationOutcome } from "../core/audio/identification/audioIdentificationTypes.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
 /** `app/src/types/api.ts`의 TaxonGroup — 도감 필터 UI가 쓰는 5종 분류. */
@@ -521,4 +523,59 @@ export function buildExploredRegions(
   currentLocation: { lat: number; lng: number } | null,
 ): ApiExploredRegionsResponse {
   return { blobs: [], home_zone: null, current_location: currentLocation };
+}
+
+// ── 소리 기능(오디오) 3단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md`의 `POST /audio/sightings/upload` 성공 응답
+ * (`fixtures/upload-success.json`과 필드 1:1 대응). */
+export function audioSightingToUploadResponse(sighting: AudioSighting) {
+  return {
+    audio_sighting_id: sighting.id,
+    status: sighting.status,
+    quality: {
+      usable: sighting.quality.usable,
+      duration_ms: sighting.quality.durationMs,
+      active_duration_ms: sighting.quality.activeDurationMs,
+      snr_db: sighting.quality.snrDb,
+      clipping_ratio: sighting.quality.clippingRatio,
+      silence_ratio: sighting.quality.silenceRatio,
+      speech_ratio: sighting.quality.speechRatio,
+      feedback_codes: sighting.quality.feedbackCodes,
+      valid_segments: sighting.quality.validSegments.map((s) => ({
+        start_ms: s.startMs,
+        end_ms: s.endMs,
+        quality_score: s.qualityScore,
+      })),
+    },
+    expires_at: sighting.expiresAt,
+  };
+}
+
+// ── 소리 기능(오디오) 6단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §2의 `POST /audio/identify` 성공 응답 —
+ * `fixtures/identify-high-confidence.json`/`identify-multiple-candidates.json`/
+ * `identify-unknown.json` 세 개와 필드 1:1 대응(unknown_reason은 unknown일 때만 존재). */
+export function audioIdentificationOutcomeToResponse(
+  audioSightingId: string,
+  outcome: AudioIdentificationOutcome,
+) {
+  const body: Record<string, unknown> = {
+    audio_sighting_id: audioSightingId,
+    candidates: outcome.candidates.map((c) => ({
+      species_id: c.speciesId,
+      common_name_ko: c.commonNameKo,
+      scientific_name: c.scientificName,
+      confidence: c.confidence,
+      confidence_level: c.confidenceLevel,
+      start_ms: c.startMs,
+      end_ms: c.endMs,
+      is_dangerous: c.isDangerous,
+    })),
+    unknown: outcome.unknown,
+    needs_user_confirmation: outcome.needsUserConfirmation,
+    model_version: outcome.modelVersion,
+    location_prior_used: outcome.locationPriorUsed,
+  };
+  if (outcome.unknown) body.unknown_reason = outcome.unknownReason;
+  return body;
 }

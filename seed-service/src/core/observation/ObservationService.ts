@@ -12,6 +12,7 @@ import type {
   UserId,
   Observation,
   ObservationId,
+  ObservationModality,
   ObservedRegion,
   PreciseCoordinate,
   TaxonId,
@@ -32,6 +33,8 @@ export interface CreateObservationInput {
   preciseCoord: PreciseCoordinate | null; // D단계: 동의와 무관하게 항상 저장(호출부가 이미 결정)
   note?: string;
   now?: Date;
+  /** 5단계 — 생략하면 기존 사진 흐름과 동일하게 "photo"(기존 호출부는 안 바꿔도 됨). */
+  modality?: ObservationModality;
 }
 
 export class ObservationService {
@@ -44,6 +47,7 @@ export class ObservationService {
       taxonId: input.taxonId,
       taxonRank: input.taxonRank,
       timestamp: (input.now ?? new Date()).toISOString(),
+      modality: input.modality ?? "photo",
       region: input.region, // null 이거나 시·군·구 수준
       preciseCoord: input.preciseCoord,
       media: input.media,

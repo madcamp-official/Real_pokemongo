@@ -38,8 +38,10 @@ import type {
   ConsentRepository,
   CreatureRepository,
   GardenRepository,
+  AudioSightingRepository,
 } from "../../core/repositories/ports.js";
 import type { AuthContext, Authorizer } from "../../core/auth/Authorization.js";
+import type { AudioTempStore } from "../../core/audio/AudioTempStore.js";
 
 /** 이동권(내보내기) 결과 — 본인에게 전달할 데이터 사본. */
 export interface UserDataExport {
@@ -74,8 +76,11 @@ export interface ErasureReport {
     profile: boolean;
     credential: boolean;
     consent: boolean;
+    /** 5단계: 오디오 세션(audio_sighting) 파기 건수 — 파일도 아래에서 실제로 지운다(사진과
+     * 달리 TODO가 아님, AudioTempStore가 이미 있어 즉시 파기 가능). */
+    audioSightings: number;
   };
-  /** TODO(제공 필요): 스토리지 어댑터가 실제 blob 을 파기해야 할 미디어 참조 목록. */
+  /** TODO(제공 필요): 스토리지 어댑터가 실제 blob 을 파기해야 할 미디어 참조 목록(사진). */
   mediaRefsToPurge: MediaRef[];
 }
 
@@ -92,6 +97,8 @@ export class DataRightsService {
       consent: ConsentRepository;
       creatures: CreatureRepository;
       garden: GardenRepository;
+      audioSightings: AudioSightingRepository;
+      audioTempStore: AudioTempStore;
     },
   ) {}
 
@@ -137,6 +144,21 @@ export class DataRightsService {
     const observations = await this.deps.observations.listByUser(userId);
     const mediaRefsToPurge = observations.flatMap((o) => o.media);
 
+    // 오디오는 사진과 달리 실제 파기 가능한 스토리지(AudioTempStore)가 이미 있으므로, TODO로
+    // 미루지 않고 여기서 바로 파일을 지운다(DB 행을 지우기 전에 storagePath를 모아야 함).
+    // 파일 하나가 실패해도(권한 등) 계정 전체 파기가 막히면 안 되므로 best-effort — 실패해도
+    // 계속 진행한다(재시도 대상으로 남기려면 TTL 스윕과 달리 "행을 남겨두는" 선택지가 없다,
+    // 계정 자체가 지워지는 일회성 액션이라 다음 스윕 같은 재시도 기회가 없기 때문).
+    const audioSightings = await this.deps.audioSightings.listByUser(userId);
+    for (const sighting of audioSightings) {
+      if (!sighting.storagePath) continue;
+      try {
+        await this.deps.audioTempStore.delete(sighting.storagePath);
+      } catch {
+        // best-effort — 로그 없이 계속(호출부인 계정삭제 흐름 자체를 막지 않는다).
+      }
+    }
+
     // ── 사용자 데이터를 담는 모든 저장소 열거(새 저장소 추가 시 여기와 테스트에 필수 반영) ──
     const deletedObservations = await this.deps.observations.deleteByUser(userId);
     const deletedCollection = await this.deps.collection.deleteByUser(userId);
@@ -146,6 +168,7 @@ export class DataRightsService {
     const deletedGardenTiles = await this.deps.garden.deleteByUser(userId);
     const deletedCredential = await this.deps.credentials.deleteByUser(userId);
     const deletedConsent = await this.deps.consent.deleteByUser(userId);
+    const deletedAudioSightings = await this.deps.audioSightings.deleteByUser(userId);
     const profileDeleted = await this.deps.users.delete(userId);
 
     return {
@@ -161,6 +184,7 @@ export class DataRightsService {
         profile: profileDeleted,
         credential: deletedCredential,
         consent: deletedConsent,
+        audioSightings: deletedAudioSightings,
       },
       mediaRefsToPurge,
     };

@@ -23,6 +23,7 @@ import { registerGardenRoutes } from "./routes/garden.routes.js";
 import { registerVisionRoutes, RateLimitedError } from "./routes/vision.routes.js";
 import { registerMapRoutes } from "./routes/map.routes.js";
 import { registerPhotoRoutes } from "./routes/photos.routes.js";
+import { registerAudioRoutes } from "./routes/audio.routes.js";
 
 /**
  * `config.auth.jwtSecret`이 비어있으면(개발 환경) 부팅 시 임의 시크릿을 생성한다.
@@ -77,6 +78,7 @@ export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   registerVisionRoutes(server, app);
   registerMapRoutes(server, app, authenticate);
   registerPhotoRoutes(server, app, authenticate, jwtSecret);
+  registerAudioRoutes(server, app, authenticate);
 
   // 전역 에러 매핑 — core/auth/Authorization.ts의 원칙("소유권 없음/미존재는 같은 404,
   // 자원 존재 여부를 누설하지 않는다")을 HTTP 계층에서도 그대로 지킨다. 이걸 안 걸면

@@ -1,0 +1,398 @@
+/**
+ * 통합테스트: `POST /audio/sightings/upload` (3~4단계).
+ * `sightings.routes.test.ts`(사진)와 같은 방식으로 Node 내장 FormData/Request로 진짜
+ * multipart 바디를 만든다. 오디오는 실제 ffmpeg/Windows TTS로 디코딩 가능한 합성음을 쓴다
+ * (core/audio/fixtures.ts) — 변환과 품질 분석이 실제로 동작하는 경로까지 검증하기 위함.
+ */
+import { test } from "node:test";
+import assert from "node:assert/strict";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { randomUUID } from "node:crypto";
+import { buildApp, type App } from "../../composition.js";
+import { loadConfig, type AppConfig } from "../../config/index.js";
+import { buildHttpServer } from "../server.js";
+import { makeRealAudio, makeRealSpeech } from "../../core/audio/fixtures.js";
+import { asAudioSightingId } from "../../core/domain/ids.js";
+import type { FastifyInstance } from "fastify";
+
+function testConfig(): AppConfig {
+  const cfg = loadConfig();
+  cfg.nodeEnv = "test";
+  cfg.identification.plantId.apiKey = undefined;
+  cfg.identification.plantNet.apiKey = undefined;
+  cfg.identification.freeDailyLimit = 0;
+  cfg.mediaStorage.localDir = join(tmpdir(), `seed-service-test-${randomUUID()}`);
+  cfg.audio.tempDir = join(tmpdir(), `seed-service-audio-test-${randomUUID()}`);
+  cfg.auth.jwtSecret = "test-secret-not-for-production";
+  return cfg;
+}
+
+async function testServer(): Promise<{ app: App; server: FastifyInstance; cfg: AppConfig }> {
+  const cfg = testConfig();
+  const app = await buildApp(cfg);
+  const server = await buildHttpServer(app);
+  return { app, server, cfg };
+}
+
+async function signup(server: FastifyInstance) {
+  const res = await server.inject({
+    method: "POST",
+    url: "/auth/signup",
+    payload: {
+      email: `${randomUUID()}@b.com`,
+      password: "pw12345",
+      nickname: "A",
+      avatar: "fox",
+      privacy: true,
+      location: true,
+      photo: true,
+      consent_version: "v1",
+    },
+  });
+  const body = res.json();
+  return { token: body.access_token as string, userId: body.user.user_id as string };
+}
+
+interface UploadFields {
+  client_recording_id?: string;
+  duration_ms?: string;
+  recorded_at?: string;
+  mode?: string;
+}
+
+async function buildAudioMultipart(
+  audio: Uint8Array | undefined,
+  fields: UploadFields,
+  filename = "rec.m4a",
+): Promise<{ body: Buffer; contentType: string }> {
+  const form = new FormData();
+  if (audio) {
+    form.append("audio", new Blob([audio as BlobPart], { type: "audio/m4a" }), filename);
+  }
+  for (const [k, v] of Object.entries(fields)) {
+    if (v !== undefined) form.append(k, v);
+  }
+  const req = new Request("http://local/upload", { method: "POST", body: form });
+  const contentType = req.headers.get("content-type")!;
+  const body = Buffer.from(await req.arrayBuffer());
+  return { body, contentType };
+}
+
+function defaultFields(overrides: UploadFields = {}): UploadFields {
+  return {
+    client_recording_id: randomUUID(),
+    duration_ms: "4000",
+    recorded_at: new Date().toISOString(),
+    mode: "ambient",
+    ...overrides,
+  };
+}
+
+async function upload(
+  server: FastifyInstance,
+  token: string | undefined,
+  audio: Uint8Array | undefined,
+  fields: UploadFields,
+  filename = "rec.m4a",
+) {
+  const { body, contentType } = await buildAudioMultipart(audio, fields, filename);
+  const headers: Record<string, string> = { "content-type": contentType };
+  if (token) headers.authorization = `Bearer ${token}`;
+  return server.inject({ method: "POST", url: "/audio/sightings/upload", headers, payload: body });
+}
+
+test("POST /audio/sightings/upload: 인증 없으면 401", async () => {
+  const { server } = await testServer();
+  const audio = await makeRealAudio({ seconds: 4, format: "m4a" });
+  const res = await upload(server, undefined, audio, defaultFields());
+  assert.equal(res.statusCode, 401);
+});
+
+test("POST /audio/sightings/upload: 정상 M4A 업로드는 200과 표준 응답 형태를 돌려준다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 4, format: "m4a" });
+
+  const res = await upload(server, token, audio, defaultFields());
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(typeof body.audio_sighting_id, "string");
+  assert.equal(body.status, "ready");
+  assert.equal(body.quality.usable, true);
+  assert.deepEqual(body.quality.feedback_codes, []);
+  assert.ok(Math.abs(body.quality.duration_ms - 4000) < 100);
+  assert.equal(typeof body.expires_at, "string");
+});
+
+test("POST /audio/sightings/upload: WAV 입력도 통과한다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  // 4단계(품질 검사) 이후로 최소 길이(3초, DECISIONS.md)보다 짧으면 형식과 무관하게
+  // TOO_SHORT로 거부되므로, "WAV 자체가 통과하는지"를 보려면 3초 이상이어야 한다.
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+
+  const res = await upload(server, token, audio, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.status, "ready");
+});
+
+test("POST /audio/sightings/upload: 3초 미만 녹음은 422 품질 거부(TOO_SHORT)", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 2, format: "wav" });
+
+  const res = await upload(server, token, audio, defaultFields({ duration_ms: "2000" }), "rec.wav");
+  assert.equal(res.statusCode, 422);
+  const body = res.json();
+  assert.equal(body.status, "rejected");
+  assert.ok(body.quality.feedback_codes.includes("TOO_SHORT"));
+  assert.equal(body.quality.usable, false);
+});
+
+test("POST /audio/sightings/upload: 오디오 파일 누락은 400 audio_invalid_format", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await upload(server, token, undefined, defaultFields());
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "audio_invalid_format");
+});
+
+test("POST /audio/sightings/upload: 필수 필드 누락은 400 audio_invalid_format", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 2, format: "m4a" });
+  const res = await upload(server, token, audio, { mode: "ambient" }); // client_recording_id 등 누락
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "audio_invalid_format");
+});
+
+test("POST /audio/sightings/upload: 지원하지 않는 포맷(임의 바이트)은 400 audio_invalid_format", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const garbage = new Uint8Array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
+  const res = await upload(server, token, garbage, defaultFields(), "rec.bin");
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "audio_invalid_format");
+});
+
+test("POST /audio/sightings/upload: 10MB 초과는 413 audio_too_large", async () => {
+  const { server, cfg } = await testServer();
+  const { token } = await signup(server);
+  // 시그니처 검사보다 먼저 크기 검사가 걸려야 하므로, RIFF/WAVE 헤더를 붙인 큰 더미 바이트.
+  const oversized = new Uint8Array(cfg.audio.maxBytes + 1);
+  oversized.set([0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x41, 0x56, 0x45], 0);
+  const res = await upload(server, token, oversized, defaultFields(), "rec.wav");
+  assert.equal(res.statusCode, 413);
+  assert.equal(res.json().error, "audio_too_large");
+});
+
+test("POST /audio/sightings/upload: 같은 client_recording_id로 재시도하면 같은 audio_sighting_id를 돌려준다", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 3, format: "m4a" });
+  const fields = defaultFields({ duration_ms: "3000" });
+
+  const res1 = await upload(server, token, audio, fields);
+  const res2 = await upload(server, token, audio, fields);
+  assert.equal(res1.statusCode, 200);
+  assert.equal(res2.statusCode, 200);
+  assert.equal(res1.json().audio_sighting_id, res2.json().audio_sighting_id);
+});
+
+test("POST /audio/sightings/upload: 사람 음성이 우세한 녹음은 422 품질 거부(SPEECH_DETECTED)이고 바이트가 저장되지 않는다", async () => {
+  // ACCEPTANCE.md 시나리오 4: "Speech-dominant audio → Rejection; no model inference or
+  // retained user audio" — 라우트 레벨에서 422/rejected/usable=false까지 실제로 확인하고,
+  // AudioUploadService가 storagePath를 안 만든다는 것도(=바이트 미보관) 간접 확인한다
+  // (repo에서 조회해 storagePath가 없는지 직접 보는 건 이 테스트의 범위 밖이라, 응답 계약만
+  // 확인 — 저장 여부 자체는 AudioUploadService.test.ts가 별도로 확인).
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealSpeech("This recording contains a full human sentence, not a bird call.");
+  const res = await upload(server, token, audio, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(res.statusCode, 422);
+  const body = res.json();
+  assert.equal(body.status, "rejected");
+  assert.equal(body.quality.usable, false);
+  assert.ok(body.quality.feedback_codes.includes("SPEECH_DETECTED"), JSON.stringify(body.quality));
+  assert.deepEqual(body.quality.valid_segments, []);
+});
+
+test("POST /audio/sightings/upload: mode가 ambient가 아니면 400 audio_invalid_format", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 2, format: "m4a" });
+  const res = await upload(server, token, audio, defaultFields({ mode: "practice" }));
+  assert.equal(res.statusCode, 400);
+  assert.equal(res.json().error, "audio_invalid_format");
+});
+
+// ── 6단계: POST /audio/identify ─────────────────────────────────────────────
+// BioClipProvider.test.ts와 같은 원칙 — 전역 fetch를 모킹해 실제 GPU 서버 없이 검증한다.
+function withMockedFetch<T>(impl: typeof fetch, run: () => Promise<T>): Promise<T> {
+  const original = globalThis.fetch;
+  globalThis.fetch = impl;
+  return run().finally(() => {
+    globalThis.fetch = original;
+  });
+}
+
+function fakeBirdNetResponse(
+  segments: { start_s: number; end_s: number; candidates: { sci_name: string; label: string; score: number }[] }[],
+) {
+  return (async () =>
+    new Response(
+      JSON.stringify({
+        model_version: "birdnet@audio-mvp-1.0.0",
+        quality: { duration_s: 4, sample_rate: 48000, segment_duration_s: 3 },
+        segments: segments.map((s) => ({ ...s, embedding: [] })),
+      }),
+      { status: 200 },
+    )) as typeof fetch;
+}
+
+async function uploadReadySighting(server: FastifyInstance, token: string): Promise<string> {
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const res = await upload(server, token, audio, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(res.statusCode, 200, "테스트 전제(정상 업로드)가 깨짐: " + JSON.stringify(res.json()));
+  return res.json().audio_sighting_id as string;
+}
+
+async function callIdentify(server: FastifyInstance, token: string | undefined, audioSightingId: string) {
+  const headers: Record<string, string> = { "content-type": "application/json" };
+  if (token) headers.authorization = `Bearer ${token}`;
+  return server.inject({
+    method: "POST",
+    url: "/audio/identify",
+    headers,
+    payload: { audio_sighting_id: audioSightingId },
+  });
+}
+
+test("POST /audio/identify: 인증 없으면 401", async () => {
+  const { server } = await testServer();
+  const res = await callIdentify(server, undefined, randomUUID());
+  assert.equal(res.statusCode, 401);
+});
+
+test("POST /audio/identify: 존재하지 않는 세션은 404 not_found", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const res = await callIdentify(server, token, randomUUID());
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify: 남의 세션은 존재 여부를 안 드러내고 같은 404 not_found", async () => {
+  const { server } = await testServer();
+  const { token: ownerToken } = await signup(server);
+  const { token: otherToken } = await signup(server);
+  const sightingId = await uploadReadySighting(server, ownerToken);
+
+  const res = await callIdentify(server, otherToken, sightingId);
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify: 품질 거부(rejected)된 세션은 404 not_found(STATE_MACHINE.md — identify 불허)", async () => {
+  const { server } = await testServer();
+  const { token } = await signup(server);
+  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
+  const uploadRes = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  assert.equal(uploadRes.statusCode, 422); // 사전조건: 정말 거부됐는지
+  const sightingId = uploadRes.json().audio_sighting_id as string;
+
+  const res = await callIdentify(server, token, sightingId);
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify: 만료된 세션은 404 not_found", async () => {
+  const { server, app } = await testServer();
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  // TTL이 지난 것처럼 만들기 위해 저장소에서 직접 만료 시각을 과거로 되돌린다(실제 시간이
+  // 지나가길 기다리지 않고 "만료" 상태를 결정론적으로 재현).
+  const audioSightingId = asAudioSightingId(sightingId);
+  const sighting = await app.repos.audioSightings.get(audioSightingId);
+  assert.ok(sighting);
+  await app.repos.audioSightings.create({
+    ...sighting!,
+    expiresAt: new Date(Date.now() - 60_000).toISOString(),
+  });
+
+  const res = await callIdentify(server, token, sightingId);
+  assert.equal(res.statusCode, 404);
+  assert.equal(res.json().error, "not_found");
+});
+
+test("POST /audio/identify: 정상 동정은 200과 계약 형태(candidates/confidence_level/model_version)를 돌려준다", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.87 }] },
+    { start_s: 3, end_s: 4, candidates: [] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.audio_sighting_id, sightingId);
+  assert.equal(body.unknown, false);
+  assert.equal(body.needs_user_confirmation, true);
+  assert.equal(body.model_version, "birdnet@audio-mvp-1.0.0");
+  assert.equal(body.candidates.length, 1);
+  assert.equal(body.candidates[0].species_id, "taxon-hypsipetes-amaurotis");
+  assert.equal(body.candidates[0].common_name_ko, "직박구리");
+  assert.equal(body.candidates[0].confidence_level, "high");
+  assert.equal(body.candidates[0].is_dangerous, false);
+  assert.equal(body.unknown_reason, undefined, "unknown=false면 unknown_reason 필드가 없어야 함");
+});
+
+test("POST /audio/identify: 지원 종이 하나도 안 나오면 200 unknown=true", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Not A Real Bird", label: "?", score: 0.99 }] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.unknown, true);
+  assert.equal(body.unknown_reason, "NO_SUPPORTED_BIRD_MATCH");
+  assert.equal(body.needs_user_confirmation, false);
+  assert.deepEqual(body.candidates, []);
+});
+
+test("POST /audio/identify: 모델 서비스 오류는 503 audio_processor_unavailable(doc03 '모델 오류는 5xx')", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const fakeFetch = (async () => new Response("internal error", { status: 500 })) as typeof fetch;
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().error, "audio_processor_unavailable");
+  assert.equal(res.json().retryable, true);
+});
+
+test("POST /audio/identify: 모델 서비스가 아예 설정 안 됐으면(기본값) 503", async () => {
+  const { server } = await testServer(); // cfg.audio.model.endpoint를 안 채움(기본 꺼짐)
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const res = await callIdentify(server, token, sightingId);
+  assert.equal(res.statusCode, 503);
+  assert.equal(res.json().error, "audio_processor_unavailable");
+});

@@ -1,0 +1,19 @@
+[Unit]
+Description=SEED BirdNET Audio Model Inference Server (Stage 2)
+After=network.target
+StartLimitBurst=5
+StartLimitIntervalSec=300
+
+[Service]
+Type=simple
+WorkingDirectory=/root
+Environment=LD_LIBRARY_PATH=/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cuda_runtime/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cudnn/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cublas/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cuda_nvrtc/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cusolver/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cuda_cupti/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/nccl/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cufft/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/curand/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/nvjitlink/lib:/root/venvs/audio-model/lib/python3.11/site-packages/nvidia/cusparse/lib
+ExecStart=/root/venvs/audio-model/bin/python -m uvicorn audio_model_service:app --host 127.0.0.1 --port 8932
+Restart=on-failure
+RestartSec=5
+KillMode=control-group
+StandardOutput=append:/root/audio_model_service.log
+StandardError=append:/root/audio_model_service.log
+
+[Install]
+WantedBy=multi-user.target

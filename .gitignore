@@ -15,6 +15,9 @@ dist/
 # C단계: 로컬 디스크 미디어 저장소(개발용 스텁, 실제 사진 바이트) — 커밋 대상 아님
 seed-service/data/
 
+# 소리 기능: 참조 음원 원본/캐시(저작권 있는 오디오 바이트) — 커밋 대상 아님, CAMP-3에 별도 보관
+seed-service/research/audio-reference-pool/downloads/
+
 # 세션 간 인수인계용 개인 메모(커밋 대상 아님)
 HANDOFF_NEXT_SESSION.md
 

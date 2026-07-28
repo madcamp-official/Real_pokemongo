@@ -19,9 +19,13 @@ import {
   PgQuestRepo,
   PgBadgeRepo,
   PgCreatureRepo,
+  PgAudioSightingRepo,
+  PgAudioIdentificationResultRepo,
 } from "./PostgresRepositories.js";
 import type { User, Taxon, Observation, CollectionEntry, Creature } from "../../domain/types.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
+import type { AudioSighting } from "../../audio/audioTypes.js";
+import type { AudioIdentificationResult } from "../../audio/identification/audioIdentificationTypes.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const skip = DATABASE_URL ? false : "DATABASE_URL 미설정 — SSH 터널을 연 뒤 수동 실행(파일 상단 주석 참고)";
@@ -132,6 +136,7 @@ test("PgObservationRepo: preciseCoord/region이 분리 저장되고, media 순�
       taxonId: null,
       taxonRank: null,
       timestamp: new Date().toISOString(),
+      modality: "photo",
       region: null, // 동의 OFF
       preciseCoord: { lat: 37.5, lng: 127.0 }, // D단계: 동의 무관 저장
       media: ["local://a.bin", "local://b.bin"] as Observation["media"],
@@ -143,9 +148,122 @@ test("PgObservationRepo: preciseCoord/region이 분리 저장되고, media 순�
     assert.equal(fetched?.region, null);
     assert.deepEqual(fetched?.preciseCoord, { lat: 37.5, lng: 127.0 });
     assert.deepEqual(fetched?.media, ["local://a.bin", "local://b.bin"]);
+    assert.equal(fetched?.modality, "photo"); // 5단계: modality 왕복 확인
 
     const list = await observations.listByUser(userId);
     assert.equal(list.length, 1);
+  });
+});
+
+function newAudioSightingRow(userId: User["id"], overrides: Partial<AudioSighting> = {}): AudioSighting {
+  const now = new Date();
+  return {
+    id: randomUUID() as AudioSighting["id"],
+    userId,
+    clientRecordingId: randomUUID(),
+    status: "ready",
+    mediaKind: "audio",
+    mimeType: "audio/wav",
+    durationMs: 4000,
+    sha256: "a".repeat(64),
+    storagePath: "local://audio-it-test.bin",
+    quality: {
+      usable: true,
+      durationMs: 4000,
+      activeDurationMs: 4000,
+      snrDb: 20,
+      clippingRatio: 0,
+      silenceRatio: 0,
+      speechRatio: 0,
+      feedbackCodes: [],
+      validSegments: [{ startMs: 0, endMs: 4000, qualityScore: 1 }],
+    },
+    recordedAt: now.toISOString(),
+    createdAt: now.toISOString(),
+    expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000).toISOString(),
+    ...overrides,
+  };
+}
+
+test("PgAudioSightingRepo: recorded_at이 왕복되고, 5단계 TTL 스윕(findExpired/deleteById)이 동작한다", { skip }, async () => {
+  await withUser(async (userId) => {
+    const repo = new PgAudioSightingRepo(pool!);
+    const recordedAt = new Date("2026-07-20T10:00:00.000Z").toISOString();
+    const notExpired = newAudioSightingRow(userId, { recordedAt });
+    const expired = newAudioSightingRow(userId, {
+      recordedAt,
+      expiresAt: new Date(Date.now() - 60_000).toISOString(), // 1분 전 만료
+    });
+    await repo.create(notExpired);
+    await repo.create(expired);
+
+    const fetched = await repo.get(notExpired.id);
+    assert.equal(fetched?.recordedAt, recordedAt); // recorded_at 왕복 확인(5단계 버그 수정)
+    assert.equal(fetched?.confirmedObservationId, undefined); // 아직 미확정
+
+    const foundExpired = await repo.findExpired(new Date(), 10);
+    const foundIds = foundExpired.map((s) => s.id);
+    assert.ok(foundIds.includes(expired.id), "만료된 세션이 findExpired에 나와야 함");
+    assert.ok(!foundIds.includes(notExpired.id), "안 만료된 세션은 findExpired에 나오면 안 됨");
+
+    await repo.deleteById(expired.id);
+    assert.equal(await repo.get(expired.id), null);
+    assert.ok(await repo.get(notExpired.id), "안 만료된 세션은 그대로 남아야 함");
+
+    await repo.deleteByUser(userId); // 정리
+  });
+});
+
+test("PgAudioIdentificationResultRepo: candidates_json이 왕복되고, 재동정은 upsert(덮어쓰기)로 동작한다", { skip }, async () => {
+  await withUser(async (userId) => {
+    const sightingRepo = new PgAudioSightingRepo(pool!);
+    const resultRepo = new PgAudioIdentificationResultRepo(pool!);
+    const sighting = newAudioSightingRow(userId);
+    await sightingRepo.create(sighting);
+
+    const first: AudioIdentificationResult = {
+      audioSightingId: sighting.id,
+      candidates: [
+        {
+          speciesId: "taxon-hypsipetes-amaurotis" as any,
+          commonNameKo: "직박구리",
+          scientificName: "Hypsipetes amaurotis",
+          confidence: 0.87,
+          confidenceLevel: "high",
+          startMs: 1100,
+          endMs: 5300,
+          isDangerous: false,
+        },
+      ],
+      unknown: false,
+      modelProvider: "birdnet",
+      modelVersion: "birdnet@audio-mvp-1.0.0",
+      locationPriorUsed: false,
+      createdAt: new Date("2026-07-28T10:00:00.000Z").toISOString(),
+    };
+    await resultRepo.upsert(first);
+
+    const fetched = await resultRepo.get(sighting.id);
+    assert.equal(fetched?.candidates.length, 1);
+    assert.equal(fetched?.candidates[0]?.scientificName, "Hypsipetes amaurotis");
+    assert.equal(fetched?.unknown, false);
+    assert.equal(fetched?.modelVersion, "birdnet@audio-mvp-1.0.0");
+
+    // 재동정: 같은 audio_sighting_id로 다시 upsert하면 이전 스냅샷이 아니라 새 값으로
+    // 덮어써져야 한다(STATE_MACHINE.md "identified -> Identify again" = 이력이 아니라 최신값).
+    const second: AudioIdentificationResult = {
+      ...first,
+      candidates: [],
+      unknown: true,
+      unknownReason: "NO_SUPPORTED_BIRD_MATCH",
+    };
+    await resultRepo.upsert(second);
+    const refetched = await resultRepo.get(sighting.id);
+    assert.equal(refetched?.unknown, true);
+    assert.equal(refetched?.unknownReason, "NO_SUPPORTED_BIRD_MATCH");
+    assert.deepEqual(refetched?.candidates, []);
+
+    await sightingRepo.deleteByUser(userId); // audio_identification_result도 CASCADE로 함께 정리
   });
 });
 
