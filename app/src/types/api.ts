@@ -59,6 +59,100 @@ export interface IdentifyResponse {
   needs_user_confirmation: boolean;
 }
 
+// ─── Audio MVP: 소리 기반 동정 · 유사도 ──────────────────
+export type AudioQualityFeedbackCode =
+  | 'TOO_SHORT'
+  | 'MOSTLY_SILENCE'
+  | 'TOO_NOISY'
+  | 'CLIPPED'
+  | 'SPEECH_DETECTED'
+  | 'MULTIPLE_OVERLAP'
+  | 'UNSUPPORTED_SOUND'
+  | 'NO_TARGET_ACTIVITY';
+
+export interface AudioValidSegment {
+  start_ms: number;
+  end_ms: number;
+  quality_score: number;
+}
+
+export interface AudioQualityResult {
+  usable: boolean;
+  duration_ms: number;
+  active_duration_ms: number;
+  snr_db: number | null;
+  clipping_ratio: number;
+  silence_ratio: number;
+  speech_ratio: number | null;
+  feedback_codes: AudioQualityFeedbackCode[];
+  valid_segments: AudioValidSegment[];
+}
+
+export interface AudioSightingUploadResponse {
+  audio_sighting_id: ID;
+  status: 'ready' | 'rejected';
+  quality: AudioQualityResult;
+  expires_at: string;
+}
+
+export interface AudioIdentifyCandidate {
+  species_id: ID;
+  common_name_ko: string;
+  scientific_name: string;
+  confidence: number;
+  confidence_level: 'high' | 'medium' | 'low';
+  start_ms: number;
+  end_ms: number;
+  is_dangerous: boolean;
+}
+
+export interface AudioIdentifyResponse {
+  audio_sighting_id: ID;
+  candidates: AudioIdentifyCandidate[];
+  unknown: boolean;
+  unknown_reason?: string;
+  needs_user_confirmation: boolean;
+  model_version: string;
+  location_prior_used: boolean;
+}
+
+export interface AudioConfirmResponse {
+  observation_id: ID;
+  modality: 'audio';
+  species_id: ID;
+  dex_updated: boolean;
+  reward: { xp: number; quest_ids: ID[] };
+}
+
+export interface AudioSimilarityResponse {
+  audio_sighting_id: ID;
+  species_id: ID;
+  score: number;
+  grade: 'low_similarity' | 'somewhat_similar' | 'very_similar' | 'strong_match';
+  score_reliability: 'high' | 'medium' | 'low';
+  matched_segment: { start_ms: number; end_ms: number };
+  feedback_codes: AudioQualityFeedbackCode[];
+  model_version: string;
+  reference_set_version: string;
+}
+
+export interface SpeciesSoundClip {
+  id: ID;
+  call_type: string;
+  duration_ms: number;
+  playback_url: string;
+  attribution: string;
+  license: string;
+  source_url: string;
+}
+
+export interface SpeciesSoundsResponse {
+  species_id: ID;
+  supported_for_similarity: boolean;
+  reference_set_version: string;
+  clips: SpeciesSoundClip[];
+}
+
 // ─── F5. 도감 ───────────────────────────────────────────
 export interface Creature {
   id: ID;

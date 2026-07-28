@@ -35,9 +35,11 @@ export default function SettingsScreen() {
   const notificationsEnabled = useSettingsStore((s) => s.notificationsEnabled);
   const locationCollectionEnabled = useSettingsStore((s) => s.locationCollectionEnabled);
   const photoCollectionEnabled = useSettingsStore((s) => s.photoCollectionEnabled);
+  const audioRecordingEnabled = useSettingsStore((s) => s.audioRecordingEnabled);
   const setNotificationsEnabled = useSettingsStore((s) => s.setNotificationsEnabled);
   const setLocationCollectionEnabled = useSettingsStore((s) => s.setLocationCollectionEnabled);
   const setPhotoCollectionEnabled = useSettingsStore((s) => s.setPhotoCollectionEnabled);
+  const setAudioRecordingEnabled = useSettingsStore((s) => s.setAudioRecordingEnabled);
 
   const [restoring, setRestoring] = useState(false);
   const [deleting, setDeleting] = useState(false);
@@ -181,6 +183,12 @@ export default function SettingsScreen() {
           value={photoCollectionEnabled}
           onChange={(v) => void onChangePrivacy({ location: locationCollectionEnabled, photo: v })}
           disabled={savingPrivacy || privacyQuery.isLoading}
+        />
+        <ToggleRow
+          label="소리 녹음·분석"
+          desc="주변 생물 소리를 최대 15초 녹음해 서버에서 분석해요"
+          value={audioRecordingEnabled}
+          onChange={setAudioRecordingEnabled}
         />
       </Section>
 

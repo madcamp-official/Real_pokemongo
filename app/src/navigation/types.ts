@@ -5,6 +5,7 @@
 import type { ConsentPayload } from '@/types/api';
 export type RootTabParamList = {
   Camera: undefined; // F2 촬영
+  Sound: undefined; // Audio MVP 소리 찾기
   Dex: undefined; // F5 도감
   Garden: undefined; // F16 홈 가든
   Map: undefined; // F11 지도 & 탐험 기록
