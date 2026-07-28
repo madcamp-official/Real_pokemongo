@@ -34,7 +34,6 @@ export default function MapScreen() {
   const [locationDenied, setLocationDenied] = useState(false);
   const [mapError, setMapError] = useState<string | null>(null);
   const [selectedPin, setSelectedPin] = useState<MapPin | null>(null);
-  const [unexploredMode, setUnexploredMode] = useState(false);
 
   const pinsQuery = useQuery({ queryKey: ['map', 'pins'], queryFn: fetchMapPins });
   const regionsQuery = useQuery({ queryKey: ['map', 'regions'], queryFn: fetchExploredRegions });
@@ -130,22 +129,8 @@ export default function MapScreen() {
         </View>
       </View>
 
-      {/* 우상단: 참조 시안과 같은 탐험 필터 + 설정 진입점 */}
+      {/* 우상단: 설정 진입점 */}
       <View pointerEvents="box-none" style={[styles.topRight, { top: insets.top + 10 }]}>
-        <Pressable
-          onPress={() => setUnexploredMode((value) => !value)}
-          accessibilityRole="button"
-          accessibilityLabel="안 가본 곳 보기"
-          accessibilityState={{ selected: unexploredMode }}
-          style={({ pressed }) => [
-            styles.unexploredButton,
-            unexploredMode && styles.unexploredButtonActive,
-            pressed && styles.pressed,
-          ]}
-        >
-          <Text style={styles.unexploredIcon}>👣</Text>
-          <Text style={styles.unexploredText}>안 가본 곳</Text>
-        </Pressable>
         <Pressable
           onPress={() => navigation.navigate('Settings')}
           accessibilityRole="button"
@@ -155,12 +140,6 @@ export default function MapScreen() {
           <Text style={styles.squareButtonIcon}>⚙︎</Text>
         </Pressable>
       </View>
-
-      {unexploredMode && (
-        <View pointerEvents="none" style={[styles.unexploredHint, { top: insets.top + 112 }]}>
-          <Text style={styles.unexploredHintText}>아직 가보지 않은 곳을 찾아볼까요?</Text>
-        </View>
-      )}
 
       {/* 상태 안내 */}
       {(mapError || isOffline || locationDenied) && (
@@ -239,24 +218,6 @@ const styles = StyleSheet.create({
   chipAccent: { color: colors.primary, fontWeight: '900' },
 
   topRight: { position: 'absolute', right: 14, alignItems: 'flex-end', gap: 9 },
-  unexploredButton: {
-    height: 42,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 7,
-    backgroundColor: '#fff',
-    borderWidth: 2,
-    borderColor: INK,
-    paddingHorizontal: 11,
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 3 },
-    elevation: 3,
-  },
-  unexploredButtonActive: { backgroundColor: '#FBE0DA', borderColor: colors.primaryDark },
-  unexploredIcon: { fontSize: 16 },
-  unexploredText: { fontSize: 12, fontWeight: '800', color: INK },
   squareButton: {
     width: 46,
     height: 46,
@@ -278,16 +239,6 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   noticeText: { color: '#fff', fontSize: 12, fontWeight: '600', lineHeight: 17 },
-  unexploredHint: {
-    position: 'absolute',
-    alignSelf: 'center',
-    backgroundColor: INK,
-    borderLeftWidth: 5,
-    borderLeftColor: colors.primary,
-    paddingHorizontal: 13,
-    paddingVertical: 8,
-  },
-  unexploredHintText: { color: '#fff', fontSize: 12, fontWeight: '700' },
 
   recenter: {
     position: 'absolute',
