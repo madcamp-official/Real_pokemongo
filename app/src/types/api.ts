@@ -201,6 +201,38 @@ export interface SpeciesCard {
   safety_notes?: string; // 위험 생물일 때 최상단 고정 노출 (F6)
 }
 
+// ─── F22. 도감 박사 ──────────────────────────────────────
+export type ProfessorConfidence = 'high' | 'medium' | 'low' | 'unknown';
+export interface ProfessorMatchedSpecies {
+  species_id: ID;
+  name: string;
+  discovered: boolean;
+}
+export interface ProfessorRelatedSpecies {
+  species_id: ID;
+  name: string;
+  reason: string;
+}
+export interface ProfessorAskResponse {
+  confidence: ProfessorConfidence;
+  answer: string;
+  matched_species: ProfessorMatchedSpecies | null;
+  safety_warning: string | null;
+  related: ProfessorRelatedSpecies[];
+  similarity_score: number | null;
+  restricted: boolean;
+  response_source: 'indexed_sentence' | 'fixed_safety' | 'unknown';
+}
+export interface ProfessorSuggestion {
+  id: string;
+  question: string;
+  context_species_id?: ID;
+}
+export interface ProfessorGreeting {
+  message: string;
+  discovered_count: number;
+}
+
 /** F6 종 카드 하단 "지금까지 찍은 사진" 갤러리 항목. */
 export interface SpeciesPhoto {
   observation_id: ID;

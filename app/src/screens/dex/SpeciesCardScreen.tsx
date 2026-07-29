@@ -127,6 +127,24 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             </View>
           )}
 
+          <Pressable
+            style={styles.professorCta}
+            onPress={() =>
+              navigation.navigate('Professor', { contextSpeciesId: card.species_id })
+            }
+          >
+            <View style={styles.professorMark}>
+              <Text style={styles.professorMarkText}>?</Text>
+            </View>
+            <View style={styles.professorCopy}>
+              <Text style={styles.professorCtaTitle}>도감 박사에게 묻기</Text>
+              <Text style={styles.professorCtaCaption}>
+                이 친구의 사는 곳과 특징을 물어보세요
+              </Text>
+            </View>
+            <Text style={styles.professorArrow}>›</Text>
+          </Pressable>
+
           <Pressable style={styles.cta} onPress={inviteToGarden}>
             <Text style={styles.ctaText}>우리집 정원에 초대하기</Text>
           </Pressable>
@@ -218,6 +236,32 @@ const styles = StyleSheet.create({
   observeText: { flex: 1, fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
 
   quizSection: { gap: 10 },
+
+  professorCta: {
+    minHeight: 72,
+    borderRadius: 20,
+    paddingHorizontal: 15,
+    paddingVertical: 12,
+    backgroundColor: '#E9F2E4',
+    borderWidth: 1,
+    borderColor: '#D2E2C9',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
+  professorMark: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: '#4E795B',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  professorMarkText: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
+  professorCopy: { flex: 1 },
+  professorCtaTitle: { color: '#2E5139', fontSize: 15, fontWeight: '900' },
+  professorCtaCaption: { color: '#718176', fontSize: 12, lineHeight: 17, marginTop: 2 },
+  professorArrow: { color: '#4E795B', fontSize: 28, lineHeight: 28 },
 
   cta: {
     backgroundColor: colors.primary,

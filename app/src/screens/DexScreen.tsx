@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -37,6 +37,12 @@ export default function DexScreen() {
       ?.navigate('SpeciesCard', { speciesId: entry.species_id });
   };
 
+  const openProfessor = () => {
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate('Professor');
+  };
+
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <ScreenHeader title="도감" />
@@ -68,6 +74,15 @@ export default function DexScreen() {
           )
         }
       />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="도감 박사에게 질문하기"
+        style={[styles.professorFab, { bottom: Math.max(insets.bottom, 16) + 12 }]}
+        onPress={openProfessor}
+      >
+        <Text style={styles.professorFabIcon}>?</Text>
+        <Text style={styles.professorFabText}>박사</Text>
+      </Pressable>
     </View>
   );
 }
@@ -78,4 +93,36 @@ const styles = StyleSheet.create({
   column: { paddingHorizontal: 16, gap: 12, marginBottom: 12 },
   center: { paddingVertical: 60, alignItems: 'center', paddingHorizontal: 32 },
   emptyText: { color: colors.textSecondary, fontSize: 14, textAlign: 'center' },
+  professorFab: {
+    position: 'absolute',
+    right: 18,
+    minWidth: 78,
+    height: 52,
+    paddingHorizontal: 14,
+    borderRadius: 26,
+    backgroundColor: '#3E7456',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    shadowColor: '#203B2B',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
+  professorFabIcon: {
+    width: 23,
+    height: 23,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    color: '#3E7456',
+    textAlign: 'center',
+    lineHeight: 23,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  professorFabText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
 });

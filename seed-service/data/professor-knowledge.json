@@ -1,0 +1,5200 @@
+{
+  "schema_version": "professor-knowledge-v1",
+  "content_version": "seed-content-v1",
+  "content_hash": "ced7f43d16c35ca3c5e8e74daa47304eec93e98a6af0231f40a82c8854ae9615",
+  "records": [
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:habitat:1",
+      "sentence": "네발나비 관찰 장소: 공원, 들판.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:activity:1",
+      "sentence": "네발나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:size:1",
+      "sentence": "네발나비 크기: 날개폭 4~5cm 정도예요.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:funfact:1",
+      "sentence": "네발나비는 어른벌레로 겨울을 나요. 날개 뒷면이 낙엽처럼 갈색이라 겨울에 숨어있어도 잘 안 보여요.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:observation:1",
+      "sentence": "네발나비 관찰 포인트: 날개를 접었을 때 색깔을 봐요.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:observation:2",
+      "sentence": "네발나비 관찰 포인트: 다리가 4개인지 살펴보아요.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-polygonia-c-aureum:similar:1",
+      "sentence": "네발나비와 헷갈리기 쉬운 생물: 남방노랑나비.",
+      "species_id": "taxon-polygonia-c-aureum",
+      "species_name": "네발나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:habitat:1",
+      "sentence": "양봉꿀벌 관찰 장소: 화단과 정원, 공원, 들판.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:activity:1",
+      "sentence": "양봉꿀벌 활동 시간: 주로 낮.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:size:1",
+      "sentence": "양봉꿀벌 크기: 몸길이 1~1.5cm 정도예요.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:season:1",
+      "sentence": "양봉꿀벌 관찰 계절: 봄, 여름.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:funfact:1",
+      "sentence": "꿀벌은 꽃에서 꿀을 모아요. 하지만 쏘일 수 있으니 멀리서 봐요.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:observation:1",
+      "sentence": "양봉꿀벌 관찰 포인트: 노란 줄무늬를 봐요.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:observation:2",
+      "sentence": "양봉꿀벌 관찰 포인트: 꽃 위에서 무엇을 하는지 봐요.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-honeybee:safety:1",
+      "sentence": "양봉꿀벌: 쏘이거나 물릴 수 있어요. 가까이 가지 말고 멀리서 봐요.",
+      "species_id": "taxon-honeybee",
+      "species_name": "양봉꿀벌",
+      "field_type": "safety",
+      "is_safety": true,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:habitat:1",
+      "sentence": "배추흰나비 관찰 장소: 들판, 화단과 정원, 공원.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:activity:1",
+      "sentence": "배추흰나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:size:1",
+      "sentence": "배추흰나비 크기: 날개폭 4~5cm 정도예요.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:season:1",
+      "sentence": "배추흰나비 관찰 계절: 봄, 여름.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:funfact:1",
+      "sentence": "배추흰나비 애벌레는 배추나 무 잎을 먹고 자라요. 그래서 텃밭에서 자주 보여요.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:observation:1",
+      "sentence": "배추흰나비 관찰 포인트: 하얀 날개의 검은 점을 세어봐요.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:observation:2",
+      "sentence": "배추흰나비 관찰 포인트: 꽃 주위를 팔랑팔랑 나는 모습을 봐요.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cabbage-white:similar:1",
+      "sentence": "배추흰나비와 헷갈리기 쉬운 생물: 큰줄흰나비, 푸른부전나비.",
+      "species_id": "taxon-cabbage-white",
+      "species_name": "배추흰나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:habitat:1",
+      "sentence": "무당벌레 관찰 장소: 화단과 정원, 들판, 우리 동네.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:activity:1",
+      "sentence": "무당벌레 활동 시간: 주로 낮.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:size:1",
+      "sentence": "무당벌레 크기: 몸길이 7~8mm 정도예요.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:season:1",
+      "sentence": "무당벌레 관찰 계절: 봄, 여름, 가을.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:funfact:1",
+      "sentence": "무당벌레는 진딧물을 잡아먹어서 식물을 지켜주는 고마운 곤충이에요.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:observation:1",
+      "sentence": "무당벌레 관찰 포인트: 등딱지의 점 개수와 색깔을 세어봐요.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:observation:2",
+      "sentence": "무당벌레 관찰 포인트: 위험을 느끼면 다리를 오므리는 모습을 봐요.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ladybug:similar:1",
+      "sentence": "무당벌레와 헷갈리기 쉬운 생물: 칠성무당벌레.",
+      "species_id": "taxon-ladybug",
+      "species_name": "무당벌레",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:habitat:1",
+      "sentence": "끝검은말매미충 관찰 장소: 들판, 공원.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:activity:1",
+      "sentence": "끝검은말매미충 활동 시간: 주로 낮.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:size:1",
+      "sentence": "끝검은말매미충 크기: 몸길이 1cm 정도예요.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:funfact:1",
+      "sentence": "끝검은말매미충은 위험을 느끼면 옆으로 폴짝 뛰어 도망가요. 나뭇잎 즙을 빨아 먹고 살아요.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:observation:1",
+      "sentence": "끝검은말매미충 관찰 포인트: 몸 끝의 검은 무늬를 봐요.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bothrogonia-ferruginea:observation:2",
+      "sentence": "끝검은말매미충 관찰 포인트: 잎사귀 위에서 옆으로 움직이는 모습을 봐요.",
+      "species_id": "taxon-bothrogonia-ferruginea",
+      "species_name": "끝검은말매미충",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:habitat:1",
+      "sentence": "개똥하루살이 관찰 장소: 물가.",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:activity:1",
+      "sentence": "개똥하루살이 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:size:1",
+      "sentence": "개똥하루살이 크기: 몸길이 5~8mm 정도예요.",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:funfact:1",
+      "sentence": "개똥하루살이는 물이 깨끗한 개울에서만 애벌레 시절을 보내요. 그래서 이 벌레가 있으면 물이 맑다는 뜻이에요.",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:observation:1",
+      "sentence": "개똥하루살이 관찰 포인트: 개울가 돌 밑을 살펴봐요(애벌레).",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-baetis-fuscatus:observation:2",
+      "sentence": "개똥하루살이 관찰 포인트: 물 위를 낮게 나는 어른벌레를 봐요.",
+      "species_id": "taxon-baetis-fuscatus",
+      "species_name": "개똥하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:habitat:1",
+      "sentence": "밀잠자리 관찰 장소: 물가, 들판.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:activity:1",
+      "sentence": "밀잠자리 활동 시간: 주로 낮.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:size:1",
+      "sentence": "밀잠자리 크기: 몸길이 5cm 안팎이에요.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:season:1",
+      "sentence": "밀잠자리 관찰 계절: 여름.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:funfact:1",
+      "sentence": "성숙한 수컷은 몸에 하얀 가루가 생겨 연한 하늘색처럼 보여요.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:observation:1",
+      "sentence": "밀잠자리 관찰 포인트: 배 색깔을 관찰해보아요.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-orthetrum-albistylum:observation:2",
+      "sentence": "밀잠자리 관찰 포인트: 물가 풀 위에 앉아 쉬는 모습을 봐요.",
+      "species_id": "taxon-orthetrum-albistylum",
+      "species_name": "밀잠자리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:habitat:1",
+      "sentence": "꼬마남생이무당벌레 관찰 장소: 화단과 정원, 들판.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:activity:1",
+      "sentence": "꼬마남생이무당벌레 활동 시간: 주로 낮.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:size:1",
+      "sentence": "꼬마남생이무당벌레 크기: 몸길이 4mm 정도로 아주 작아요.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:funfact:1",
+      "sentence": "꼬마남생이무당벌레는 무당벌레보다 몸집이 작지만 똑같이 진딧물을 잡아먹어요.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:observation:1",
+      "sentence": "꼬마남생이무당벌레 관찰 포인트: 무당벌레와 크기를 비교해봐요.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-propylea-japonica:observation:2",
+      "sentence": "꼬마남생이무당벌레 관찰 포인트: 등딱지 무늬 모양을 봐요.",
+      "species_id": "taxon-propylea-japonica",
+      "species_name": "꼬마남생이무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:habitat:1",
+      "sentence": "호랑나비 관찰 장소: 화단과 정원, 공원, 들판.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:activity:1",
+      "sentence": "호랑나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:size:1",
+      "sentence": "호랑나비 크기: 날개폭 8~10cm 정도로 커요.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:season:1",
+      "sentence": "호랑나비 관찰 계절: 여름.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:funfact:1",
+      "sentence": "호랑나비는 이름처럼 호랑이 줄무늬 같은 노랑과 검정 무늬를 가지고 있어요.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:observation:1",
+      "sentence": "호랑나비 관찰 포인트: 날개의 줄무늬를 봐요.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:observation:2",
+      "sentence": "호랑나비 관찰 포인트: 뒷날개 끝의 꼬리 모양을 봐요.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-papilio-xuthus:similar:1",
+      "sentence": "호랑나비와 헷갈리기 쉬운 생물: 애기세줄나비.",
+      "species_id": "taxon-papilio-xuthus",
+      "species_name": "호랑나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:habitat:1",
+      "sentence": "칠성무당벌레 관찰 장소: 화단과 정원, 들판.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:activity:1",
+      "sentence": "칠성무당벌레 활동 시간: 주로 낮.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:size:1",
+      "sentence": "칠성무당벌레 크기: 몸길이 7~8mm 정도예요.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:funfact:1",
+      "sentence": "칠성무당벌레는 빨간 등딱지 위에 검은 점이 7개 있어서 이런 이름이 붙었어요.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:observation:1",
+      "sentence": "칠성무당벌레 관찰 포인트: 점이 정말 7개인지 세어봐요.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:observation:2",
+      "sentence": "칠성무당벌레 관찰 포인트: 머리 쪽 하얀 무늬도 살펴봐요.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-coccinella-septempunctata:similar:1",
+      "sentence": "칠성무당벌레와 헷갈리기 쉬운 생물: 무당벌레.",
+      "species_id": "taxon-coccinella-septempunctata",
+      "species_name": "칠성무당벌레",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:habitat:1",
+      "sentence": "호리꽃등에 관찰 장소: 화단과 정원, 들판.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:activity:1",
+      "sentence": "호리꽃등에 활동 시간: 주로 낮.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:size:1",
+      "sentence": "호리꽃등에 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:funfact:1",
+      "sentence": "호리꽃등에는 벌처럼 보이지만 침이 없는 파리 친구예요. 헬리콥터처럼 공중에 멈춰있을 수 있어요.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:observation:1",
+      "sentence": "호리꽃등에 관찰 포인트: 꽃 앞에서 멈춰 떠 있는 모습을 봐요.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:observation:2",
+      "sentence": "호리꽃등에 관찰 포인트: 배의 줄무늬를 봐요.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-episyrphus-balteatus:similar:1",
+      "sentence": "호리꽃등에와 헷갈리기 쉬운 생물: 꼬마꽃등에.",
+      "species_id": "taxon-episyrphus-balteatus",
+      "species_name": "호리꽃등에",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:habitat:1",
+      "sentence": "큰줄흰나비 관찰 장소: 산, 들판.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:activity:1",
+      "sentence": "큰줄흰나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:size:1",
+      "sentence": "큰줄흰나비 크기: 날개폭 5cm 안팎이에요.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:season:1",
+      "sentence": "큰줄흰나비 관찰 계절: 봄.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:funfact:1",
+      "sentence": "큰줄흰나비는 배추흰나비와 닮았지만 몸집이 조금 더 크고 산이나 숲 근처에서 자주 보여요.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:observation:1",
+      "sentence": "큰줄흰나비 관찰 포인트: 배추흰나비와 크기를 비교해봐요.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:observation:2",
+      "sentence": "큰줄흰나비 관찰 포인트: 날개 아랫면의 초록빛 무늬를 봐요.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pieris-melete:similar:1",
+      "sentence": "큰줄흰나비와 헷갈리기 쉬운 생물: 배추흰나비.",
+      "species_id": "taxon-pieris-melete",
+      "species_name": "큰줄흰나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:habitat:1",
+      "sentence": "부채하루살이 관찰 장소: 물가.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:activity:1",
+      "sentence": "부채하루살이 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:size:1",
+      "sentence": "부채하루살이 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:funfact:1",
+      "sentence": "부채하루살이 애벌레는 부채처럼 납작한 몸으로 물살이 빠른 돌 표면에 딱 붙어살아요.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:observation:1",
+      "sentence": "부채하루살이 관찰 포인트: 개울 돌 표면을 살펴봐요(애벌레).",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:observation:2",
+      "sentence": "부채하루살이 관찰 포인트: 투명한 날개를 가진 어른벌레를 봐요.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-epeorus-pellucidus:similar:1",
+      "sentence": "부채하루살이와 헷갈리기 쉬운 생물: 두점하루살이, 네점하루살이.",
+      "species_id": "taxon-epeorus-pellucidus",
+      "species_name": "부채하루살이",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:habitat:1",
+      "sentence": "아시아실잠자리 관찰 장소: 물가.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:activity:1",
+      "sentence": "아시아실잠자리 활동 시간: 주로 낮.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:size:1",
+      "sentence": "아시아실잠자리 크기: 몸길이 3cm 안팎이에요.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:funfact:1",
+      "sentence": "아시아실잠자리는 잠자리보다 몸이 실처럼 가늘어요. 쉴 때 날개를 등 위로 접는 게 잠자리와 달라요.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:observation:1",
+      "sentence": "아시아실잠자리 관찰 포인트: 쉴 때 날개를 접는지 펴는지 봐요.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ischnura-asiatica:observation:2",
+      "sentence": "아시아실잠자리 관찰 포인트: 가느다란 몸통을 봐요.",
+      "species_id": "taxon-ischnura-asiatica",
+      "species_name": "아시아실잠자리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:habitat:1",
+      "sentence": "네점하루살이 관찰 장소: 물가.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:activity:1",
+      "sentence": "네점하루살이 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:size:1",
+      "sentence": "네점하루살이 크기: 몸길이 1~1.5cm 정도예요.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:funfact:1",
+      "sentence": "두점하루살이도 깨끗한 개울에 사는 하루살이예요. 어른벌레는 짝짓기를 마치면 금방 생을 마쳐요.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:observation:1",
+      "sentence": "네점하루살이 관찰 포인트: 날개의 점무늬를 봐요.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:observation:2",
+      "sentence": "네점하루살이 관찰 포인트: 물 위를 나풀나풀 나는 모습을 봐요.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-levis:similar:1",
+      "sentence": "네점하루살이와 헷갈리기 쉬운 생물: 두점하루살이, 부채하루살이.",
+      "species_id": "taxon-ecdyonurus-levis",
+      "species_name": "네점하루살이",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:habitat:1",
+      "sentence": "애기세줄나비 관찰 장소: 산, 공원.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:activity:1",
+      "sentence": "애기세줄나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:size:1",
+      "sentence": "애기세줄나비 크기: 날개폭 5~6cm 정도예요.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:season:1",
+      "sentence": "애기세줄나비 관찰 계절: 여름.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:funfact:1",
+      "sentence": "애기세줄나비는 검은 날개에 하얀 줄무늬 세 개가 있어서 이런 이름이 붙었어요.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:observation:1",
+      "sentence": "애기세줄나비 관찰 포인트: 날개의 하얀 줄무늬 개수를 세어봐요.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:observation:2",
+      "sentence": "애기세줄나비 관찰 포인트: 미끄러지듯 나는 모습을 봐요.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neptis-sappho:similar:1",
+      "sentence": "애기세줄나비와 헷갈리기 쉬운 생물: 호랑나비.",
+      "species_id": "taxon-neptis-sappho",
+      "species_name": "애기세줄나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:habitat:1",
+      "sentence": "톱다리개미허리노린재 관찰 장소: 들판, 화단과 정원.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:activity:1",
+      "sentence": "톱다리개미허리노린재 활동 시간: 주로 낮.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:size:1",
+      "sentence": "톱다리개미허리노린재 크기: 몸길이 1.5cm 안팎이에요.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:funfact:1",
+      "sentence": "톱다리개미허리노린재는 허리가 개미처럼 잘록해요. 다리에 톱니 같은 돌기가 있어요.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:observation:1",
+      "sentence": "톱다리개미허리노린재 관찰 포인트: 잘록한 허리를 봐요.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-riptortus-pedestris:observation:2",
+      "sentence": "톱다리개미허리노린재 관찰 포인트: 뒷다리의 울퉁불퉁한 돌기를 봐요.",
+      "species_id": "taxon-riptortus-pedestris",
+      "species_name": "톱다리개미허리노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:habitat:1",
+      "sentence": "푸른부전나비 관찰 장소: 공원, 들판, 화단과 정원.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:activity:1",
+      "sentence": "푸른부전나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:size:1",
+      "sentence": "푸른부전나비 크기: 날개폭 2~3cm로 작아요.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:season:1",
+      "sentence": "푸른부전나비 관찰 계절: 봄.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:funfact:1",
+      "sentence": "푸른부전나비는 아주 작지만 날개 안쪽이 파랗게 반짝여요.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:observation:1",
+      "sentence": "푸른부전나비 관찰 포인트: 날개 안쪽의 파란빛을 봐요.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:observation:2",
+      "sentence": "푸른부전나비 관찰 포인트: 꽃이나 젖은 땅에 앉는 모습을 봐요.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-celastrina-argiolus:similar:1",
+      "sentence": "푸른부전나비와 헷갈리기 쉬운 생물: 암먹부전나비, 배추흰나비.",
+      "species_id": "taxon-celastrina-argiolus",
+      "species_name": "푸른부전나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:habitat:1",
+      "sentence": "암먹부전나비 관찰 장소: 들판, 공원.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:activity:1",
+      "sentence": "암먹부전나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:size:1",
+      "sentence": "암먹부전나비 크기: 날개폭 2cm 안팎으로 아주 작아요.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:season:1",
+      "sentence": "암먹부전나비 관찰 계절: 봄.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:funfact:1",
+      "sentence": "암먹부전나비는 수컷과 암컷의 날개 색이 서로 달라요. 아주 작은 나비예요.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:observation:1",
+      "sentence": "암먹부전나비 관찰 포인트: 날개 색깔이 파란지 갈색인지 봐요.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:observation:2",
+      "sentence": "암먹부전나비 관찰 포인트: 풀밭 낮은 꽃 사이를 나는 모습을 봐요.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-elkalyce-argiades:similar:1",
+      "sentence": "암먹부전나비와 헷갈리기 쉬운 생물: 푸른부전나비.",
+      "species_id": "taxon-elkalyce-argiades",
+      "species_name": "암먹부전나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:habitat:1",
+      "sentence": "줄날도래 관찰 장소: 물가.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:activity:1",
+      "sentence": "줄날도래 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:size:1",
+      "sentence": "줄날도래 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:funfact:1",
+      "sentence": "줄날도래 애벌레는 실을 뽑아 돌 사이에 그물집을 짓고, 물살에 떠내려오는 먹이를 걸러 먹어요.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:observation:1",
+      "sentence": "줄날도래 관찰 포인트: 개울 돌 사이의 작은 그물집을 찾아봐요.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cheumatopsyche-brevilineata:observation:2",
+      "sentence": "줄날도래 관찰 포인트: 지붕 모양으로 접은 날개를 봐요.",
+      "species_id": "taxon-cheumatopsyche-brevilineata",
+      "species_name": "줄날도래",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:habitat:1",
+      "sentence": "꼬마꽃등에 관찰 장소: 화단과 정원, 들판.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:activity:1",
+      "sentence": "꼬마꽃등에 활동 시간: 주로 낮.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:size:1",
+      "sentence": "꼬마꽃등에 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:funfact:1",
+      "sentence": "꼬마꽃등에는 몸이 가늘고 길어서 다른 꽃등에보다 날씬해 보여요.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:observation:1",
+      "sentence": "꼬마꽃등에 관찰 포인트: 가늘고 긴 배 모양을 봐요.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:observation:2",
+      "sentence": "꼬마꽃등에 관찰 포인트: 꽃 위에서 정지 비행하는 모습을 봐요.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sphaerophoria-scripta:similar:1",
+      "sentence": "꼬마꽃등에와 헷갈리기 쉬운 생물: 호리꽃등에.",
+      "species_id": "taxon-sphaerophoria-scripta",
+      "species_name": "꼬마꽃등에",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:habitat:1",
+      "sentence": "두점하루살이 관찰 장소: 물가.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:activity:1",
+      "sentence": "두점하루살이 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:size:1",
+      "sentence": "두점하루살이 크기: 몸길이 1~1.5cm 정도예요.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:funfact:1",
+      "sentence": "네점하루살이는 날개에 점 무늬가 있는 하루살이예요. 맑은 계곡물에서 자라요.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:observation:1",
+      "sentence": "두점하루살이 관찰 포인트: 날개의 점무늬 개수를 봐요.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:observation:2",
+      "sentence": "두점하루살이 관찰 포인트: 계곡 바위 근처를 살펴봐요.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ecdyonurus-kibunensis:similar:1",
+      "sentence": "두점하루살이와 헷갈리기 쉬운 생물: 네점하루살이, 부채하루살이.",
+      "species_id": "taxon-ecdyonurus-kibunensis",
+      "species_name": "두점하루살이",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:habitat:1",
+      "sentence": "더듬이긴노린재 관찰 장소: 들판.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:activity:1",
+      "sentence": "더듬이긴노린재 활동 시간: 주로 낮.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:size:1",
+      "sentence": "더듬이긴노린재 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:funfact:1",
+      "sentence": "더듬이긴노린재는 몸이 길쭉하고 날씬해서 풀줄기와 잘 구분되지 않아요.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:observation:1",
+      "sentence": "더듬이긴노린재 관찰 포인트: 몸의 십자 무늬를 찾아봐요.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pachygrontha-antennata:observation:2",
+      "sentence": "더듬이긴노린재 관찰 포인트: 벼과 풀밭에서 찾아봐요.",
+      "species_id": "taxon-pachygrontha-antennata",
+      "species_name": "더듬이긴노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:habitat:1",
+      "sentence": "우리가시허리노린재 관찰 장소: 들판.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:activity:1",
+      "sentence": "우리가시허리노린재 활동 시간: 주로 낮.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:size:1",
+      "sentence": "우리가시허리노린재 크기: 몸길이 1.5cm 안팎이에요.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:funfact:1",
+      "sentence": "우리가시허리노린재는 허리가 잘록하고 뒷다리가 넓적해요. 벼나 풀의 즙을 빨아 먹어요.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:observation:1",
+      "sentence": "우리가시허리노린재 관찰 포인트: 잘록한 허리 모양을 봐요.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cletus-schmidti:observation:2",
+      "sentence": "우리가시허리노린재 관찰 포인트: 넓적한 뒷다리를 봐요.",
+      "species_id": "taxon-cletus-schmidti",
+      "species_name": "우리가시허리노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:habitat:1",
+      "sentence": "방아깨비 관찰 장소: 들판.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:activity:1",
+      "sentence": "방아깨비 활동 시간: 주로 낮.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:size:1",
+      "sentence": "방아깨비 크기: 몸길이 5~8cm로 커요(암컷 기준).",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:season:1",
+      "sentence": "방아깨비 관찰 계절: 가을.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:funfact:1",
+      "sentence": "방아깨비는 머리가 길쭉한 삼각형 모양이에요. 뒷다리를 잡으면 방아 찧듯 몸을 위아래로 움직여요.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:observation:1",
+      "sentence": "방아깨비 관찰 포인트: 길쭉한 머리 모양을 봐요.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:observation:2",
+      "sentence": "방아깨비 관찰 포인트: 긴 뒷다리로 멀리 뛰는 모습을 봐요.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-acrida-cinerea:similar:1",
+      "sentence": "방아깨비와 헷갈리기 쉬운 생물: 섬서구메뚜기.",
+      "species_id": "taxon-acrida-cinerea",
+      "species_name": "방아깨비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:habitat:1",
+      "sentence": "섬서구메뚜기 관찰 장소: 들판, 화단과 정원.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:activity:1",
+      "sentence": "섬서구메뚜기 활동 시간: 주로 낮.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:size:1",
+      "sentence": "섬서구메뚜기 크기: 몸길이 3~4cm 정도예요.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:season:1",
+      "sentence": "섬서구메뚜기 관찰 계절: 가을.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:funfact:1",
+      "sentence": "섬서구메뚜기는 초록색이나 분홍색 등 색깔이 조금씩 달라요. 뒷다리로 멀리 뛸 수 있어요.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:observation:1",
+      "sentence": "섬서구메뚜기 관찰 포인트: 몸 색깔을 살펴봐요.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:observation:2",
+      "sentence": "섬서구메뚜기 관찰 포인트: 긴 뒷다리를 봐요.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-atractomorpha-lata:similar:1",
+      "sentence": "섬서구메뚜기와 헷갈리기 쉬운 생물: 방아깨비.",
+      "species_id": "taxon-atractomorpha-lata",
+      "species_name": "섬서구메뚜기",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:habitat:1",
+      "sentence": "가시노린재 관찰 장소: 들판, 화단과 정원.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:activity:1",
+      "sentence": "가시노린재 활동 시간: 주로 낮.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:size:1",
+      "sentence": "가시노린재 크기: 몸길이 1cm 안팎이에요.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:funfact:1",
+      "sentence": "가시노린재는 위험을 느끼면 고약한 냄새를 내뿜어서 스스로를 지켜요.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:observation:1",
+      "sentence": "가시노린재 관찰 포인트: 등의 방패 모양을 봐요.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carbula-putoni:observation:2",
+      "sentence": "가시노린재 관찰 포인트: 몸 가장자리의 뾰족한 부분을 봐요.",
+      "species_id": "taxon-carbula-putoni",
+      "species_name": "가시노린재",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:habitat:1",
+      "sentence": "남방노랑나비 관찰 장소: 들판, 공원.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:activity:1",
+      "sentence": "남방노랑나비 활동 시간: 주로 낮.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:size:1",
+      "sentence": "남방노랑나비 크기: 날개폭 3~4cm 정도예요.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:season:1",
+      "sentence": "남방노랑나비 관찰 계절: 가을.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:funfact:1",
+      "sentence": "남방노랑나비는 작고 노란 날개를 가진 나비로, 낮은 풀꽃 사이를 즐겨 날아다녀요.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:observation:1",
+      "sentence": "남방노랑나비 관찰 포인트: 노란 날개 색을 봐요.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:observation:2",
+      "sentence": "남방노랑나비 관찰 포인트: 낮게 날아다니는 모습을 봐요.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-eurema-mandarina:similar:1",
+      "sentence": "남방노랑나비와 헷갈리기 쉬운 생물: 네발나비.",
+      "species_id": "taxon-eurema-mandarina",
+      "species_name": "남방노랑나비",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:habitat:1",
+      "sentence": "팥중이 관찰 장소: 들판.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:activity:1",
+      "sentence": "팥중이 활동 시간: 주로 낮.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:size:1",
+      "sentence": "팥중이 크기: 몸길이 2~3cm 정도예요.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:season:1",
+      "sentence": "팥중이 관찰 계절: 가을.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:funfact:1",
+      "sentence": "팥중이는 날개를 펼치면 뒷날개에 예쁜 무늬가 숨어있어요. 평소엔 접혀서 잘 안 보여요.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:observation:1",
+      "sentence": "팥중이 관찰 포인트: 날아오를 때 뒷날개 무늬를 봐요.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oedaleus-infernalis:observation:2",
+      "sentence": "팥중이 관찰 포인트: 풀밭 색과 비슷한 몸 색을 봐요.",
+      "species_id": "taxon-oedaleus-infernalis",
+      "species_name": "팥중이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:habitat:1",
+      "sentence": "동양하루살이 관찰 장소: 물가.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:activity:1",
+      "sentence": "동양하루살이 활동 시간: 주로 낮과 밤.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:size:1",
+      "sentence": "동양하루살이 크기: 몸길이 1.5~2cm 정도예요.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:season:1",
+      "sentence": "동양하루살이 관찰 계절: 여름.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:funfact:1",
+      "sentence": "동양하루살이는 초여름 강가에서 떼를 지어 날아다녀요. 어른벌레는 입이 없어서 아무것도 먹지 않아요.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:observation:1",
+      "sentence": "동양하루살이 관찰 포인트: 강가 가로등 주변에 모인 모습을 봐요.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ephemera-orientalis:observation:2",
+      "sentence": "동양하루살이 관찰 포인트: 얇고 큰 날개를 봐요.",
+      "species_id": "taxon-ephemera-orientalis",
+      "species_name": "동양하루살이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:habitat:1",
+      "sentence": "장수말벌 관찰 장소: 산, 공원.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:activity:1",
+      "sentence": "장수말벌 활동 시간: 주로 낮.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:size:1",
+      "sentence": "장수말벌 크기: 몸길이 3.5~5cm로 말벌 중 가장 커요.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:season:1",
+      "sentence": "장수말벌 관찰 계절: 여름.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:funfact:1",
+      "sentence": "장수말벌은 우리나라에서 몸집이 가장 큰 말벌이에요. 멀리서 눈으로만 관찰해요.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:observation:1",
+      "sentence": "장수말벌 관찰 포인트: 멀리서 몸 크기를 가늠해봐요.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:observation:2",
+      "sentence": "장수말벌 관찰 포인트: 날아다니는 소리를 들어봐요(가까이 가지 않기).",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-vespa-mandarinia:safety:1",
+      "sentence": "장수말벌: 쏘이거나 물릴 수 있어요. 가까이 가지 말고 멀리서 봐요.",
+      "species_id": "taxon-vespa-mandarinia",
+      "species_name": "장수말벌",
+      "field_type": "safety",
+      "is_safety": true,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:habitat:1",
+      "sentence": "옻나무 관찰 장소: 산.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:activity:1",
+      "sentence": "옻나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:size:1",
+      "sentence": "옻나무 크기: 높이 7~8m까지 자라는 나무예요.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:season:1",
+      "sentence": "옻나무 관찰 계절: 여름, 가을.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:funfact:1",
+      "sentence": "옻나무는 나무껍질에서 나오는 진(옻)이 옻칠 재료로 쓰여요. 하지만 만지면 피부가 가려울 수 있어요.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:observation:1",
+      "sentence": "옻나무 관찰 포인트: 잎이 여러 장 붙은 모양을 멀리서 봐요.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:observation:2",
+      "sentence": "옻나무 관찰 포인트: 나무껍질 색을 살펴봐요(만지지 않기).",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lacquer-tree:safety:1",
+      "sentence": "옻나무: 만지면 피부가 가려울 수 있어요. 손대지 말고 관찰만 해요.",
+      "species_id": "taxon-lacquer-tree",
+      "species_name": "옻나무",
+      "field_type": "safety",
+      "is_safety": true,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:habitat:1",
+      "sentence": "생강나무 관찰 장소: 산.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:activity:1",
+      "sentence": "생강나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:size:1",
+      "sentence": "생강나무 크기: 높이 2~5m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:season:1",
+      "sentence": "생강나무 관찰 계절: 봄.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:funfact:1",
+      "sentence": "생강나무는 가지를 꺾으면 생강 비슷한 향이 나서 이런 이름이 붙었어요. 이른 봄 노란 꽃이 먼저 펴요.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:observation:1",
+      "sentence": "생강나무 관찰 포인트: 동그란 세 갈래 잎 모양을 봐요.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lindera-obtusiloba:observation:2",
+      "sentence": "생강나무 관찰 포인트: 봄에 노란 꽃이 피는 모습을 봐요.",
+      "species_id": "taxon-lindera-obtusiloba",
+      "species_name": "생강나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:habitat:1",
+      "sentence": "개망초 관찰 장소: 들판, 우리 동네.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:activity:1",
+      "sentence": "개망초 활동 시간: 주로 낮.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:size:1",
+      "sentence": "개망초 크기: 키가 30~100cm 정도 돼요.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:season:1",
+      "sentence": "개망초 관찰 계절: 여름.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:funfact:1",
+      "sentence": "개망초는 하얀 꽃잎에 노란 가운데를 가진 작은 꽃을 아주 많이 피워요. 길가 어디서나 잘 자라요.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:observation:1",
+      "sentence": "개망초 관찰 포인트: 하얀 꽃잎 개수를 세어봐요.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:observation:2",
+      "sentence": "개망초 관찰 포인트: 여러 송이가 함께 핀 모습을 봐요.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-annuus:similar:1",
+      "sentence": "개망초와 헷갈리기 쉬운 생물: 망초.",
+      "species_id": "taxon-erigeron-annuus",
+      "species_name": "개망초",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:habitat:1",
+      "sentence": "신갈나무 관찰 장소: 산.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:activity:1",
+      "sentence": "신갈나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:size:1",
+      "sentence": "신갈나무 크기: 높이 20~30m까지 자라는 큰 나무예요.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:season:1",
+      "sentence": "신갈나무 관찰 계절: 가을.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:funfact:1",
+      "sentence": "신갈나무는 도토리가 열리는 참나무 중 하나예요. 잎이 나뭇가지 끝에 모여 달려요.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:observation:1",
+      "sentence": "신갈나무 관찰 포인트: 잎 가장자리의 물결 모양을 봐요.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:observation:2",
+      "sentence": "신갈나무 관찰 포인트: 가을에 열리는 도토리를 찾아봐요.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-mongolica:similar:1",
+      "sentence": "신갈나무와 헷갈리기 쉬운 생물: 굴참나무.",
+      "species_id": "taxon-quercus-mongolica",
+      "species_name": "신갈나무",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:habitat:1",
+      "sentence": "소나무 관찰 장소: 산, 공원.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:activity:1",
+      "sentence": "소나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:size:1",
+      "sentence": "소나무 크기: 높이 20~35m까지 자라는 큰 나무예요.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:season:1",
+      "sentence": "소나무 관찰 계절: 겨울.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:funfact:1",
+      "sentence": "소나무는 잎이 바늘처럼 뾰족하고, 겨울에도 잎이 지지 않는 늘푸른나무예요.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:observation:1",
+      "sentence": "소나무 관찰 포인트: 바늘 같은 잎 두 개가 한 쌍인지 봐요.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pinus-densiflora:observation:2",
+      "sentence": "소나무 관찰 포인트: 나무껍질의 갈라진 무늬를 봐요.",
+      "species_id": "taxon-pinus-densiflora",
+      "species_name": "소나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:habitat:1",
+      "sentence": "닭의장풀 관찰 장소: 들판, 물가.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:activity:1",
+      "sentence": "닭의장풀 활동 시간: 주로 낮.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:size:1",
+      "sentence": "닭의장풀 크기: 키가 15~50cm 정도 돼요.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:season:1",
+      "sentence": "닭의장풀 관찰 계절: 여름.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:funfact:1",
+      "sentence": "닭의장풀은 하늘색 꽃이 아침에 피었다가 오후엔 시들어요. 그래서 아침에 보면 가장 예뻐요.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:observation:1",
+      "sentence": "닭의장풀 관찰 포인트: 파란 꽃잎 두 장을 봐요.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dayflower:observation:2",
+      "sentence": "닭의장풀 관찰 포인트: 잎이 대나무 잎처럼 길쭉한지 봐요.",
+      "species_id": "taxon-dayflower",
+      "species_name": "닭의장풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:habitat:1",
+      "sentence": "환삼덩굴 관찰 장소: 들판, 물가.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:activity:1",
+      "sentence": "환삼덩굴 활동 시간: 주로 낮.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:size:1",
+      "sentence": "환삼덩굴 크기: 줄기가 몇 미터씩 뻗어 자라는 덩굴이에요.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:season:1",
+      "sentence": "환삼덩굴 관찰 계절: 여름.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:funfact:1",
+      "sentence": "환삼덩굴은 줄기에 작은 가시가 있어서 다른 식물을 타고 올라가며 자라요.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:observation:1",
+      "sentence": "환삼덩굴 관찰 포인트: 줄기를 만지기 전에 까끌한 가시를 눈으로 확인해요.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-humulus-scandens:observation:2",
+      "sentence": "환삼덩굴 관찰 포인트: 손바닥 모양 잎을 봐요.",
+      "species_id": "taxon-humulus-scandens",
+      "species_name": "환삼덩굴",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:habitat:1",
+      "sentence": "미국자리공 관찰 장소: 들판, 우리 동네.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:activity:1",
+      "sentence": "미국자리공 활동 시간: 주로 낮.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:size:1",
+      "sentence": "미국자리공 크기: 키가 1~2m까지 크게 자라요.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:season:1",
+      "sentence": "미국자리공 관찰 계절: 가을.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:funfact:1",
+      "sentence": "미국자리공은 가을에 까만 열매가 포도송이처럼 열려요. 열매는 먹을 수 없으니 눈으로만 봐요.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:observation:1",
+      "sentence": "미국자리공 관찰 포인트: 까만 열매가 줄지어 달린 모습을 봐요.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phytolacca-americana:observation:2",
+      "sentence": "미국자리공 관찰 포인트: 빨간 줄기 색을 봐요.",
+      "species_id": "taxon-phytolacca-americana",
+      "species_name": "미국자리공",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:habitat:1",
+      "sentence": "진달래 관찰 장소: 산.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:activity:1",
+      "sentence": "진달래 활동 시간: 주로 낮.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:size:1",
+      "sentence": "진달래 크기: 높이 2~3m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:season:1",
+      "sentence": "진달래 관찰 계절: 봄.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:funfact:1",
+      "sentence": "진달래는 잎보다 꽃이 먼저 피는 봄꽃이에요. 분홍빛 꽃이 산을 곱게 물들여요.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:observation:1",
+      "sentence": "진달래 관찰 포인트: 잎이 있는지 없는지 봐요.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhododendron-mucronulatum:observation:2",
+      "sentence": "진달래 관찰 포인트: 분홍 꽃잎 개수를 세어봐요.",
+      "species_id": "taxon-rhododendron-mucronulatum",
+      "species_name": "진달래",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:habitat:1",
+      "sentence": "산초나무 관찰 장소: 산.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:activity:1",
+      "sentence": "산초나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:size:1",
+      "sentence": "산초나무 크기: 높이 3m 안팎으로 자라요.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:season:1",
+      "sentence": "산초나무 관찰 계절: 가을.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:funfact:1",
+      "sentence": "산초나무는 잎을 만지면 향긋하면서도 알싸한 향이 나요. 열매는 향신료로도 쓰여요.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:observation:1",
+      "sentence": "산초나무 관찰 포인트: 작은 잎이 여러 장 마주난 모습을 봐요.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-zanthoxylum-schinifolium:observation:2",
+      "sentence": "산초나무 관찰 포인트: 가지에 있는 가시를 조심해서 봐요.",
+      "species_id": "taxon-zanthoxylum-schinifolium",
+      "species_name": "산초나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:habitat:1",
+      "sentence": "서양민들레 관찰 장소: 우리 동네, 공원, 들판.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:activity:1",
+      "sentence": "서양민들레 활동 시간: 주로 낮.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:size:1",
+      "sentence": "서양민들레 크기: 키가 10~25cm 정도 돼요.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:season:1",
+      "sentence": "서양민들레 관찰 계절: 봄.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:funfact:1",
+      "sentence": "민들레 씨앗은 바람을 타고 멀리 날아가요. 후~ 불어볼까요?",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:observation:1",
+      "sentence": "서양민들레 관찰 포인트: 노란 꽃잎을 세어봐요.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-dandelion:observation:2",
+      "sentence": "서양민들레 관찰 포인트: 솜털 씨앗을 살펴봐요.",
+      "species_id": "taxon-dandelion",
+      "species_name": "서양민들레",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:habitat:1",
+      "sentence": "국수나무 관찰 장소: 산, 공원.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:activity:1",
+      "sentence": "국수나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:size:1",
+      "sentence": "국수나무 크기: 높이 1~2m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:season:1",
+      "sentence": "국수나무 관찰 계절: 여름.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:funfact:1",
+      "sentence": "국수나무는 가느다란 줄기가 국수 가락처럼 늘어져서 이런 이름이 붙었어요.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:observation:1",
+      "sentence": "국수나무 관찰 포인트: 가늘게 늘어진 줄기를 봐요.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-neillia-incisa:observation:2",
+      "sentence": "국수나무 관찰 포인트: 작고 하얀 꽃송이를 봐요.",
+      "species_id": "taxon-neillia-incisa",
+      "species_name": "국수나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:habitat:1",
+      "sentence": "토끼풀 관찰 장소: 공원, 들판, 우리 동네.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:activity:1",
+      "sentence": "토끼풀 활동 시간: 주로 낮.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:size:1",
+      "sentence": "토끼풀 크기: 키가 10~30cm 정도로 낮게 자라요.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:season:1",
+      "sentence": "토끼풀 관찰 계절: 봄.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:funfact:1",
+      "sentence": "토끼풀은 잎이 보통 세 장이지만, 아주 가끔 네 잎짜리도 있어서 행운의 상징으로 불려요.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:observation:1",
+      "sentence": "토끼풀 관찰 포인트: 잎이 몇 장인지 세어봐요.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:observation:2",
+      "sentence": "토끼풀 관찰 포인트: 하얀 꽃송이의 모양을 봐요.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trifolium-repens:similar:1",
+      "sentence": "토끼풀와 헷갈리기 쉬운 생물: 괭이밥.",
+      "species_id": "taxon-trifolium-repens",
+      "species_name": "토끼풀",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:habitat:1",
+      "sentence": "칡 관찰 장소: 산, 들판.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:activity:1",
+      "sentence": "칡 활동 시간: 주로 낮.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:size:1",
+      "sentence": "칡 크기: 줄기가 10m 넘게 뻗기도 하는 덩굴이에요.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:season:1",
+      "sentence": "칡 관찰 계절: 여름.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:funfact:1",
+      "sentence": "칡은 줄기가 아주 길게 뻗으며 다른 나무를 감고 올라가요. 뿌리는 예로부터 음식 재료로도 쓰였어요.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:observation:1",
+      "sentence": "칡 관찰 포인트: 줄기가 다른 나무를 감은 모습을 봐요.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pueraria-montana:observation:2",
+      "sentence": "칡 관찰 포인트: 세 장씩 붙은 잎을 봐요.",
+      "species_id": "taxon-pueraria-montana",
+      "species_name": "칡",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:habitat:1",
+      "sentence": "왜모시풀 관찰 장소: 들판.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:activity:1",
+      "sentence": "왜모시풀 활동 시간: 주로 낮.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:size:1",
+      "sentence": "왜모시풀 크기: 키가 40~100cm 정도 돼요.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:season:1",
+      "sentence": "왜모시풀 관찰 계절: 여름.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:funfact:1",
+      "sentence": "왜모시풀은 잎 뒷면에 하얀 솜털이 있어서 앞면과 색이 다르게 보여요.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:observation:1",
+      "sentence": "왜모시풀 관찰 포인트: 잎 앞면과 뒷면의 색 차이를 봐요.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-boehmeria-japonica:observation:2",
+      "sentence": "왜모시풀 관찰 포인트: 잎 가장자리의 톱니 모양을 봐요.",
+      "species_id": "taxon-boehmeria-japonica",
+      "species_name": "왜모시풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:habitat:1",
+      "sentence": "애기똥풀 관찰 장소: 들판, 우리 동네.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:activity:1",
+      "sentence": "애기똥풀 활동 시간: 주로 낮.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:size:1",
+      "sentence": "애기똥풀 크기: 키가 30~80cm 정도 돼요.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:season:1",
+      "sentence": "애기똥풀 관찰 계절: 봄.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:funfact:1",
+      "sentence": "애기똥풀은 줄기를 자르면 노란 즙이 나와요. 그 색이 아기 똥 같다고 해서 이런 이름이 붙었어요.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:observation:1",
+      "sentence": "애기똥풀 관찰 포인트: 노란 꽃잎을 봐요.",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-chelidonium-majus:observation:2",
+      "sentence": "애기똥풀 관찰 포인트: 줄기를 관찰해요(꺾지 않고 눈으로만).",
+      "species_id": "taxon-chelidonium-majus",
+      "species_name": "애기똥풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:habitat:1",
+      "sentence": "산딸기 관찰 장소: 산.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:activity:1",
+      "sentence": "산딸기 활동 시간: 주로 낮.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:size:1",
+      "sentence": "산딸기 크기: 높이 1~2m 정도 되는 가시나무예요.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:season:1",
+      "sentence": "산딸기 관찰 계절: 여름.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:funfact:1",
+      "sentence": "산딸기는 여름에 빨갛고 달콤한 열매가 열리는 나무예요. 가지에 작은 가시가 있어요.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:observation:1",
+      "sentence": "산딸기 관찰 포인트: 빨간 열매의 오돌토돌한 모양을 봐요.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rubus-crataegifolius:observation:2",
+      "sentence": "산딸기 관찰 포인트: 가지의 가시를 조심해서 봐요.",
+      "species_id": "taxon-rubus-crataegifolius",
+      "species_name": "산딸기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:habitat:1",
+      "sentence": "망초 관찰 장소: 들판, 우리 동네.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:activity:1",
+      "sentence": "망초 활동 시간: 주로 낮.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:size:1",
+      "sentence": "망초 크기: 키가 1~1.5m까지 크게 자라요.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:season:1",
+      "sentence": "망초 관찰 계절: 여름.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:funfact:1",
+      "sentence": "망초는 키가 사람 허리춤까지 자라기도 하는 큰 풀이에요. 작은 흰 꽃이 줄기 위쪽에 잔뜩 피어요.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:observation:1",
+      "sentence": "망초 관찰 포인트: 줄기의 키를 가늠해봐요.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:observation:2",
+      "sentence": "망초 관찰 포인트: 작은 꽃이 모여 핀 모습을 봐요.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-erigeron-canadensis:similar:1",
+      "sentence": "망초와 헷갈리기 쉬운 생물: 개망초.",
+      "species_id": "taxon-erigeron-canadensis",
+      "species_name": "망초",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:habitat:1",
+      "sentence": "굴참나무 관찰 장소: 산.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:activity:1",
+      "sentence": "굴참나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:size:1",
+      "sentence": "굴참나무 크기: 높이 20~25m까지 자라는 큰 나무예요.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:season:1",
+      "sentence": "굴참나무 관찰 계절: 가을.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:funfact:1",
+      "sentence": "굴참나무는 나무껍질이 두껍고 코르크처럼 폭신폭신해요. 도토리가 열리는 참나무예요.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:observation:1",
+      "sentence": "굴참나무 관찰 포인트: 두꺼운 나무껍질을 살살 만져봐요.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:observation:2",
+      "sentence": "굴참나무 관찰 포인트: 잎 뒷면의 하얀빛을 봐요.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-quercus-variabilis:similar:1",
+      "sentence": "굴참나무와 헷갈리기 쉬운 생물: 신갈나무.",
+      "species_id": "taxon-quercus-variabilis",
+      "species_name": "굴참나무",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:habitat:1",
+      "sentence": "괭이밥 관찰 장소: 화단과 정원, 우리 동네.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:activity:1",
+      "sentence": "괭이밥 활동 시간: 주로 낮.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:size:1",
+      "sentence": "괭이밥 크기: 키가 10~30cm 정도로 낮게 자라요.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:season:1",
+      "sentence": "괭이밥 관찰 계절: 여름.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:funfact:1",
+      "sentence": "괭이밥은 하트 모양 잎 세 장이 모여 있고, 밤이 되면 잎을 접고 잠을 자요.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:observation:1",
+      "sentence": "괭이밥 관찰 포인트: 하트 모양 잎 세 장을 봐요.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:observation:2",
+      "sentence": "괭이밥 관찰 포인트: 노란 작은 꽃을 찾아봐요.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-oxalis-corniculata:similar:1",
+      "sentence": "괭이밥와 헷갈리기 쉬운 생물: 토끼풀.",
+      "species_id": "taxon-oxalis-corniculata",
+      "species_name": "괭이밥",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:habitat:1",
+      "sentence": "돼지풀 관찰 장소: 들판, 우리 동네.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:activity:1",
+      "sentence": "돼지풀 활동 시간: 주로 낮.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:size:1",
+      "sentence": "돼지풀 크기: 키가 30~100cm 정도 돼요.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:season:1",
+      "sentence": "돼지풀 관찰 계절: 가을.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:funfact:1",
+      "sentence": "돼지풀은 잎이 쑥처럼 가늘게 갈라져 있어요. 꽃가루가 알레르기를 일으킬 수 있어서 눈으로만 봐요.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:observation:1",
+      "sentence": "돼지풀 관찰 포인트: 가늘게 갈라진 잎 모양을 봐요.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ambrosia-artemisiifolia:observation:2",
+      "sentence": "돼지풀 관찰 포인트: 줄기 끝의 작은 꽃 이삭을 봐요.",
+      "species_id": "taxon-ambrosia-artemisiifolia",
+      "species_name": "돼지풀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:habitat:1",
+      "sentence": "청미래덩굴 관찰 장소: 산.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:activity:1",
+      "sentence": "청미래덩굴 활동 시간: 주로 낮.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:size:1",
+      "sentence": "청미래덩굴 크기: 줄기가 2~3m 정도 뻗는 덩굴이에요.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:season:1",
+      "sentence": "청미래덩굴 관찰 계절: 가을.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:funfact:1",
+      "sentence": "청미래덩굴은 가을에 빨간 열매가 동그랗게 열려요. 줄기에는 갈고리 같은 가시가 있어요.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:observation:1",
+      "sentence": "청미래덩굴 관찰 포인트: 빨갛고 동그란 열매를 봐요.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-smilax-china:observation:2",
+      "sentence": "청미래덩굴 관찰 포인트: 줄기의 가시를 조심해서 봐요.",
+      "species_id": "taxon-smilax-china",
+      "species_name": "청미래덩굴",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:habitat:1",
+      "sentence": "고마리 관찰 장소: 물가.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:activity:1",
+      "sentence": "고마리 활동 시간: 주로 낮.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:size:1",
+      "sentence": "고마리 크기: 키가 30~100cm 정도 돼요.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:season:1",
+      "sentence": "고마리 관찰 계절: 가을.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:funfact:1",
+      "sentence": "고마리는 물가에서 무리 지어 자라며 분홍빛이 도는 작은 꽃송이를 피워요.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:observation:1",
+      "sentence": "고마리 관찰 포인트: 세모 모양 잎을 봐요.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-persicaria-thunbergii:observation:2",
+      "sentence": "고마리 관찰 포인트: 여러 송이가 뭉쳐 핀 꽃을 봐요.",
+      "species_id": "taxon-persicaria-thunbergii",
+      "species_name": "고마리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:habitat:1",
+      "sentence": "조록싸리 관찰 장소: 산.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:activity:1",
+      "sentence": "조록싸리 활동 시간: 주로 낮.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:size:1",
+      "sentence": "조록싸리 크기: 높이 2~3m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:season:1",
+      "sentence": "조록싸리 관찰 계절: 가을.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:funfact:1",
+      "sentence": "조록싸리는 가을에 자주색 나비 모양 꽃을 피우는 산속 작은 나무예요.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:observation:1",
+      "sentence": "조록싸리 관찰 포인트: 나비 모양 꽃을 봐요.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lespedeza-maximowiczii:observation:2",
+      "sentence": "조록싸리 관찰 포인트: 세 장씩 붙은 잎을 봐요.",
+      "species_id": "taxon-lespedeza-maximowiczii",
+      "species_name": "조록싸리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:habitat:1",
+      "sentence": "미국가막사리 관찰 장소: 물가, 들판.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:activity:1",
+      "sentence": "미국가막사리 활동 시간: 주로 낮.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:size:1",
+      "sentence": "미국가막사리 크기: 키가 50~150cm 정도 돼요.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:season:1",
+      "sentence": "미국가막사리 관찰 계절: 가을.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:funfact:1",
+      "sentence": "미국가막사리 씨앗은 끝에 갈고리가 있어서 옷이나 동물 털에 잘 달라붙어요.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:observation:1",
+      "sentence": "미국가막사리 관찰 포인트: 노란 꽃을 봐요.",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-bidens-frondosa:observation:2",
+      "sentence": "미국가막사리 관찰 포인트: 씨앗 끝의 갈고리를 살펴봐요(만질 때 조심).",
+      "species_id": "taxon-bidens-frondosa",
+      "species_name": "미국가막사리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:habitat:1",
+      "sentence": "큰까치수염 관찰 장소: 들판, 산.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:activity:1",
+      "sentence": "큰까치수염 활동 시간: 주로 낮.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:size:1",
+      "sentence": "큰까치수염 크기: 키가 50~100cm 정도 돼요.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:season:1",
+      "sentence": "큰까치수염 관찰 계절: 여름.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:funfact:1",
+      "sentence": "큰까치수염은 하얀 꽃이 강아지 꼬리처럼 길게 휘어져 피어요.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:observation:1",
+      "sentence": "큰까치수염 관찰 포인트: 휘어진 꽃 이삭 모양을 봐요.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lysimachia-clethroides:observation:2",
+      "sentence": "큰까치수염 관찰 포인트: 작은 흰 꽃송이들을 봐요.",
+      "species_id": "taxon-lysimachia-clethroides",
+      "species_name": "큰까치수염",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:habitat:1",
+      "sentence": "소리쟁이 관찰 장소: 물가, 들판.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:activity:1",
+      "sentence": "소리쟁이 활동 시간: 주로 낮.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:size:1",
+      "sentence": "소리쟁이 크기: 키가 50~100cm 정도 돼요.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:season:1",
+      "sentence": "소리쟁이 관찰 계절: 여름.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:funfact:1",
+      "sentence": "소리쟁이는 잎 가장자리가 파도처럼 구불구불해요. 씨앗이 익으면 갈색으로 변해 줄기에 잔뜩 매달려요.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:observation:1",
+      "sentence": "소리쟁이 관찰 포인트: 구불구불한 잎 가장자리를 봐요.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rumex-crispus:observation:2",
+      "sentence": "소리쟁이 관찰 포인트: 줄기에 매달린 갈색 씨앗을 봐요.",
+      "species_id": "taxon-rumex-crispus",
+      "species_name": "소리쟁이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:habitat:1",
+      "sentence": "작살나무 관찰 장소: 산.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:activity:1",
+      "sentence": "작살나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:size:1",
+      "sentence": "작살나무 크기: 높이 2~3m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:season:1",
+      "sentence": "작살나무 관찰 계절: 가을.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:funfact:1",
+      "sentence": "작살나무는 가을에 보라색 열매가 알알이 열려 아주 눈에 띄어요.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:observation:1",
+      "sentence": "작살나무 관찰 포인트: 보라색 열매송이를 봐요.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-callicarpa-japonica:observation:2",
+      "sentence": "작살나무 관찰 포인트: 마주난 잎 모양을 봐요.",
+      "species_id": "taxon-callicarpa-japonica",
+      "species_name": "작살나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:habitat:1",
+      "sentence": "쥐똥나무 관찰 장소: 공원, 산.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:activity:1",
+      "sentence": "쥐똥나무 활동 시간: 주로 낮.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:size:1",
+      "sentence": "쥐똥나무 크기: 높이 2~4m 정도 되는 작은 나무예요.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:season:1",
+      "sentence": "쥐똥나무 관찰 계절: 가을.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:funfact:1",
+      "sentence": "쥐똥나무는 가을에 까맣고 동그란 열매가 열리는데, 그 모양이 쥐똥을 닮아서 이런 이름이 붙었어요.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:observation:1",
+      "sentence": "쥐똥나무 관찰 포인트: 까만 열매 모양을 봐요.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ligustrum-obtusifolium:observation:2",
+      "sentence": "쥐똥나무 관찰 포인트: 작고 도톰한 잎을 봐요.",
+      "species_id": "taxon-ligustrum-obtusifolium",
+      "species_name": "쥐똥나무",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:habitat:1",
+      "sentence": "사위질빵 관찰 장소: 산.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:activity:1",
+      "sentence": "사위질빵 활동 시간: 주로 낮.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:size:1",
+      "sentence": "사위질빵 크기: 줄기가 3~4m 정도 뻗는 덩굴이에요.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:season:1",
+      "sentence": "사위질빵 관찰 계절: 여름.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:funfact:1",
+      "sentence": "사위질빵은 줄기가 가늘어서 잘 끊어지지만, 다른 나무를 타고 올라가며 하얀 꽃을 잔뜩 피워요.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:observation:1",
+      "sentence": "사위질빵 관찰 포인트: 작고 하얀 꽃이 뭉쳐 핀 모습을 봐요.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-clematis-apiifolia:observation:2",
+      "sentence": "사위질빵 관찰 포인트: 덩굴 줄기를 살펴봐요.",
+      "species_id": "taxon-clematis-apiifolia",
+      "species_name": "사위질빵",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:habitat:1",
+      "sentence": "대사초 관찰 장소: 산.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:activity:1",
+      "sentence": "대사초 활동 시간: 주로 낮.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:size:1",
+      "sentence": "대사초 크기: 키가 20~40cm 정도 돼요.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:season:1",
+      "sentence": "대사초 관찰 계절: 봄.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:funfact:1",
+      "sentence": "대사초는 잎이 넓적하고 줄무늬가 있어서 다른 풀과 쉽게 구별돼요. 그늘진 숲 바닥에서 잘 자라요.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:observation:1",
+      "sentence": "대사초 관찰 포인트: 넓적한 잎의 줄무늬를 봐요.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-carex-siderosticta:observation:2",
+      "sentence": "대사초 관찰 포인트: 그늘진 곳에 모여 자란 모습을 봐요.",
+      "species_id": "taxon-carex-siderosticta",
+      "species_name": "대사초",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:habitat:1",
+      "sentence": "직박구리 관찰 장소: 공원, 우리 동네, 화단과 정원.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:activity:1",
+      "sentence": "직박구리 활동 시간: 주로 낮.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:size:1",
+      "sentence": "직박구리 크기: 몸길이 27~28cm 정도예요.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:funfact:1",
+      "sentence": "직박구리는 도시 공원에서도 흔히 보이는 새예요. \"삐이요\" 하는 크고 날카로운 소리로 울어요.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:observation:1",
+      "sentence": "직박구리 관찰 포인트: 회색빛 몸과 볼의 갈색 무늬를 봐요.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-hypsipetes-amaurotis:observation:2",
+      "sentence": "직박구리 관찰 포인트: 나뭇가지에서 우는 소리를 들어봐요.",
+      "species_id": "taxon-hypsipetes-amaurotis",
+      "species_name": "직박구리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:habitat:1",
+      "sentence": "참새 관찰 장소: 우리 동네, 공원, 들판.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:activity:1",
+      "sentence": "참새 활동 시간: 주로 낮.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:size:1",
+      "sentence": "참새 크기: 몸길이 14cm 안팎으로 작아요.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:funfact:1",
+      "sentence": "참새는 우리나라에서 가장 흔히 보이는 작은 새예요. 무리를 지어 다니는 걸 좋아해요.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:observation:1",
+      "sentence": "참새 관찰 포인트: 갈색 몸과 검은 볼 점을 봐요.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-passer-montanus:observation:2",
+      "sentence": "참새 관찰 포인트: 여러 마리가 함께 있는 모습을 봐요.",
+      "species_id": "taxon-passer-montanus",
+      "species_name": "참새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:habitat:1",
+      "sentence": "멧비둘기 관찰 장소: 공원, 들판, 우리 동네.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:activity:1",
+      "sentence": "멧비둘기 활동 시간: 주로 낮.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:size:1",
+      "sentence": "멧비둘기 크기: 몸길이 33cm 안팎이에요.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:funfact:1",
+      "sentence": "멧비둘기는 목에 검은 줄무늬가 있는 비둘기예요. \"구구구\" 낮은 소리로 울어요.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:observation:1",
+      "sentence": "멧비둘기 관찰 포인트: 목 옆의 검은 줄무늬를 봐요.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-streptopelia-orientalis:observation:2",
+      "sentence": "멧비둘기 관찰 포인트: 낮게 우는 울음소리를 들어봐요.",
+      "species_id": "taxon-streptopelia-orientalis",
+      "species_name": "멧비둘기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:habitat:1",
+      "sentence": "왜가리 관찰 장소: 물가.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:activity:1",
+      "sentence": "왜가리 활동 시간: 주로 낮.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:size:1",
+      "sentence": "왜가리 크기: 몸길이 90~100cm로 커요.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:season:1",
+      "sentence": "왜가리 관찰 계절: 겨울.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:funfact:1",
+      "sentence": "왜가리는 다리가 길고 목이 긴 큰 새로, 물가에서 가만히 서서 물고기를 기다려요.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:observation:1",
+      "sentence": "왜가리 관찰 포인트: 긴 다리와 목을 봐요.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:observation:2",
+      "sentence": "왜가리 관찰 포인트: 물가에서 가만히 서 있는 모습을 봐요.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-cinerea:similar:1",
+      "sentence": "왜가리와 헷갈리기 쉬운 생물: 대백로.",
+      "species_id": "taxon-ardea-cinerea",
+      "species_name": "왜가리",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:habitat:1",
+      "sentence": "큰부리까마귀 관찰 장소: 산, 공원, 우리 동네.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:activity:1",
+      "sentence": "큰부리까마귀 활동 시간: 주로 낮.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:size:1",
+      "sentence": "큰부리까마귀 크기: 몸길이 55~60cm 정도예요.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:funfact:1",
+      "sentence": "큰부리까마귀는 부리가 굵고 크며, 아주 머리가 좋아서 도구를 쓸 줄도 알아요.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:observation:1",
+      "sentence": "큰부리까마귀 관찰 포인트: 굵고 큰 부리를 봐요.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-corvus-macrorhynchos:observation:2",
+      "sentence": "큰부리까마귀 관찰 포인트: 온몸이 까만 깃털을 봐요.",
+      "species_id": "taxon-corvus-macrorhynchos",
+      "species_name": "큰부리까마귀",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:habitat:1",
+      "sentence": "까치 관찰 장소: 우리 동네, 공원, 들판.",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:activity:1",
+      "sentence": "까치 활동 시간: 주로 낮.",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:size:1",
+      "sentence": "까치 크기: 몸길이 45cm 안팎이에요(꼬리 포함).",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:funfact:1",
+      "sentence": "까치는 반가운 손님이 온다는 이야기가 전해지는 우리에게 친숙한 새예요. 어깨와 배는 하얗고 나머지는 까매요.",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:observation:1",
+      "sentence": "까치 관찰 포인트: 검은색과 흰색이 섞인 깃털을 봐요.",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-pica-serica:observation:2",
+      "sentence": "까치 관찰 포인트: 긴 꼬리를 봐요.",
+      "species_id": "taxon-pica-serica",
+      "species_name": "까치",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:habitat:1",
+      "sentence": "딱새 관찰 장소: 공원, 화단과 정원, 산.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:activity:1",
+      "sentence": "딱새 활동 시간: 주로 낮.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:size:1",
+      "sentence": "딱새 크기: 몸길이 14~15cm 정도로 작아요.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:funfact:1",
+      "sentence": "딱새 수컷은 가슴이 주황빛으로 예쁘게 물들어 있어요. 꼬리를 파르르 떠는 습관이 있어요.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:observation:1",
+      "sentence": "딱새 관찰 포인트: 주황빛 가슴을 봐요.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phoenicurus-auroreus:observation:2",
+      "sentence": "딱새 관찰 포인트: 꼬리를 떠는 모습을 봐요.",
+      "species_id": "taxon-phoenicurus-auroreus",
+      "species_name": "딱새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:habitat:1",
+      "sentence": "괭이갈매기 관찰 장소: 물가.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:activity:1",
+      "sentence": "괭이갈매기 활동 시간: 주로 낮.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:size:1",
+      "sentence": "괭이갈매기 크기: 몸길이 45~47cm 정도예요.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:season:1",
+      "sentence": "괭이갈매기 관찰 계절: 겨울.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:funfact:1",
+      "sentence": "괭이갈매기는 고양이 울음소리처럼 \"야옹\"하고 우는 갈매기예요. 그래서 이런 이름이 붙었어요.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:observation:1",
+      "sentence": "괭이갈매기 관찰 포인트: 부리 끝의 검은 무늬를 봐요.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-larus-crassirostris:observation:2",
+      "sentence": "괭이갈매기 관찰 포인트: 울음소리를 들어봐요.",
+      "species_id": "taxon-larus-crassirostris",
+      "species_name": "괭이갈매기",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:habitat:1",
+      "sentence": "청둥오리 관찰 장소: 물가.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:activity:1",
+      "sentence": "청둥오리 활동 시간: 주로 낮.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:size:1",
+      "sentence": "청둥오리 크기: 몸길이 55~65cm 정도예요.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:season:1",
+      "sentence": "청둥오리 관찰 계절: 겨울.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:funfact:1",
+      "sentence": "청둥오리 수컷은 머리가 반짝이는 초록빛이에요. 암컷은 전체적으로 갈색이라 구별하기 쉬워요.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:observation:1",
+      "sentence": "청둥오리 관찰 포인트: 수컷의 초록빛 머리를 봐요.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:observation:2",
+      "sentence": "청둥오리 관찰 포인트: 암컷의 갈색 무늬를 봐요.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-platyrhynchos:similar:1",
+      "sentence": "청둥오리와 헷갈리기 쉬운 생물: 흰뺨검둥오리.",
+      "species_id": "taxon-anas-platyrhynchos",
+      "species_name": "청둥오리",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:habitat:1",
+      "sentence": "대백로 관찰 장소: 물가.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:activity:1",
+      "sentence": "대백로 활동 시간: 주로 낮.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:size:1",
+      "sentence": "대백로 크기: 몸길이 85~100cm로 커요.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:season:1",
+      "sentence": "대백로 관찰 계절: 겨울.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:funfact:1",
+      "sentence": "대백로는 온몸이 새하얀 큰 새예요. 목을 S자로 접고 날아다녀요.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:observation:1",
+      "sentence": "대백로 관찰 포인트: 새하얀 깃털을 봐요.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:observation:2",
+      "sentence": "대백로 관찰 포인트: 날 때 목을 접은 모양을 봐요.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-ardea-alba:similar:1",
+      "sentence": "대백로와 헷갈리기 쉬운 생물: 왜가리.",
+      "species_id": "taxon-ardea-alba",
+      "species_name": "대백로",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:habitat:1",
+      "sentence": "붉은머리오목눈이 관찰 장소: 들판, 물가.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:activity:1",
+      "sentence": "붉은머리오목눈이 활동 시간: 주로 낮.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:size:1",
+      "sentence": "붉은머리오목눈이 크기: 몸길이 12~13cm로 아주 작아요.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:funfact:1",
+      "sentence": "붉은머리오목눈이는 몸집이 아주 작고 동그란 새예요. 여러 마리가 떼 지어 수풀 사이를 옮겨 다녀요.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:observation:1",
+      "sentence": "붉은머리오목눈이 관찰 포인트: 동글동글한 몸매를 봐요.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-sinosuthora-webbiana:observation:2",
+      "sentence": "붉은머리오목눈이 관찰 포인트: 여러 마리가 함께 움직이는 모습을 봐요.",
+      "species_id": "taxon-sinosuthora-webbiana",
+      "species_name": "붉은머리오목눈이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:habitat:1",
+      "sentence": "박새 관찰 장소: 공원, 화단과 정원, 산.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:activity:1",
+      "sentence": "박새 활동 시간: 주로 낮.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:size:1",
+      "sentence": "박새 크기: 몸길이 13~14cm 정도예요.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:funfact:1",
+      "sentence": "박새는 가슴 한가운데 검은 넥타이 같은 줄무늬가 있는 작은 새예요.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:observation:1",
+      "sentence": "박새 관찰 포인트: 가슴의 검은 줄무늬를 봐요.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-parus-cinereus:observation:2",
+      "sentence": "박새 관찰 포인트: 머리의 까만 색과 볼의 흰색을 봐요.",
+      "species_id": "taxon-parus-cinereus",
+      "species_name": "박새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:habitat:1",
+      "sentence": "쇠박새 관찰 장소: 산, 공원.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:activity:1",
+      "sentence": "쇠박새 활동 시간: 주로 낮.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:size:1",
+      "sentence": "쇠박새 크기: 몸길이 12~13cm로 작아요.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:funfact:1",
+      "sentence": "쇠박새는 박새와 닮았지만 몸집이 더 작고, 목에 넥타이 무늬가 없어요.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:observation:1",
+      "sentence": "쇠박새 관찰 포인트: 박새와 크기를 비교해봐요.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-poecile-palustris:observation:2",
+      "sentence": "쇠박새 관찰 포인트: 검은 머리와 하얀 볼을 봐요.",
+      "species_id": "taxon-poecile-palustris",
+      "species_name": "쇠박새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:habitat:1",
+      "sentence": "노랑턱멧새 관찰 장소: 산, 들판.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:activity:1",
+      "sentence": "노랑턱멧새 활동 시간: 주로 낮.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:size:1",
+      "sentence": "노랑턱멧새 크기: 몸길이 14~15cm 정도예요.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:funfact:1",
+      "sentence": "노랑턱멧새 수컷은 턱과 눈썹이 노랗게 물들어 있어요.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:observation:1",
+      "sentence": "노랑턱멧새 관찰 포인트: 노란 턱과 눈썹 무늬를 봐요.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-emberiza-elegans:observation:2",
+      "sentence": "노랑턱멧새 관찰 포인트: 머리의 검은 줄무늬를 봐요.",
+      "species_id": "taxon-emberiza-elegans",
+      "species_name": "노랑턱멧새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:habitat:1",
+      "sentence": "흰뺨검둥오리 관찰 장소: 물가.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:activity:1",
+      "sentence": "흰뺨검둥오리 활동 시간: 주로 낮.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:size:1",
+      "sentence": "흰뺨검둥오리 크기: 몸길이 55~63cm 정도예요.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:season:1",
+      "sentence": "흰뺨검둥오리 관찰 계절: 겨울.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:funfact:1",
+      "sentence": "흰뺨검둥오리는 이름처럼 뺨이 하얗고 몸은 진한 갈색이에요. 물가에서 사계절 내내 볼 수 있어요.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:observation:1",
+      "sentence": "흰뺨검둥오리 관찰 포인트: 하얀 뺨을 봐요.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:observation:2",
+      "sentence": "흰뺨검둥오리 관찰 포인트: 부리 끝의 노란 무늬를 봐요.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-anas-zonorhyncha:similar:1",
+      "sentence": "흰뺨검둥오리와 헷갈리기 쉬운 생물: 청둥오리.",
+      "species_id": "taxon-anas-zonorhyncha",
+      "species_name": "흰뺨검둥오리",
+      "field_type": "similar",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:habitat:1",
+      "sentence": "알락할미새 관찰 장소: 물가, 우리 동네.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:activity:1",
+      "sentence": "알락할미새 활동 시간: 주로 낮.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:size:1",
+      "sentence": "알락할미새 크기: 몸길이 17~20cm 정도예요.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:funfact:1",
+      "sentence": "알락할미새는 검은색과 흰색이 섞인 무늬를 가지고, 걸을 때마다 꼬리를 위아래로 까딱까딱 흔들어요.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:observation:1",
+      "sentence": "알락할미새 관찰 포인트: 까딱거리는 꼬리를 봐요.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-motacilla-alba:observation:2",
+      "sentence": "알락할미새 관찰 포인트: 검고 흰 깃털 무늬를 봐요.",
+      "species_id": "taxon-motacilla-alba",
+      "species_name": "알락할미새",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:habitat:1",
+      "sentence": "민물가마우지 관찰 장소: 물가.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:activity:1",
+      "sentence": "민물가마우지 활동 시간: 주로 낮.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:size:1",
+      "sentence": "민물가마우지 크기: 몸길이 80~100cm로 커요.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:season:1",
+      "sentence": "민물가마우지 관찰 계절: 겨울.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:funfact:1",
+      "sentence": "민물가마우지는 물속에 잠수해서 물고기를 잡는 새예요. 물에서 나오면 날개를 활짝 펴고 말려요.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:observation:1",
+      "sentence": "민물가마우지 관찰 포인트: 날개를 펼치고 말리는 모습을 봐요.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-phalacrocorax-carbo:observation:2",
+      "sentence": "민물가마우지 관찰 포인트: 물속으로 잠수하는 모습을 봐요.",
+      "species_id": "taxon-phalacrocorax-carbo",
+      "species_name": "민물가마우지",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:habitat:1",
+      "sentence": "물까치 관찰 장소: 공원, 우리 동네, 산.",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:activity:1",
+      "sentence": "물까치 활동 시간: 주로 낮.",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:size:1",
+      "sentence": "물까치 크기: 몸길이 33~38cm 정도예요(꼬리 포함).",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:funfact:1",
+      "sentence": "물까치는 날개와 꼬리가 하늘빛으로 반짝이는 예쁜 새예요. 시끄럽게 울며 무리 지어 다녀요.",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:observation:1",
+      "sentence": "물까치 관찰 포인트: 하늘빛 날개와 꼬리를 봐요.",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-cyanopica-cyanus:observation:2",
+      "sentence": "물까치 관찰 포인트: 무리 지어 나는 모습을 봐요.",
+      "species_id": "taxon-cyanopica-cyanus",
+      "species_name": "물까치",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:habitat:1",
+      "sentence": "광대버섯 관찰 장소: 산.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:activity:1",
+      "sentence": "광대버섯 활동 시간: 주로 낮.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:size:1",
+      "sentence": "광대버섯 크기: 갓 지름 8~20cm 정도예요.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:season:1",
+      "sentence": "광대버섯 관찰 계절: 가을.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:funfact:1",
+      "sentence": "광대버섯은 빨간 갓 위에 하얀 점이 콕콕 박혀있는 아주 눈에 띄는 버섯이에요. 독이 있어서 절대 먹으면 안 돼요.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:observation:1",
+      "sentence": "광대버섯 관찰 포인트: 빨간 갓과 하얀 점무늬를 눈으로만 봐요.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:observation:2",
+      "sentence": "광대버섯 관찰 포인트: 버섯 밑동의 볼록한 부분을 봐요(만지지 않기).",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-fly-agaric:safety:1",
+      "sentence": "광대버섯: 버섯은 눈으로만 관찰해요. 만지거나 먹으면 안 돼요 🍄.",
+      "species_id": "taxon-fly-agaric",
+      "species_name": "광대버섯",
+      "field_type": "safety",
+      "is_safety": true,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:habitat:1",
+      "sentence": "유혈목이 관찰 장소: 물가, 들판.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:activity:1",
+      "sentence": "유혈목이 활동 시간: 주로 낮.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:size:1",
+      "sentence": "유혈목이 크기: 몸길이 60~120cm 정도예요.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:funfact:1",
+      "sentence": "유혈목이는 목 뒤에 노랑과 검정이 섞인 무늬가 있는 우리나라 뱀이에요. 독이 있으니 절대 가까이 가거나 만지면 안 돼요.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "funfact",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:observation:1",
+      "sentence": "유혈목이 관찰 포인트: 목 뒤의 노랑-검정 무늬를 멀리서 봐요.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:observation:2",
+      "sentence": "유혈목이 관찰 포인트: 몸의 얼룩덜룩한 무늬를 눈으로만 관찰해요.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "observation",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-rhabdophis-tigrinus:safety:1",
+      "sentence": "유혈목이: 쏘이거나 물릴 수 있어요. 가까이 가지 말고 멀리서 봐요.",
+      "species_id": "taxon-rhabdophis-tigrinus",
+      "species_name": "유혈목이",
+      "field_type": "safety",
+      "is_safety": true,
+      "content_version": "seed-content-v1"
+    }
+  ]
+}

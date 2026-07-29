@@ -64,6 +64,8 @@ import { AccountService } from "./child/account/AccountService.js";
 import { ContentCardService } from "./child/content/ContentCardService.js";
 import { DataRightsService } from "./child/privacy/DataRightsService.js";
 import { ObservationFlow } from "./child/ObservationFlow.js";
+import { ProfessorService } from "./core/professor/ProfessorService.js";
+import { buildProfessorService } from "./core/professor/ProfessorRuntime.js";
 import {
   SEED_TAXA,
   SEED_QUESTS,
@@ -92,6 +94,7 @@ export interface App {
   authorizer: Authorizer;
   accounts: AccountService;
   content: ContentCardService;
+  professor: ProfessorService;
   collection: CollectionEngine;
   quests: QuestEngine;
   rewards: RewardEngine;
@@ -223,6 +226,13 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
 
   const mediaStore = new LocalDiskMediaStore(config.mediaStorage.localDir);
   const pendingSightings = new PendingSightingStore();
+  const professor = await buildProfessorService({
+    config,
+    taxa: SEED_TAXA,
+    contents: SEED_CONTENT,
+    taxonRepo: repos.taxa,
+    collectionRepo: repos.collection,
+  });
 
   return {
     config,
@@ -233,6 +243,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
     authorizer,
     accounts,
     content,
+    professor,
     collection,
     quests,
     rewards,

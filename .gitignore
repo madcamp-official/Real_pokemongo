@@ -12,8 +12,23 @@ node_modules/
 *.tsbuildinfo
 dist/
 
-# C단계: 로컬 디스크 미디어 저장소(개발용 스텁, 실제 사진 바이트) — 커밋 대상 아님
-seed-service/data/
+# Expo 정적 번들 검증 산출물(로컬 QA 전용)
+app/.expo-*-verify/
+
+# 로컬 실행 로그
+seed-service/.runtime/
+
+# Python 워커 로컬 캐시/패키징 산출물
+__pycache__/
+*.py[cod]
+.pytest_cache/
+*.egg-info/
+
+# C단계: 로컬 디스크 미디어 저장소(개발용 스텁, 실제 사진 바이트) — 커밋 대상 아님.
+# 단, 도감 박사의 검수 지식/벡터 인덱스는 배포 산출물이므로 추적한다.
+seed-service/data/*
+!seed-service/data/professor-knowledge.json
+!seed-service/data/professor-knowledge-vectors.json
 
 # 세션 간 인수인계용 개인 메모(커밋 대상 아님)
 HANDOFF_NEXT_SESSION.md

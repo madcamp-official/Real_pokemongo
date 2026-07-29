@@ -27,6 +27,11 @@ import {
   mockAudioUploadSuccess,
   mockSpeciesSounds,
 } from '@/mocks/audioFixtures';
+import {
+  buildMockProfessorAnswer,
+  mockProfessorGreeting,
+  mockProfessorSuggestions,
+} from '@/mocks/professorFixtures';
 
 function speciesIdFromUrl(url: string): string {
   const m = url.match(/\/species\/([^/]+)\/card/);
@@ -66,6 +71,20 @@ function parseBody(config: InternalAxiosRequestConfig): Record<string, unknown> 
 
 // [메서드, URL 정규식, 응답 생성기]
 const routes: Array<[string, RegExp, Handler]> = [
+  // F22 도감 박사 — 질문 원문은 상태에 저장하지 않고 요청마다 응답만 만든다.
+  [
+    'POST',
+    /\/professor\/ask$/,
+    (config) => {
+      const body = parseBody(config);
+      return buildMockProfessorAnswer(
+        String(body.question ?? ''),
+        typeof body.context_species_id === 'string' ? body.context_species_id : undefined
+      );
+    },
+  ],
+  ['GET', /\/professor\/suggestions$/, () => mockProfessorSuggestions],
+  ['GET', /\/professor\/greeting$/, () => mockProfessorGreeting],
   // Audio MVP — app/src/mocks/audioFixtures.ts는 docs/audio/fixtures와 같은 계약을 따른다.
   ['POST', /\/audio\/sightings\/upload$/, () => mockAudioUploadSuccess],
   ['POST', /\/audio\/identify\/confirm$/, () => mockAudioConfirm],

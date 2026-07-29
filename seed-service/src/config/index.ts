@@ -94,6 +94,19 @@ export interface AppConfig {
      * 같은 관례). */
     kakaoJsKey?: string;
   };
+
+  professor: {
+    /** 비어 있으면 개발/테스트에서만 결정론적 로컬 임베딩을 사용한다. */
+    embeddingEndpoint?: string;
+    embeddingTimeoutMs: number;
+    /** sentence-transformer로 미리 생성한 JSON 벡터 인덱스. */
+    vectorIndexFile: string;
+    thresholds: {
+      high: number;
+      medium: number;
+      low: number;
+    };
+  };
 }
 
 export function loadConfig(): AppConfig {
@@ -158,6 +171,17 @@ export function loadConfig(): AppConfig {
     },
     map: {
       kakaoJsKey: env("KAKAO_MAP_JS_KEY"),
+    },
+    professor: {
+      embeddingEndpoint: env("PROFESSOR_EMBEDDING_ENDPOINT"),
+      embeddingTimeoutMs: envNumber("PROFESSOR_EMBEDDING_TIMEOUT_MS", 1500),
+      vectorIndexFile:
+        env("PROFESSOR_VECTOR_INDEX_FILE") ?? "./data/professor-knowledge-vectors.json",
+      thresholds: {
+        high: envNumber("PROFESSOR_CONFIDENCE_HIGH", 0.7),
+        medium: envNumber("PROFESSOR_CONFIDENCE_MEDIUM", 0.5),
+        low: envNumber("PROFESSOR_CONFIDENCE_LOW", 0.35),
+      },
     },
   };
 }

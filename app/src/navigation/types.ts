@@ -29,4 +29,5 @@ export type RootStackParamList = {
   SpeciesCard: { speciesId: string };
   IdentifyResult: { uploadId: string };
   PhotoViewer: { speciesId: string; initialIndex: number };
+  Professor: { contextSpeciesId?: string } | undefined;
 };
