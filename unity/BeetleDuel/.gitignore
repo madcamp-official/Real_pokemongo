@@ -1,0 +1,22 @@
+# Unity-generated local state
+[Ll]ibrary/
+[Tt]emp/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
+# Build output
+[Bb]uild/
+[Bb]uilds/
+
+# IDE and OS files
+.vs/
+.idea/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.suo
+.DS_Store
+Thumbs.db
