@@ -7,7 +7,7 @@ import type { DexEntry } from '@/types/api';
 /**
  * 도감 그리드 카드 (F5).
  * 발견된 종: assets/species의 컬러 PNG + 이름.
- * 미발견 종: 같은 PNG의 회색 종별 실루엣 + 이름 비공개.
+ * 미발견 종: 같은 PNG의 회색 종별 실루엣 + 이름은 그대로 노출(무엇을 찾아야 하는지 알 수 있게).
  */
 interface Props {
   entry: DexEntry;
@@ -28,7 +28,7 @@ export function SpeciesGridCard({ entry, onPress, index }: Props) {
             silhouette
           />
         </View>
-        <Text style={styles.lockedName}>미발견</Text>
+        <Text style={styles.lockedName}>{entry.name}</Text>
       </View>
     );
   }
