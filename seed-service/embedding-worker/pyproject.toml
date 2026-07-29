@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "nature-go-professor-worker"
+version = "0.1.0"
+description = "Nature Go 도감 박사 CPU 임베딩 워커"
+requires-python = ">=3.11"
+dependencies = [
+  "fastapi==0.116.1",
+  "sentence-transformers==5.1.1",
+  "uvicorn[standard]==0.35.0",
+]
+
+[project.optional-dependencies]
+test = ["pytest==8.4.2", "httpx==0.28.1"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["professor_worker*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+

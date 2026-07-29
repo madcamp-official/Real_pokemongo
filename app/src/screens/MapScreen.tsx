@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -102,6 +102,12 @@ export default function MapScreen() {
       ?.navigate('SpeciesCard', { speciesId });
   };
 
+  const openProfessor = () => {
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate('Professor');
+  };
+
   const onPinPress = useCallback(
     (speciesId: string) => {
       setSelectedPin(pins.find((p) => p.species_id === speciesId) ?? null);
@@ -124,6 +130,10 @@ export default function MapScreen() {
   };
 
   const isOffline = pinsQuery.isError || regionsQuery.isError;
+  const mapErrorText =
+    mapError === 'map_html_fetch_failed'
+      ? '🗺️ 지도 서버에 연결하지 못했어요'
+      : '🗺️ 카카오 지도를 불러오지 못했어요 · 잠시 후 다시 시도해 주세요';
 
   return (
     <View style={styles.root}>
@@ -217,10 +227,7 @@ export default function MapScreen() {
         <View pointerEvents="none" style={[styles.notices, { top: insets.top + 142 }]}>
           {mapError && (
             <View style={styles.notice}>
-              <Text style={styles.noticeText}>
-                🗺️ 지도를 불러오지 못했어요 · 카카오 개발자 콘솔에 이 주소가 Web 플랫폼으로
-                등록됐는지 확인해 주세요
-              </Text>
+              <Text style={styles.noticeText}>{mapErrorText}</Text>
             </View>
           )}
           {isOffline && (
@@ -250,6 +257,30 @@ export default function MapScreen() {
         <Text style={styles.nearbyEyebrow}>{selectedGroup === '전체' ? locationLabel : `${selectedGroup} 관찰`}</Text>
         <Text style={styles.nearbyTitle}>내 주변 관찰 {visiblePins.length}건</Text>
       </View>
+
+      {/* 앱 첫 화면에서도 새 기능을 바로 찾을 수 있는 상시 진입점. */}
+      <Pressable
+        onPress={openProfessor}
+        accessibilityRole="button"
+        accessibilityLabel="도감 박사에게 질문하기"
+        style={({ pressed }) => [
+          styles.professorShortcut,
+          { bottom: insets.bottom + 112 },
+          pressed && styles.professorShortcutPressed,
+        ]}
+      >
+        <View style={styles.professorShortcutAvatar}>
+          <Image
+            source={require('../../assets/professor/dex-professor-avatar.png')}
+            style={styles.professorShortcutImage}
+            resizeMode="contain"
+          />
+        </View>
+        <View>
+          <Text style={styles.professorShortcutEyebrow}>궁금한 게 있나요?</Text>
+          <Text style={styles.professorShortcutTitle}>도감 박사</Text>
+        </View>
+      </Pressable>
 
       <RadialMenu />
 
@@ -365,5 +396,37 @@ const styles = StyleSheet.create({
   scaleText: { fontSize: 12, fontWeight: '800', color: '#555652' },
   nearbyEyebrow: { fontSize: 12, fontWeight: '800', letterSpacing: 0.2, color: '#667062' },
   nearbyTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.35, color: INK },
+
+  professorShortcut: {
+    position: 'absolute',
+    right: 18,
+    zIndex: 19,
+    minHeight: 58,
+    borderRadius: 29,
+    paddingLeft: 5,
+    paddingRight: 15,
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    borderWidth: 2,
+    borderColor: '#D7E6CE',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    shadowColor: '#30452D',
+    shadowOpacity: 0.18,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 5 },
+    elevation: 6,
+  },
+  professorShortcutPressed: { opacity: 0.82, transform: [{ scale: 0.97 }] },
+  professorShortcutAvatar: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    overflow: 'hidden',
+    backgroundColor: '#E8F2DF',
+  },
+  professorShortcutImage: { width: 48, height: 48 },
+  professorShortcutEyebrow: { color: '#819084', fontSize: 9, fontWeight: '800' },
+  professorShortcutTitle: { color: '#31563F', fontSize: 14, fontWeight: '900', marginTop: 1 },
 
 });

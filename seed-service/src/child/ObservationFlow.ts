@@ -16,6 +16,7 @@
  */
 import type {
   MediaRef,
+  ObservationModality,
   Taxon,
   TaxonGroup,
   TaxonRank,
@@ -64,6 +65,9 @@ export interface RecordedOutcome {
   newlyUnlockedTaxonId?: string;
   collectionRatio: number;
   completedQuestTitles: string[];
+  /** 7단계(오디오 확정) — completedQuestTitles와 같은 집합의 quest id 버전. 사진 흐름은
+   * 여전히 제목만 쓰므로 이 필드를 참조하지 않는다(순수 추가, 기존 동작 무변경). */
+  completedQuestIds: string[];
   xpGained: number;
   newLevel: number | null;
   newBadgeTitles: string[];
@@ -79,6 +83,9 @@ export interface RecordIdentificationParams {
   rawCoord?: RawCoordinate;
   note?: string;
   now?: Date;
+  /** 7단계(오디오 확정) — 생략하면 기존 사진 흐름과 동일하게 "photo"(기존 호출부는
+   * 안 바꿔도 됨, ObservationService.record()와 같은 기본값 관례). */
+  modality?: ObservationModality;
 }
 
 /** 한 번의 관찰이 만든 결과 전체. UI 는 이것으로 연출을 구성한다. */
@@ -204,6 +211,7 @@ export class ObservationFlow {
       preciseCoord,
       note: params.note,
       now,
+      modality: params.modality,
     });
 
     // ── F5 도감 해금 ──────────────────────────────────────────────────────
@@ -243,6 +251,7 @@ export class ObservationFlow {
       newlyUnlockedTaxonId: unlock?.newlyUnlocked ? (taxon.id as string) : undefined,
       collectionRatio: progress.ratio,
       completedQuestTitles: completed.map((u) => u.quest.title),
+      completedQuestIds: completed.map((u) => u.quest.id),
       xpGained: obsReward.xpGained,
       newLevel: obsReward.newLevel,
       newBadgeTitles: obsReward.newBadges.map((b) => b.title),

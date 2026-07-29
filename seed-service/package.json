@@ -9,6 +9,8 @@
     "demo": "tsx src/demo.ts",
     "serve": "tsx --env-file=.env src/serve.ts",
     "db:migrate": "tsx --env-file=.env src/db/migrate.ts",
+    "professor:knowledge": "tsx src/core/professor/buildKnowledge.ts",
+    "professor:index": "cd embedding-worker && python -m professor_worker.build_index",
     "test": "tsx --test \"src/**/*.test.ts\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

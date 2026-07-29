@@ -28,11 +28,15 @@ import type {
   ConsentRecord,
   Creature,
   CreatureId,
+  AudioSightingId,
 } from "../../domain/types.js";
 import type { Quest, QuestProgress, QuestCriteria } from "../../quest/questTypes.js";
 import type { EarnedBadge, BadgeDefinition } from "../../rewards/rewardTypes.js";
 import type { GardenLayout, GardenTile, CreaturePlacement, TileType } from "../../garden/gardenTypes.js";
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
+import type { AudioSighting, AudioQuality, AudioConfirmResult } from "../../audio/audioTypes.js";
+import type { AudioIdentificationResult, AudioIdentificationCandidate } from "../../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../../audio/reference/referenceTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -44,6 +48,9 @@ import type {
   ConsentRepository,
   CreatureRepository,
   GardenRepository,
+  AudioSightingRepository,
+  AudioIdentificationResultRepository,
+  SpeciesSoundReferenceRepository,
 } from "../ports.js";
 
 type Pool = pg.Pool;
@@ -310,9 +317,9 @@ export class PgObservationRepo implements ObservationRepository {
       await client.query("BEGIN");
       await client.query(
         `INSERT INTO observation
-           (id, user_id, taxon_id, taxon_rank, observed_at, region_code, region_label,
+           (id, user_id, taxon_id, taxon_rank, observed_at, modality, region_code, region_label,
             precise_lat, precise_lng, confidence, source, note)
-         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
          ON CONFLICT (id) DO UPDATE SET
            taxon_id = EXCLUDED.taxon_id, taxon_rank = EXCLUDED.taxon_rank,
            region_code = EXCLUDED.region_code, region_label = EXCLUDED.region_label,
@@ -324,6 +331,7 @@ export class PgObservationRepo implements ObservationRepository {
           o.taxonId,
           o.taxonRank,
           o.timestamp,
+          o.modality,
           o.region?.regionCode ?? null,
           o.region?.regionLabel ?? null,
           o.preciseCoord?.lat ?? null,
@@ -403,6 +411,7 @@ function rowToObservation(row: any, media: string[]): Observation {
     taxonId: row.taxon_id ? (row.taxon_id as TaxonId) : null,
     taxonRank: row.taxon_rank ?? null,
     timestamp: new Date(row.observed_at).toISOString(),
+    modality: row.modality,
     region,
     preciseCoord,
     media: media as Observation["media"],
@@ -838,4 +847,280 @@ export class PgGardenRepo implements GardenRepository {
     ]);
     return r.rowCount ?? 0;
   }
+}
+
+// ---------------------------------------------------------------------------
+// 소리 기능(오디오) 3단계 — audio_sighting
+// ---------------------------------------------------------------------------
+
+export class PgAudioSightingRepo implements AudioSightingRepository {
+  constructor(private pool: Pool) {}
+
+  async create(sighting: AudioSighting): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO audio_sighting
+         (id, user_id, client_recording_id, status, media_kind, mime_type,
+          duration_ms, sha256, storage_path, quality, recorded_at, created_at, expires_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+      [
+        sighting.id,
+        sighting.userId,
+        sighting.clientRecordingId,
+        sighting.status,
+        sighting.mediaKind,
+        sighting.mimeType,
+        sighting.durationMs,
+        sighting.sha256,
+        sighting.storagePath ?? null,
+        JSON.stringify(sighting.quality),
+        sighting.recordedAt,
+        sighting.createdAt,
+        sighting.expiresAt,
+      ],
+    );
+  }
+
+  async get(id: AudioSightingId): Promise<AudioSighting | null> {
+    const r = await this.pool.query(`SELECT * FROM audio_sighting WHERE id = $1`, [id]);
+    return r.rows[0] ? rowToAudioSighting(r.rows[0]) : null;
+  }
+
+  async findByClientRecordingId(
+    userId: UserId,
+    clientRecordingId: string,
+  ): Promise<AudioSighting | null> {
+    const r = await this.pool.query(
+      `SELECT * FROM audio_sighting WHERE user_id = $1 AND client_recording_id = $2`,
+      [userId, clientRecordingId],
+    );
+    return r.rows[0] ? rowToAudioSighting(r.rows[0]) : null;
+  }
+
+  async deleteByUser(userId: UserId): Promise<number> {
+    const r = await this.pool.query(`DELETE FROM audio_sighting WHERE user_id = $1 RETURNING id`, [
+      userId,
+    ]);
+    return r.rowCount ?? 0;
+  }
+
+  async listByUser(userId: UserId): Promise<AudioSighting[]> {
+    const r = await this.pool.query(`SELECT * FROM audio_sighting WHERE user_id = $1`, [userId]);
+    return r.rows.map(rowToAudioSighting);
+  }
+
+  async findExpired(now: Date, limit: number): Promise<AudioSighting[]> {
+    const r = await this.pool.query(
+      `SELECT * FROM audio_sighting WHERE expires_at <= $1 ORDER BY expires_at ASC LIMIT $2`,
+      [now.toISOString(), limit],
+    );
+    return r.rows.map(rowToAudioSighting);
+  }
+
+  async deleteById(id: AudioSightingId): Promise<void> {
+    await this.pool.query(`DELETE FROM audio_sighting WHERE id = $1`, [id]);
+  }
+
+  // 7단계 — API_CONTRACT.md §3 "confirm" 멱등성. WHERE confirmation_id IS NULL이 원자적
+  // compare-and-swap — 동시에 도착한 서로 다른 확정 요청 중 정확히 하나만 이 UPDATE로
+  // 1행을 바꾼다(rowCount로 판정, 애플리케이션 레벨 락 불필요).
+  async claimConfirmation(id: AudioSightingId, confirmationId: string): Promise<boolean> {
+    const r = await this.pool.query(
+      `UPDATE audio_sighting SET confirmation_id = $2 WHERE id = $1 AND confirmation_id IS NULL`,
+      [id, confirmationId],
+    );
+    return (r.rowCount ?? 0) > 0;
+  }
+
+  async finalizeConfirmation(
+    id: AudioSightingId,
+    params: { observationId: ObservationId; result: AudioConfirmResult },
+  ): Promise<void> {
+    await this.pool.query(
+      `UPDATE audio_sighting
+         SET status = 'confirmed', confirmed_observation_id = $2, confirm_result_json = $3
+       WHERE id = $1`,
+      [
+        id,
+        params.observationId,
+        JSON.stringify({
+          speciesId: params.result.speciesId,
+          dexUpdated: params.result.dexUpdated,
+          reward: params.result.reward,
+        }),
+      ],
+    );
+  }
+}
+
+function rowToAudioSighting(row: any): AudioSighting {
+  const confirmSnapshot = row.confirm_result_json as
+    | { speciesId: string; dexUpdated: boolean; reward: { xp: number; questIds: string[] } }
+    | null;
+  return {
+    id: row.id as AudioSightingId,
+    userId: row.user_id as UserId,
+    clientRecordingId: row.client_recording_id,
+    status: row.status,
+    mediaKind: row.media_kind,
+    mimeType: row.mime_type,
+    durationMs: row.duration_ms,
+    sha256: row.sha256,
+    storagePath: row.storage_path ?? undefined,
+    // pg는 jsonb 컬럼을 이미 파싱된 객체로 돌려준다(문자열 아님) — 그대로 캐스팅.
+    quality: row.quality as AudioQuality,
+    recordedAt: new Date(row.recorded_at).toISOString(),
+    createdAt: new Date(row.created_at).toISOString(),
+    expiresAt: new Date(row.expires_at).toISOString(),
+    confirmedObservationId: row.confirmed_observation_id ?? undefined,
+    confirmationId: row.confirmation_id ?? undefined,
+    confirmResult:
+      confirmSnapshot && row.confirmed_observation_id
+        ? {
+            observationId: row.confirmed_observation_id as ObservationId,
+            speciesId: confirmSnapshot.speciesId as TaxonId,
+            dexUpdated: confirmSnapshot.dexUpdated,
+            reward: confirmSnapshot.reward,
+          }
+        : undefined,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 소리 기능(오디오) 6단계 — audio_identification_result
+// ---------------------------------------------------------------------------
+
+export class PgAudioIdentificationResultRepo implements AudioIdentificationResultRepository {
+  constructor(private pool: Pool) {}
+
+  async upsert(result: AudioIdentificationResult): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO audio_identification_result
+         (audio_sighting_id, candidates_json, model_provider, model_version,
+          location_prior_used, created_at)
+       VALUES ($1,$2,$3,$4,$5,$6)
+       ON CONFLICT (audio_sighting_id) DO UPDATE SET
+         candidates_json = EXCLUDED.candidates_json,
+         model_provider = EXCLUDED.model_provider,
+         model_version = EXCLUDED.model_version,
+         location_prior_used = EXCLUDED.location_prior_used,
+         created_at = EXCLUDED.created_at`,
+      [
+        result.audioSightingId,
+        JSON.stringify(result.candidates),
+        result.modelProvider,
+        result.modelVersion,
+        result.locationPriorUsed,
+        result.createdAt,
+      ],
+    );
+  }
+
+  async get(audioSightingId: AudioSightingId): Promise<AudioIdentificationResult | null> {
+    const r = await this.pool.query(
+      `SELECT * FROM audio_identification_result WHERE audio_sighting_id = $1`,
+      [audioSightingId],
+    );
+    return r.rows[0] ? rowToAudioIdentificationResult(r.rows[0]) : null;
+  }
+}
+
+function rowToAudioIdentificationResult(row: any): AudioIdentificationResult {
+  // candidates_json은 "unknown" 상태를 별도 컬럼 없이 빈 배열로 표현한다(0003 마이그레이션
+  // 주석 — DATA_CONTRACT.md가 candidates_json 하나만 정의). unknown 여부/사유는 여기서 파생.
+  const candidates = row.candidates_json as AudioIdentificationCandidate[];
+  return {
+    audioSightingId: row.audio_sighting_id as AudioSightingId,
+    candidates,
+    unknown: candidates.length === 0,
+    unknownReason: candidates.length === 0 ? "NO_SUPPORTED_BIRD_MATCH" : undefined,
+    modelProvider: row.model_provider,
+    modelVersion: row.model_version,
+    locationPriorUsed: row.location_prior_used,
+    createdAt: new Date(row.created_at).toISOString(),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// 소리 기능(오디오) 8단계 — species_sound_reference
+// ---------------------------------------------------------------------------
+export class PgSpeciesSoundReferenceRepo implements SpeciesSoundReferenceRepository {
+  constructor(private pool: Pool) {}
+
+  async listApproved(taxonId: TaxonId): Promise<SpeciesSoundReference[]> {
+    const r = await this.pool.query(
+      `SELECT * FROM species_sound_reference WHERE taxon_id = $1 AND quality_status = 'approved'`,
+      [taxonId],
+    );
+    return r.rows.map(rowToSpeciesSoundReference);
+  }
+
+  async get(id: string): Promise<SpeciesSoundReference | null> {
+    const r = await this.pool.query(`SELECT * FROM species_sound_reference WHERE id = $1`, [id]);
+    return r.rows[0] ? rowToSpeciesSoundReference(r.rows[0]) : null;
+  }
+
+  async upsertMany(refs: SpeciesSoundReference[]): Promise<void> {
+    for (const ref of refs) {
+      await this.pool.query(
+        `INSERT INTO species_sound_reference
+           (id, taxon_id, media_ref, call_type, duration_ms, source_url, creator, license,
+            attribution, quality_status, reference_set_version, embedding_ref, embedding_model_version)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+         ON CONFLICT (id) DO UPDATE SET
+           taxon_id = EXCLUDED.taxon_id,
+           media_ref = EXCLUDED.media_ref,
+           call_type = EXCLUDED.call_type,
+           duration_ms = EXCLUDED.duration_ms,
+           source_url = EXCLUDED.source_url,
+           creator = EXCLUDED.creator,
+           license = EXCLUDED.license,
+           attribution = EXCLUDED.attribution,
+           quality_status = EXCLUDED.quality_status,
+           reference_set_version = EXCLUDED.reference_set_version,
+           embedding_ref = EXCLUDED.embedding_ref,
+           embedding_model_version = EXCLUDED.embedding_model_version`,
+        [
+          ref.id,
+          ref.taxonId,
+          ref.mediaRef,
+          ref.callType,
+          ref.durationMs,
+          ref.sourceUrl,
+          ref.creator,
+          ref.license,
+          ref.attribution,
+          ref.qualityStatus,
+          ref.referenceSetVersion,
+          ref.embeddingRef ?? null,
+          ref.embeddingModelVersion ?? null,
+        ],
+      );
+    }
+  }
+
+  async countApprovedWithEmbedding(): Promise<number> {
+    const r = await this.pool.query(
+      `SELECT count(*) FROM species_sound_reference
+       WHERE quality_status = 'approved' AND embedding_ref IS NOT NULL`,
+    );
+    return Number(r.rows[0].count);
+  }
+}
+
+function rowToSpeciesSoundReference(row: any): SpeciesSoundReference {
+  return {
+    id: row.id,
+    taxonId: row.taxon_id as TaxonId,
+    mediaRef: row.media_ref,
+    callType: row.call_type,
+    durationMs: row.duration_ms,
+    sourceUrl: row.source_url,
+    creator: row.creator,
+    license: row.license,
+    attribution: row.attribution,
+    qualityStatus: row.quality_status,
+    referenceSetVersion: row.reference_set_version,
+    embeddingRef: row.embedding_ref ?? undefined,
+    embeddingModelVersion: row.embedding_model_version ?? undefined,
+  };
 }

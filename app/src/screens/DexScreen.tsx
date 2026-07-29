@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { ActivityIndicator, FlatList, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -37,6 +37,12 @@ export default function DexScreen() {
       ?.navigate('SpeciesCard', { speciesId: entry.species_id });
   };
 
+  const openProfessor = () => {
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate('Professor');
+  };
+
   return (
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <ScreenHeader title="도감" />
@@ -61,6 +67,18 @@ export default function DexScreen() {
             <View style={styles.center}>
               <ActivityIndicator color={colors.primary} />
             </View>
+          ) : dexQuery.isError ? (
+            <View style={styles.center}>
+              <Text style={styles.emptyText}>도감 정보를 불러오지 못했어요.</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="도감 다시 불러오기"
+                style={styles.retryButton}
+                onPress={() => void dexQuery.refetch()}
+              >
+                <Text style={styles.retryText}>다시 시도</Text>
+              </Pressable>
+            </View>
           ) : (
             <View style={styles.center}>
               <Text style={styles.emptyText}>이 분류에는 아직 발견한 친구가 없어요.</Text>
@@ -68,6 +86,15 @@ export default function DexScreen() {
           )
         }
       />
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="도감 박사에게 질문하기"
+        style={[styles.professorFab, { bottom: Math.max(insets.bottom, 16) + 12 }]}
+        onPress={openProfessor}
+      >
+        <Text style={styles.professorFabIcon}>?</Text>
+        <Text style={styles.professorFabText}>박사</Text>
+      </Pressable>
     </View>
   );
 }
@@ -78,4 +105,44 @@ const styles = StyleSheet.create({
   column: { paddingHorizontal: 16, gap: 12, marginBottom: 12 },
   center: { paddingVertical: 60, alignItems: 'center', paddingHorizontal: 32 },
   emptyText: { color: colors.textSecondary, fontSize: 14, textAlign: 'center' },
+  retryButton: {
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 18,
+    backgroundColor: colors.primary,
+  },
+  retryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
+  professorFab: {
+    position: 'absolute',
+    right: 18,
+    minWidth: 78,
+    height: 52,
+    paddingHorizontal: 14,
+    borderRadius: 26,
+    backgroundColor: '#3E7456',
+    borderWidth: 3,
+    borderColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 7,
+    shadowColor: '#203B2B',
+    shadowOpacity: 0.22,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
+  },
+  professorFabIcon: {
+    width: 23,
+    height: 23,
+    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    color: '#3E7456',
+    textAlign: 'center',
+    lineHeight: 23,
+    fontSize: 15,
+    fontWeight: '900',
+  },
+  professorFabText: { color: '#FFFFFF', fontSize: 14, fontWeight: '900' },
 });

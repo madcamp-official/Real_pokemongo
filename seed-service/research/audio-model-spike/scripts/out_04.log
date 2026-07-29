@@ -1,0 +1,51 @@
+=== 모델 로드 ===
+
+=== A) 18종 학명 -> BirdNET 라벨 존재 여부 (species_list 매칭) ===
+  직박구리       Hypsipetes amaurotis         in_model=True  label=Hypsipetes amaurotis_직박구리
+  참새         Passer montanus              in_model=True  label=Passer montanus_참새
+  멧비둘기       Streptopelia orientalis      in_model=True  label=Streptopelia orientalis_멧비둘기
+  왜가리        Ardea cinerea                in_model=True  label=Ardea cinerea_왜가리
+  큰부리까마귀     Corvus macrorhynchos         in_model=True  label=Corvus macrorhynchos_큰부리까마귀
+  까치         Pica serica                  in_model=True  label=Pica serica_까치
+  딱새         Phoenicurus auroreus         in_model=True  label=Phoenicurus auroreus_딱새
+  괭이갈매기      Larus crassirostris          in_model=True  label=Larus crassirostris_괭이갈매기
+  청둥오리       Anas platyrhynchos           in_model=True  label=Anas platyrhynchos_청둥오리
+  대백로        Ardea alba                   in_model=True  label=Ardea alba_중대백로
+  붉은머리오목눈이   Sinosuthora webbiana         in_model=True  label=Sinosuthora webbiana_붉은머리오목눈이
+  박새         Parus cinereus               in_model=True  label=Parus cinereus_Cinereous Tit
+  쇠박새        Poecile palustris            in_model=True  label=Poecile palustris_쇠박새
+  노랑턱멧새      Emberiza elegans             in_model=True  label=Emberiza elegans_노랑턱멧새
+  흰뺨검둥오리     Anas zonorhyncha             in_model=True  label=Anas zonorhyncha_흰뺨검둥오리
+  알락할미새      Motacilla alba               in_model=True  label=Motacilla alba_알락할미새
+  민물가마우지     Phalacrocorax carbo          in_model=True  label=Phalacrocorax carbo_민물가마우지
+  물까치        Cyanopica cyanus             in_model=True  label=Cyanopica cyanus_물까치
+
+=== B) 실제 오디오로 top-1 예측 (세그먼트별 최고 신뢰도, idx=-1이 1위) ===
+  직박구리       n_seg=  6 time=12.23s | 전체최고=Hypsipetes amaurotis_직박구리(0.996, seg0) | 타겟종이1위인구간존재=True(최고conf=0.996)
+  참새         n_seg=  6 time=1.14s | 전체최고=Passer montanus_참새(0.766, seg0) | 타겟종이1위인구간존재=True(최고conf=0.766)
+  멧비둘기       n_seg= 20 time=1.37s | 전체최고=Streptopelia orientalis_멧비둘기(0.951, seg3) | 타겟종이1위인구간존재=True(최고conf=0.951)
+  왜가리        n_seg= 20 time=1.37s | 전체최고=Ardea cinerea_왜가리(0.951, seg10) | 타겟종이1위인구간존재=True(최고conf=0.951)
+  큰부리까마귀     n_seg= 20 time=1.36s | 전체최고=Corvus macrorhynchos_큰부리까마귀(0.963, seg3) | 타겟종이1위인구간존재=True(최고conf=0.963)
+  까치         n_seg=  6 time=1.14s | 전체최고=Sittiparus varius_곤줄박이(0.966, seg3) | 타겟종이1위인구간존재=True(최고conf=0.786)
+  딱새         n_seg= 20 time=1.36s | 전체최고=Phoenicurus auroreus_딱새(0.946, seg17) | 타겟종이1위인구간존재=True(최고conf=0.946)
+  괭이갈매기      n_seg= 20 time=1.33s | 전체최고=Larus crassirostris_괭이갈매기(0.996, seg1) | 타겟종이1위인구간존재=True(최고conf=0.996)
+  청둥오리       n_seg= 20 time=1.35s | 전체최고=Anas platyrhynchos_청둥오리(0.969, seg2) | 타겟종이1위인구간존재=True(최고conf=0.969)
+  대백로        n_seg= 20 time=1.35s | 전체최고=Ardea herodias_Great Blue Heron(0.981, seg12) | 타겟종이1위인구간존재=True(최고conf=0.826)
+  붉은머리오목눈이   n_seg= 20 time=1.36s | 전체최고=Sinosuthora webbiana_붉은머리오목눈이(1.000, seg5) | 타겟종이1위인구간존재=True(최고conf=1.000)
+  박새         n_seg= 20 time=1.35s | 전체최고=Parus minor_박새(0.999, seg1) | 타겟종이1위인구간존재=False(최고conf=0.000)
+  쇠박새        n_seg= 20 time=1.35s | 전체최고=Poecile palustris_쇠박새(0.886, seg8) | 타겟종이1위인구간존재=True(최고conf=0.886)
+  노랑턱멧새      n_seg= 20 time=1.36s | 전체최고=Emberiza rustica_쑥새(0.637, seg15) | 타겟종이1위인구간존재=True(최고conf=0.359)
+  흰뺨검둥오리     n_seg= 20 time=1.34s | 전체최고=Anas platyrhynchos_청둥오리(0.820, seg0) | 타겟종이1위인구간존재=False(최고conf=0.000)
+  알락할미새      n_seg= 20 time=1.35s | 전체최고=Motacilla alba_알락할미새(0.994, seg1) | 타겟종이1위인구간존재=True(최고conf=0.994)
+  민물가마우지     n_seg= 20 time=1.36s | 전체최고=Phalacrocorax carbo_민물가마우지(0.996, seg8) | 타겟종이1위인구간존재=True(최고conf=0.996)
+  물까치        n_seg= 20 time=1.35s | 전체최고=Cyanopica cyanus_물까치(0.744, seg11) | 타겟종이1위인구간존재=True(최고conf=0.744)
+
+=== C) GPU 사용률 스냅샷 (추론 중 nvidia-smi) ===
+  nvidia-smi (추론 중): 0 %, 14653 MiB
+
+=== D) 동시 요청 1/2/4개 처리 (같은 세션에 스레드로 동시 호출) ===
+  동시 1개: 총 소요=1.10s 개별=[1.1] 에러={}
+  동시 2개: 총 소요=1.01s 개별=[] 에러={0: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')", 1: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')"}
+  동시 4개: 총 소요=1.01s 개별=[] 에러={0: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')", 2: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')", 3: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')", 1: "RuntimeError('Analysis was cancelled. Please check the logs: /tmp/birdnet_session_75f6d.log')"}
+
+DONE

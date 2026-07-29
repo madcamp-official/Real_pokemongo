@@ -9,12 +9,25 @@
  */
 import type { Taxon, TaxonId } from "../../core/domain/types.js";
 import { SafetyFilter, type SafetyNotice } from "../../core/safety/SafetyFilter.js";
+import type { ProfessorFieldType } from "../../core/professor/professorTypes.js";
 
 /** 종별 콘텐츠(원본). */
 export interface SpeciesContent {
   taxonId: TaxonId;
   funFact: string; // "이건 몰랐지?" 한 문장
   observePoints: string[]; // 관찰 포인트
+  /**
+   * 도감 박사 검색에만 쓰는 검수 완료 사실.
+   * 기존 카드 필드로 표현할 수 없는 먹이·소리·계절 정보를 억지로 추론하지 않고,
+   * 출처 검수가 끝난 문장만 명시적으로 넣는다.
+   */
+  knowledgeFacts?: Array<{
+    fieldType: Extract<
+      ProfessorFieldType,
+      "diet" | "sound" | "season" | "observation"
+    >;
+    sentence: string;
+  }>;
   similarSpecies?: string[]; // 혼동 종 구분
   narrationRef?: string; // 음성 나레이션 참조(TTS/성우). TODO(제공 필요)
   quiz?: { q: string; options: string[]; answerIndex: number }[];

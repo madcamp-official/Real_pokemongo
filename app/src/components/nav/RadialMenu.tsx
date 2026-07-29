@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
+  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -13,9 +14,10 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NatureBall } from '@/components/nav/NatureBall';
 import { colors } from '@/theme/colors';
-import type { RootTabParamList } from '@/navigation/types';
+import type { RootStackParamList, RootTabParamList } from '@/navigation/types';
 
 type Nav = BottomTabNavigationProp<RootTabParamList>;
 
@@ -97,6 +99,13 @@ export function RadialMenu() {
     navigation.navigate(route);
   };
 
+  const openProfessor = () => {
+    setOpen(false);
+    navigation
+      .getParent<NativeStackNavigationProp<RootStackParamList>>()
+      ?.navigate('Professor');
+  };
+
   // 엠블럼(닫힌 버튼) 중심 좌표 — 항목들이 여기서 부채꼴로 펼쳐져 나온다.
   const pivotX = width / 2;
   const pivotBottom = insets.bottom + 18 + EMBLEM_SIZE / 2;
@@ -157,6 +166,29 @@ export function RadialMenu() {
               </View>
             </Pressable>
           </View>
+
+          <Pressable
+            onPress={openProfessor}
+            accessibilityRole="button"
+            accessibilityLabel="도감 박사"
+            style={({ pressed }) => [
+              styles.professorMenu,
+              { top: insets.top + 14 },
+              pressed && styles.pressed,
+            ]}
+          >
+            <View style={styles.professorMenuAvatar}>
+              <Image
+                source={require('../../../assets/professor/dex-professor-avatar.png')}
+                style={styles.professorMenuImage}
+                resizeMode="contain"
+              />
+            </View>
+            <View>
+              <Text style={styles.professorMenuEyebrow}>생태 질문</Text>
+              <Text style={styles.professorMenuTitle}>도감 박사</Text>
+            </View>
+          </Pressable>
 
           {/* 부채꼴로 펼쳐지는 메뉴 항목 — 엠블럼 위치에서 각자의 호 좌표로 날아간다. */}
           {itemLayouts.map(({ item, left, bottom, dx, up }) => {
@@ -226,6 +258,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   topRightIcon: { fontSize: 20 },
+
+  professorMenu: {
+    position: 'absolute',
+    left: 18,
+    minHeight: 54,
+    paddingLeft: 4,
+    paddingRight: 14,
+    borderRadius: 27,
+    backgroundColor: 'rgba(255,255,255,0.92)',
+    borderWidth: 2,
+    borderColor: 'rgba(122,163,113,0.5)',
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  professorMenuAvatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
+    backgroundColor: '#E7F1DF',
+  },
+  professorMenuImage: { width: 44, height: 44 },
+  professorMenuEyebrow: { color: '#7B927C', fontSize: 9, fontWeight: '800' },
+  professorMenuTitle: { color: '#365A3D', fontSize: 14, fontWeight: '900' },
 
   itemWrap: {
     position: 'absolute',
