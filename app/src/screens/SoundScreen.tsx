@@ -396,7 +396,7 @@ export default function SoundScreen() {
             title={`${selectedCandidate.common_name_ko}을(를) 기록했어요!`}
             description="소리로 만난 친구가 도감에 추가되었어요."
             actionLabel="탐험 지도로 돌아가기"
-            onAction={() => navigation.navigate('Map')}
+            onAction={leave}
           />
         )}
       </ScrollView>

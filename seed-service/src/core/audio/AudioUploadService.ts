@@ -62,6 +62,9 @@ export class AudioUploadService {
       wavBytes: converted.wavBytes,
       durationMs: converted.durationMs,
     });
+    // TEMP DEBUG(새소리 오탐 원인 조사 중 — 테스트 통과 전까지 지우지 말 것) --------------
+    console.error("[audio quality DEBUG]", JSON.stringify(quality));
+    // TEMP DEBUG 끝 ------------------------------------------------------------------
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + this.opts.ttlHours * 60 * 60 * 1000);
