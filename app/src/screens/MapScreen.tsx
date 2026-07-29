@@ -279,10 +279,6 @@ export default function MapScreen() {
         style={styles.bottomWash}
       />
       <View pointerEvents="none" style={[styles.nearbySummary, { bottom: insets.bottom + 21 }]}>
-        <View style={styles.scaleRow}>
-          <View style={styles.scaleLine} />
-          <Text style={styles.scaleText}>100m</Text>
-        </View>
         <Text style={styles.nearbyEyebrow}>{selectedGroup === '전체' ? locationLabel : `${selectedGroup} 관찰`}</Text>
         <Text style={styles.nearbyTitle}>내 주변 관찰 {visiblePins.length}건</Text>
       </View>
@@ -420,9 +416,6 @@ const styles = StyleSheet.create({
 
   bottomWash: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 220 },
   nearbySummary: { position: 'absolute', left: 26, gap: 5 },
-  scaleRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 8 },
-  scaleLine: { width: 66, height: 2, backgroundColor: '#252523' },
-  scaleText: { fontSize: 12, fontWeight: '800', color: '#555652' },
   nearbyEyebrow: { fontSize: 12, fontWeight: '800', letterSpacing: 0.2, color: '#667062' },
   nearbyTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.35, color: INK },
 
