@@ -42,7 +42,16 @@ export async function uploadAudioSighting(
     form.append('lat', String(params.coord.lat));
     form.append('lng', String(params.coord.lng));
   }
-  const { data } = await apiClient.post<AudioSightingUploadResponse>('/audio/sightings/upload', form);
+  const { data } = await apiClient.post<AudioSightingUploadResponse>(
+    '/audio/sightings/upload',
+    form,
+    {
+      // 422는 전송 실패가 아니라 서버 품질 검사 결과다. 본문에 usable=false와
+      // feedback_codes가 들어 있으므로 예외로 버리지 말고 화면이 재녹음 사유를
+      // 정확히 안내하게 한다(API_CONTRACT.md §1).
+      validateStatus: (status) => (status >= 200 && status < 300) || status === 422,
+    },
+  );
   return data;
 }
 

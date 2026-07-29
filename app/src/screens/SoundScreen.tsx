@@ -13,6 +13,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAudioPlayer } from 'expo-audio';
+import { isAxiosError } from 'axios';
 import {
   confirmAudioIdentification,
   deleteAudioSighting,
@@ -75,8 +76,18 @@ function createId(prefix: string): string {
 }
 
 function errorMessage(error: unknown): string {
+  if (isAxiosError(error)) {
+    const serverMessage = (error.response?.data as { message?: unknown } | undefined)?.message;
+    if (typeof serverMessage === 'string' && serverMessage.trim()) return serverMessage;
+    if (!error.response) return '서버에 연결하지 못했어요. 네트워크를 확인해 주세요.';
+    return '소리를 처리하는 중 문제가 생겼어요. 잠시 후 다시 시도해 주세요.';
+  }
   if (error instanceof Error && error.message) return error.message;
   return '연결을 확인하고 다시 시도해 주세요.';
+}
+
+function qualityDescription(codes: AudioQualityFeedbackCode[]): string {
+  return codes.map((code) => qualityMessage[code]).join('\n');
 }
 
 function formatTime(ms: number): string {
@@ -101,7 +112,7 @@ export default function SoundScreen() {
   const [audioSightingId, setAudioSightingId] = useState<string | null>(null);
   const [identifyResult, setIdentifyResult] = useState<AudioIdentifyResponse | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<AudioIdentifyCandidate | null>(null);
-  const [qualityFailure, setQualityFailure] = useState<AudioQualityFeedbackCode | null>(null);
+  const [qualityFailures, setQualityFailures] = useState<AudioQualityFeedbackCode[]>([]);
   const [similarity, setSimilarity] = useState<AudioSimilarityResponse | null>(null);
   const [failureMessage, setFailureMessage] = useState<string | null>(null);
   /** 업로드 실패 시 같은 client_recording_id로 다시 보낼 수 있는 최소 정보. */
@@ -136,7 +147,7 @@ export default function SoundScreen() {
     setAudioSightingId(null);
     setIdentifyResult(null);
     setSelectedCandidate(null);
-    setQualityFailure(null);
+    setQualityFailures([]);
     setSimilarity(null);
     setFailureMessage(null);
     setPendingUpload(null);
@@ -155,7 +166,11 @@ export default function SoundScreen() {
     setPendingUpload(null);
 
     if (!upload.quality.usable) {
-      setQualityFailure(upload.quality.feedback_codes[0] ?? 'NO_TARGET_ACTIVITY');
+      setQualityFailures(
+        upload.quality.feedback_codes.length > 0
+          ? upload.quality.feedback_codes
+          : ['NO_TARGET_ACTIVITY'],
+      );
       setWorkflow('quality_rejected');
       return;
     }
@@ -183,7 +198,7 @@ export default function SoundScreen() {
       }
       if (recording.durationMs < MIN_AUDIO_DURATION_MS) {
         deleteRecordedAudio(recording.uri);
-        setQualityFailure('TOO_SHORT');
+        setQualityFailures(['TOO_SHORT']);
         setWorkflow('quality_rejected');
         return;
       }
@@ -208,7 +223,7 @@ export default function SoundScreen() {
   }, [interrupted, locationCollectionEnabled, stopRecording, uploadAndIdentify]);
 
   const beginRecording = useCallback(async () => {
-    setQualityFailure(null);
+    setQualityFailures([]);
     setFailureMessage(null);
     setSimilarity(null);
     const started = await startRecording().catch(() => false);
@@ -343,11 +358,11 @@ export default function SoundScreen() {
           />
         )}
 
-        {workflow === 'quality_rejected' && qualityFailure && (
+        {workflow === 'quality_rejected' && qualityFailures.length > 0 && (
           <MessagePanel
-            emoji={qualityFailure === 'SPEECH_DETECTED' ? '🔒' : '🎧'}
+            emoji={qualityFailures.includes('SPEECH_DETECTED') ? '🔒' : '🎧'}
             title="이번 소리는 분석하기 어려워요"
-            description={qualityMessage[qualityFailure]}
+            description={qualityDescription(qualityFailures)}
             actionLabel="다시 녹음"
             onAction={() => void clearSession(true)}
           />

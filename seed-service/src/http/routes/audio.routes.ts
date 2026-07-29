@@ -172,6 +172,35 @@ export function registerAudioRoutes(
     }
   });
 
+  server.delete<{ Params: { audioSightingId: string } }>(
+    "/audio/sightings/:audioSightingId",
+    { preHandler: authenticate },
+    async (request, reply) => {
+      const ctx = requireAuthContext(request);
+      const id = asAudioSightingId(request.params.audioSightingId);
+      const sighting = await app.repos.audioSightings.get(id);
+
+      // 존재하지 않는 세션과 다른 사용자의 세션을 같은 404로 처리해 존재 여부를
+      // 노출하지 않는다. 앱은 재녹음/화면 종료 시 이 API로 미확정 음원을 즉시 폐기한다.
+      if (!sighting || sighting.userId !== ctx.userId) {
+        return reply.code(404).send(audioError("not_found", "오디오 세션을 찾을 수 없습니다."));
+      }
+
+      // TTL 정리와 동일하게 파일을 먼저 지운 뒤 DB 행을 지운다. 파일 삭제가 실패했는데
+      // 행부터 지우면 고아 음원이 남아 이후 자동 정리도 할 수 없으므로 503으로 재시도시킨다.
+      try {
+        if (sighting.storagePath) await app.audioTempStore.delete(sighting.storagePath);
+        await app.repos.audioSightings.deleteById(id);
+      } catch {
+        return reply
+          .code(503)
+          .send(audioError("audio_processor_unavailable", "오디오 삭제에 실패했습니다.", { retryable: true }));
+      }
+
+      return reply.code(204).send();
+    },
+  );
+
   server.post<{ Body: IdentifyBody }>(
     "/audio/identify",
     { preHandler: authenticate, schema: { body: identifyBodySchema } },

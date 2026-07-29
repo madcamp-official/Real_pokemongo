@@ -130,6 +130,10 @@ export default function MapScreen() {
   };
 
   const isOffline = pinsQuery.isError || regionsQuery.isError;
+  const mapErrorText =
+    mapError === 'map_html_fetch_failed'
+      ? '🗺️ 지도 서버에 연결하지 못했어요'
+      : '🗺️ 카카오 지도를 불러오지 못했어요 · 잠시 후 다시 시도해 주세요';
 
   return (
     <View style={styles.root}>
@@ -223,10 +227,7 @@ export default function MapScreen() {
         <View pointerEvents="none" style={[styles.notices, { top: insets.top + 142 }]}>
           {mapError && (
             <View style={styles.notice}>
-              <Text style={styles.noticeText}>
-                🗺️ 지도를 불러오지 못했어요 · 카카오 개발자 콘솔에 이 주소가 Web 플랫폼으로
-                등록됐는지 확인해 주세요
-              </Text>
+              <Text style={styles.noticeText}>{mapErrorText}</Text>
             </View>
           )}
           {isOffline && (

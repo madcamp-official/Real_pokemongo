@@ -67,6 +67,18 @@ export default function DexScreen() {
             <View style={styles.center}>
               <ActivityIndicator color={colors.primary} />
             </View>
+          ) : dexQuery.isError ? (
+            <View style={styles.center}>
+              <Text style={styles.emptyText}>도감 정보를 불러오지 못했어요.</Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="도감 다시 불러오기"
+                style={styles.retryButton}
+                onPress={() => void dexQuery.refetch()}
+              >
+                <Text style={styles.retryText}>다시 시도</Text>
+              </Pressable>
+            </View>
           ) : (
             <View style={styles.center}>
               <Text style={styles.emptyText}>이 분류에는 아직 발견한 친구가 없어요.</Text>
@@ -93,6 +105,14 @@ const styles = StyleSheet.create({
   column: { paddingHorizontal: 16, gap: 12, marginBottom: 12 },
   center: { paddingVertical: 60, alignItems: 'center', paddingHorizontal: 32 },
   emptyText: { color: colors.textSecondary, fontSize: 14, textAlign: 'center' },
+  retryButton: {
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 18,
+    backgroundColor: colors.primary,
+  },
+  retryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
   professorFab: {
     position: 'absolute',
     right: 18,

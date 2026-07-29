@@ -17,8 +17,10 @@
  *     (애초에 가정했던 "300-3400Hz 대역 에너지 비중"은 톤/화음이 오히려 그 대역에 몰려 있어서
  *     실측 결과 완전히 반대로 나왔다 — 가정을 버리고 실측으로 대체한 사례).
  *
- * 표본이 적은 휴리스틱이라는 한계는 있다(진짜 새소리 녹음으로 검증한 게 아니라 합성음/실제
- * TTS 음성으로 검증함) — 실제 배포 후 오탐/누락이 보이면 이 파일의 상수부터 재보정할 것.
+ * 초기 보정은 합성음/TTS 중심이었지만, 실제 새소리 검증에서 정상적인 한 마리의 복합 배음도
+ * "여러 소리 중첩"으로 오탐하는 문제가 확인됐다(직박구리 XC1016816, 2026-07-29).
+ * 따라서 두 스펙트럼 피크만으로 중첩을 단정하지 않고, 낮은 SNR까지 함께 나타날 때만
+ * MULTIPLE_OVERLAP을 차단 사유로 쓴다. 최종 종 판별은 BirdNET 후보 확신도가 담당한다.
  */
 import { extractPcm16Mono } from "./pcmUtils.js";
 import { magnitudeSpectrum, nextPow2 } from "./dsp/fft.js";
@@ -40,8 +42,9 @@ const CLIP_SAMPLE_THRESHOLD = 32700 / 32768;
 /** upload-success.json 기준 통과 예시(0.001)보다 확실히 높게 잡은 거부 임계값. */
 const CLIPPING_RATIO_THRESHOLD = 0.005;
 
-/** 문헌상 자동 종 동정에 쓸 만한 최소 SNR 어림값(신뢰 여유를 두고 success 예시의 17.4dB보다 낮게). */
-const TOO_NOISY_SNR_DB_THRESHOLD = 10;
+/** BirdNET은 야외 잡음에도 견디므로 신호가 배경보다 약 4배(6dB) 이상 크면 모델 판단까지
+ * 허용한다. 10dB였던 초기값은 실제 휴대폰 녹음(8.1~8.6dB)을 과도하게 차단했다. */
+const TOO_NOISY_SNR_DB_THRESHOLD = 6;
 /** 활성/비활성 프레임을 각각 최소 이만큼은 확보해야 "조용한 구간 대비 신호" SNR을 신뢰할 수 있다. */
 const MIN_FRAMES_FOR_CONTRAST_SNR = 3;
 /** 녹음 전체가 끊김 없이 활동적이라 조용한 구간이 없을 때(=대비 기반 SNR을 못 잴 때)의 대체 판단:
@@ -270,8 +273,7 @@ export class AudioQualityAnalyzer {
     const isStationaryTone =
       peakHzActive.length >= 8 &&
       peakHzStd < STATIONARY_PEAK_HZ_STD_THRESHOLD &&
-      activeDurationMs >= MIN_STATIONARY_DURATION_MS &&
-      overlapFrameRatio <= OVERLAP_FRAME_RATIO_THRESHOLD;
+      activeDurationMs >= MIN_STATIONARY_DURATION_MS;
 
     // --- 목표 음향 활동 구간: 연속 활성 프레임을 세그먼트로 병합 ---
     const validSegments: AudioQualityValidSegment[] = [];
@@ -305,7 +307,15 @@ export class AudioQualityAnalyzer {
     if (clippingRatio > CLIPPING_RATIO_THRESHOLD) hit.add("CLIPPED");
     if (snrDb !== null && snrDb < TOO_NOISY_SNR_DB_THRESHOLD) hit.add("TOO_NOISY");
     if (speechRatio > SPEECH_MODULATION_RATIO_THRESHOLD) hit.add("SPEECH_DETECTED");
-    if (overlapFrameRatio > OVERLAP_FRAME_RATIO_THRESHOLD) hit.add("MULTIPLE_OVERLAP");
+    // 실제 한 마리 새소리도 정상적으로 여러 비배음 피크를 낼 수 있다. 스펙트럼 피크가
+    // 여러 개라는 이유만으로 차단하지 않고, 저SNR 복합 신호일 때만 "겹침" 안내를 낸다.
+    if (
+      overlapFrameRatio > OVERLAP_FRAME_RATIO_THRESHOLD &&
+      snrDb !== null &&
+      snrDb < TOO_NOISY_SNR_DB_THRESHOLD
+    ) {
+      hit.add("MULTIPLE_OVERLAP");
+    }
     if (isStationaryTone) hit.add("UNSUPPORTED_SOUND");
     if (!hit.has("MOSTLY_SILENCE") && validSegments.length === 0) hit.add("NO_TARGET_ACTIVITY");
 

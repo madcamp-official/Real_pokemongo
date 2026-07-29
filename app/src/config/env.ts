@@ -37,8 +37,14 @@ function resolveDevHost(): string | null {
  * app.json 의 `extra.apiBaseUrl` 을 채우면 그 값이 항상 우선한다(자동 탐지 실패 시 탈출구).
  */
 function resolveApiBaseUrl(): string {
+  // Expo CLI가 .env.local의 EXPO_PUBLIC_* 값을 번들에 정적으로 주입한다.
+  // 실기기 테스트에서는 PC의 Wi-Fi 주소를 명시해 Metro 메타데이터 형식이 달라져도
+  // 휴대폰이 자기 자신의 localhost를 바라보지 않게 한다.
+  const envOverride = process.env.EXPO_PUBLIC_API_BASE_URL?.trim();
+  if (envOverride) return envOverride.replace(/\/+$/, '');
+
   const override = Constants.expoConfig?.extra?.apiBaseUrl;
-  if (typeof override === 'string' && override.length > 0) return override;
+  if (typeof override === 'string' && override.length > 0) return override.replace(/\/+$/, '');
 
   const host = resolveDevHost();
   return host ? `http://${host}:${API_PORT}` : `http://localhost:${API_PORT}`;

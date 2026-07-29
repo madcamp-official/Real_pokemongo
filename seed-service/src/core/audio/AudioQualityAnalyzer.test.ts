@@ -106,9 +106,10 @@ test("UNSUPPORTED_SOUND: 주파수가 고정된 지속음(순음)은 걸리고, 
   assert.ok(!chirp.feedbackCodes.includes("UNSUPPORTED_SOUND"), JSON.stringify(chirp.feedbackCodes));
 });
 
-test("MULTIPLE_OVERLAP: 배음 관계가 아닌 두 톤이 겹치면 걸리고, 배음 관계(정수배)는 안 걸린다", async () => {
+test("복합 피크 회귀: 깨끗한 복합음은 MULTIPLE_OVERLAP으로 오탐하지 않고 고정음으로 거부한다", async () => {
   const unrelated = await analyzeWav(await makeMixedTones(5, 800, 2600));
-  assert.ok(unrelated.feedbackCodes.includes("MULTIPLE_OVERLAP"), JSON.stringify(unrelated.feedbackCodes));
+  assert.ok(!unrelated.feedbackCodes.includes("MULTIPLE_OVERLAP"), JSON.stringify(unrelated.feedbackCodes));
+  assert.ok(unrelated.feedbackCodes.includes("UNSUPPORTED_SOUND"), JSON.stringify(unrelated.feedbackCodes));
 
   const harmonic = await analyzeWav(await makeMixedTones(5, 1000, 2000));
   assert.ok(!harmonic.feedbackCodes.includes("MULTIPLE_OVERLAP"), JSON.stringify(harmonic.feedbackCodes));

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -87,9 +87,27 @@ export default function RewardsScreen() {
     <View style={[styles.root, { paddingTop: insets.top }]}>
       <ScreenHeader title="보상함" />
 
-      {isLoading || !xpQuery.data ? (
+      {isLoading ? (
         <View style={styles.center}>
           <ActivityIndicator color={colors.primary} />
+        </View>
+      ) : xpQuery.isError || badgesQuery.isError || questsQuery.isError || !xpQuery.data ? (
+        <View style={styles.center}>
+          <Text style={styles.errorText}>보상 정보를 불러오지 못했어요.</Text>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="보상 정보 다시 불러오기"
+            style={styles.retryButton}
+            onPress={() => {
+              void Promise.all([
+                xpQuery.refetch(),
+                badgesQuery.refetch(),
+                questsQuery.refetch(),
+              ]);
+            }}
+          >
+            <Text style={styles.retryText}>다시 시도</Text>
+          </Pressable>
         </View>
       ) : (
         <ScrollView contentContainerStyle={styles.content}>
@@ -128,6 +146,15 @@ const styles = StyleSheet.create({
   header: { paddingHorizontal: 20, paddingBottom: 8 },
   title: { fontSize: 26, fontWeight: '800', color: colors.textPrimary },
   center: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  errorText: { color: colors.textSecondary, fontSize: 14, fontWeight: '700' },
+  retryButton: {
+    marginTop: 14,
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+    borderRadius: 18,
+    backgroundColor: colors.primary,
+  },
+  retryText: { color: '#FFFFFF', fontSize: 14, fontWeight: '800' },
   content: { paddingHorizontal: 20, paddingBottom: 32, gap: 14 },
   xpCard: {
     backgroundColor: colors.surface,

@@ -233,6 +233,57 @@ test("POST /audio/sightings/upload: mode가 ambient가 아니면 400 audio_inval
   assert.equal(res.json().error, "audio_invalid_format");
 });
 
+test("DELETE /audio/sightings/:id: 소유한 미확정 세션의 파일과 DB 행을 함께 삭제한다", async () => {
+  const { app, server } = await testServer();
+  const { token } = await signup(server);
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const uploaded = await upload(
+    server,
+    token,
+    audio,
+    defaultFields({ duration_ms: "4000" }),
+    "rec.wav",
+  );
+  assert.equal(uploaded.statusCode, 200);
+
+  const id = asAudioSightingId(uploaded.json().audio_sighting_id as string);
+  const before = await app.repos.audioSightings.get(id);
+  assert.ok(before?.storagePath);
+  assert.ok(await app.audioTempStore.read(before.storagePath));
+
+  const deleted = await server.inject({
+    method: "DELETE",
+    url: `/audio/sightings/${id}`,
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(deleted.statusCode, 204);
+  assert.equal(await app.repos.audioSightings.get(id), null);
+  assert.equal(await app.audioTempStore.read(before.storagePath), null);
+});
+
+test("DELETE /audio/sightings/:id: 다른 사용자의 세션은 존재 여부를 숨기고 삭제하지 않는다", async () => {
+  const { app, server } = await testServer();
+  const owner = await signup(server);
+  const stranger = await signup(server);
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const uploaded = await upload(
+    server,
+    owner.token,
+    audio,
+    defaultFields({ duration_ms: "4000" }),
+    "rec.wav",
+  );
+  const id = asAudioSightingId(uploaded.json().audio_sighting_id as string);
+
+  const denied = await server.inject({
+    method: "DELETE",
+    url: `/audio/sightings/${id}`,
+    headers: { authorization: `Bearer ${stranger.token}` },
+  });
+  assert.equal(denied.statusCode, 404);
+  assert.ok(await app.repos.audioSightings.get(id));
+});
+
 // ── 6단계: POST /audio/identify ─────────────────────────────────────────────
 // BioClipProvider.test.ts와 같은 원칙 — 전역 fetch를 모킹해 실제 GPU 서버 없이 검증한다.
 function withMockedFetch<T>(impl: typeof fetch, run: () => Promise<T>): Promise<T> {
