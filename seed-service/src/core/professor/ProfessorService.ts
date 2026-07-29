@@ -22,8 +22,6 @@ const FIXED_OBSERVATION_ANSWER =
   "생물은 손대지 말고 눈으로 관찰해요. 벌이나 낯선 생물은 거리를 두고, 위험해 보이면 가까운 어른에게 알려 주세요.";
 const UNKNOWN_ANSWER =
   "아직 그 질문에 딱 맞는 내용을 찾지 못했어요. 생김새, 사는 곳, 활동 시간처럼 한 가지를 짧게 물어봐 주세요.";
-const RESTRICTED_ANSWER =
-  "아직 도감에서 만나지 못한 친구에 대한 질문이에요. 주변을 안전하게 관찰해 직접 발견해 보세요.";
 
 const REASON_BY_FIELD: Record<string, string> = {
   habitat: "사는 곳이 관련 있어요",
@@ -116,26 +114,10 @@ export class ProfessorService {
     const discovered = collection?.unlocked ?? false;
     const safety = this.safety.evaluate(taxon);
 
-    // 위험 정보와 사용자가 직접 이름을 말한 생물의 사실은 발견 전에도 공개한다.
-    // 종 카드에서 이어진 질문도 같은 생물을 가리키는 것이 명확하므로 허용한다.
-    // 답변을 보여 주는 것만으로 도감 등록 상태를 바꾸지는 않는다.
-    const safetyAnswer = best.record.is_safety;
-    const explicitlyNamed =
-      namedTaxon?.id === taxon.id || questionMentionsTaxon(question, taxon);
-    const matchesContext = input.contextSpeciesId === (taxon.id as string);
-    if (!discovered && !safetyAnswer && !explicitlyNamed && !matchesContext) {
-      return {
-        confidence: confidenceForScore(best.score, this.thresholds),
-        answer: RESTRICTED_ANSWER,
-        matched_species: null,
-        safety_warning: safety?.message ?? null,
-        related: [],
-        similarity_score: roundScore(best.score),
-        restricted: true,
-        response_source: "indexed_sentence",
-      };
-    }
-
+    // 2026-07-29: 미발견 종도 도감 박사가 모든 정보를 설명할 수 있도록 사용자(계약 소유자)
+    // 요청으로 발견 여부에 따른 답변 차단을 제거했다. 이름/사실 노출은 항상 허용하고,
+    // matched_species.discovered로만 "아직 도감에 등록되지 않았다"는 걸 알려준다
+    // (앱은 이 값을 보고 종 카드 링크 대신 미등록 안내를 보여준다 — ProfessorScreen.tsx).
     return {
       confidence: confidenceForScore(best.score, this.thresholds),
       answer: best.record.sentence,
@@ -145,7 +127,7 @@ export class ProfessorService {
         discovered,
       },
       safety_warning: safety?.message ?? null,
-      related: await this.visibleRelated(input.userId, results.slice(1), taxon.id),
+      related: await this.visibleRelated(results.slice(1), taxon.id),
       similarity_score: roundScore(best.score),
       restricted: false,
       response_source: "indexed_sentence",
@@ -164,7 +146,7 @@ export class ProfessorService {
       const name = taxon.korName || taxon.sciName;
       suggestions.unshift({
         id: `species-${taxon.id}`,
-        question: `${name}은 어디에서 살아요?`,
+        question: `${name}${topicParticleFor(name)} 어디에서 살아요?`,
         context_species_id: taxon.id as string,
       });
     }
@@ -192,7 +174,6 @@ export class ProfessorService {
   }
 
   private async visibleRelated(
-    userId: UserId,
     results: readonly SearchResult[],
     matchedTaxonId: TaxonId,
   ) {
@@ -203,8 +184,6 @@ export class ProfessorService {
       seen.add(result.record.species_id);
       const taxon = await this.deps.taxa.get(result.record.species_id as TaxonId);
       if (!taxon) continue;
-      const entry = await this.deps.collection.get(userId, taxon.id);
-      if (!(entry?.unlocked ?? false) && !result.record.is_safety) continue;
       related.push({
         species_id: taxon.id as string,
         name: taxon.korName || taxon.sciName,
@@ -231,6 +210,18 @@ function questionMentionsTaxon(question: string, taxon: Taxon): boolean {
     const comparableName = normalizeForTaxonMatch(name);
     return comparableName.length >= 2 && comparableQuestion.includes(comparableName);
   });
+}
+
+const HANGUL_SYLLABLE_START = 0xac00;
+const HANGUL_SYLLABLE_END = 0xd7a3;
+const HANGUL_JONGSEONG_COUNT = 28;
+
+/** 이름의 마지막 글자 받침 유무로 "은"/"는" 중 맞는 조사를 고른다(받침 있으면 "은"). */
+function topicParticleFor(name: string): string {
+  const lastCode = name.trim().charCodeAt(name.trim().length - 1);
+  if (lastCode < HANGUL_SYLLABLE_START || lastCode > HANGUL_SYLLABLE_END) return "는";
+  const hasBatchim = (lastCode - HANGUL_SYLLABLE_START) % HANGUL_JONGSEONG_COUNT !== 0;
+  return hasBatchim ? "은" : "는";
 }
 
 function normalizeForTaxonMatch(value: string): string {

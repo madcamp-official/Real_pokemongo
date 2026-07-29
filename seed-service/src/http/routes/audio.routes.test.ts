@@ -64,6 +64,8 @@ interface UploadFields {
   duration_ms?: string;
   recorded_at?: string;
   mode?: string;
+  lat?: string;
+  lng?: string;
 }
 
 async function buildAudioMultipart(
@@ -1171,6 +1173,52 @@ test("계약 fixture: confirm-success.json과 실제 확정 응답의 구조가 
   });
   assert.equal(res.statusCode, 200);
   assertContractShape(res.json(), loadFixture("confirm-success.json"), "confirm-success");
+});
+
+test("2026-07-29 버그 수정: 좌표와 함께 소리로 확정한 종이 /map/pins에 뜬다", async () => {
+  // 이전엔 lat/lng을 파싱만 하고 버려서 소리로 확정한 observation엔 preciseCoord가 전혀
+  // 없었고, /map/pins가 좌표 없는 관찰을 걸러내 지도에서 항상 빠졌다(0006 마이그레이션 +
+  // AudioUploadService/recordIdentification 수정으로 해결).
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const uploadRes = await upload(
+    server,
+    token,
+    audio,
+    defaultFields({ duration_ms: "4000", lat: "36.36", lng: "127.38" }),
+    "rec.wav",
+  );
+  assert.equal(uploadRes.statusCode, 200);
+  const audioSightingId = uploadRes.json().audio_sighting_id as string;
+
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.87 }] },
+  ]);
+  const identifyRes = await withMockedFetch(fakeFetch, () => callIdentify(server, token, audioSightingId));
+  assert.equal(identifyRes.statusCode, 200);
+  const speciesId = identifyRes.json().candidates[0].species_id as string;
+
+  const confirmRes = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(confirmRes.statusCode, 200);
+
+  const pinsRes = await server.inject({
+    method: "GET",
+    url: "/map/pins",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(pinsRes.statusCode, 200);
+  const pins = pinsRes.json() as Array<{ species_id: string; lat: number; lng: number }>;
+  const pin = pins.find((p) => p.species_id === speciesId);
+  assert.ok(pin, "소리로 확정한 종이 지도 핀에 있어야 함: " + JSON.stringify(pins));
+  assert.ok(Math.abs(pin!.lat - 36.36) < 0.001);
+  assert.ok(Math.abs(pin!.lng - 127.38) < 0.001);
 });
 
 test("계약 fixture: similarity-success.json과 실제 채점 응답의 구조가 일치한다", async () => {

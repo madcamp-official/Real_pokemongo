@@ -860,8 +860,9 @@ export class PgAudioSightingRepo implements AudioSightingRepository {
     await this.pool.query(
       `INSERT INTO audio_sighting
          (id, user_id, client_recording_id, status, media_kind, mime_type,
-          duration_ms, sha256, storage_path, quality, recorded_at, created_at, expires_at)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)`,
+          duration_ms, sha256, storage_path, quality, precise_lat, precise_lng,
+          recorded_at, created_at, expires_at)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)`,
       [
         sighting.id,
         sighting.userId,
@@ -873,6 +874,8 @@ export class PgAudioSightingRepo implements AudioSightingRepository {
         sighting.sha256,
         sighting.storagePath ?? null,
         JSON.stringify(sighting.quality),
+        sighting.coord?.lat ?? null,
+        sighting.coord?.lng ?? null,
         sighting.recordedAt,
         sighting.createdAt,
         sighting.expiresAt,
@@ -968,6 +971,10 @@ function rowToAudioSighting(row: any): AudioSighting {
     storagePath: row.storage_path ?? undefined,
     // pg는 jsonb 컬럼을 이미 파싱된 객체로 돌려준다(문자열 아님) — 그대로 캐스팅.
     quality: row.quality as AudioQuality,
+    coord:
+      row.precise_lat !== null && row.precise_lng !== null
+        ? { lat: Number(row.precise_lat), lng: Number(row.precise_lng) }
+        : null,
     recordedAt: new Date(row.recorded_at).toISOString(),
     createdAt: new Date(row.created_at).toISOString(),
     expiresAt: new Date(row.expires_at).toISOString(),

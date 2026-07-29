@@ -89,6 +89,8 @@ export function registerAudioRoutes(
     let durationMsField: string | undefined;
     let recordedAt: string | undefined;
     let mode: string | undefined;
+    let lat: number | undefined;
+    let lng: number | undefined;
 
     for await (const part of request.parts()) {
       if (part.type === "file" && part.fieldname === "audio") {
@@ -99,11 +101,16 @@ export function registerAudioRoutes(
         else if (part.fieldname === "duration_ms") durationMsField = value;
         else if (part.fieldname === "recorded_at") recordedAt = value;
         else if (part.fieldname === "mode") mode = value;
-        // lat/lng: API_CONTRACT.md에 정의돼 있지만 3단계 스키마(audio_sighting)에는 아직
-        // 저장 컬럼이 없다 — 파싱만 하고 무시한다(2026-07-28, 스코프 결정. 필요해지면
-        // 별도 마이그레이션으로 컬럼을 추가한다).
+        // 사진 파이프라인(sightings.routes.ts)과 같은 방식 — 좌표는 선택 사항이라
+        // 파싱 결과가 유효할 때만 쓴다(2026-07-29: 지도 핀 누락 버그 수정, 0006 마이그레이션).
+        else if (part.fieldname === "lat") lat = parseFloat(value);
+        else if (part.fieldname === "lng") lng = parseFloat(value);
       }
     }
+    const coord =
+      lat !== undefined && lng !== undefined && Number.isFinite(lat) && Number.isFinite(lng)
+        ? { lat, lng }
+        : null;
 
     if (!audioBuffer || audioBuffer.length === 0) {
       return reply.code(400).send(audioError("audio_invalid_format", "오디오 파일이 없습니다."));
@@ -141,6 +148,7 @@ export function registerAudioRoutes(
         audioBytes: audioBuffer,
         clientDurationMs: Number(durationMsField),
         recordedAt,
+        coord,
       });
       // 품질 거부(422)도 형식 오류(400)와 다른 응답 형태다 — API_CONTRACT.md 1장
       // "Quality rejection (422): see fixtures/upload-quality-rejected.json" — 에러 객체가
@@ -330,6 +338,10 @@ export function registerAudioRoutes(
         source: app.config.audio.model.name,
         media: [],
         modality: "audio",
+        // 2026-07-29 버그 수정: 업로드 때 받은 좌표를 여기로 안 넘겨서 소리로 확정한
+        // observation엔 항상 preciseCoord가 없었고, /map/pins가 좌표 없는 관찰을 걸러내
+        // 소리로 등록한 종이 탐험 지도에서 빠졌다.
+        rawCoord: sighting.coord ?? undefined,
         now: new Date(),
       });
 

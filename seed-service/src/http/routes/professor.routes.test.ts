@@ -132,6 +132,26 @@ test("POST /professor/ask: 미발견 위험 종도 안전 문장과 종명은 �
   assert.match(body.safety_warning, /멀리서/);
 });
 
+test("POST /professor/ask: 종 이름 없는 일반 질문이 미발견 종과 매칭돼도 설명을 그대로 준다(2026-07-29)", async () => {
+  const { server } = await serverPromise;
+  const { token } = await signup();
+  // "밀잠자리"라는 이름을 넣지 않고도 그 종의 funFact 문장과 거의 같은 표현을 물어, 종 이름 언급/맥락
+  // 없이도 검색이 미발견 종에 매칭되는 상황을 재현한다. 예전에는 이 경우 RESTRICTED_ANSWER로 막혔다.
+  const question = "성숙한 수컷은 몸에 하얀 가루가 생겨 연한 하늘색처럼 보이는 곤충이 있어?";
+  const response = await server.inject({
+    method: "POST",
+    url: "/professor/ask",
+    headers: { authorization: `Bearer ${token}` },
+    payload: { question },
+  });
+  assert.equal(response.statusCode, 200);
+  const body = response.json();
+  assert.equal(body.restricted, false, JSON.stringify(body));
+  assert.equal(body.matched_species.name, "밀잠자리");
+  assert.equal(body.matched_species.discovered, false);
+  assert.match(body.answer, /하늘색/);
+});
+
 test("POST /professor/ask: 발견 종은 인덱스 원문과 종 카드 링크 정보를 반환한다", async () => {
   const { app, server } = await serverPromise;
   const { token, userId } = await signup();
@@ -185,4 +205,26 @@ test("GET /professor/greeting, suggestions: 질문 원문 없이 진행도 기�
   assert.equal(suggestions.statusCode, 200);
   assert.ok(Array.isArray(suggestions.json()));
   assert.ok(suggestions.json().length >= 2);
+});
+
+test("GET /professor/suggestions: 발견한 종 이름에 맞는 조사(은/는)를 붙인다(2026-07-29)", async () => {
+  const { app, server } = await serverPromise;
+  const { token, userId } = await signup();
+  // "까치"는 받침 없는 이름이라 "는"이 맞다 — 예전엔 "은"이 하드코딩돼 "까치은"이라는 비문이 나왔다.
+  await app.repos.collection.save({
+    userId,
+    taxonId: asTaxonId("taxon-pica-serica"),
+    unlocked: true,
+    timesObserved: 1,
+  });
+  const response = await server.inject({
+    method: "GET",
+    url: "/professor/suggestions",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(response.statusCode, 200);
+  const magpieSuggestion = (response.json() as Array<{ context_species_id?: string; question: string }>)
+    .find((suggestion) => suggestion.context_species_id === "taxon-pica-serica");
+  assert.ok(magpieSuggestion, JSON.stringify(response.json()));
+  assert.equal(magpieSuggestion.question, "까치는 어디에서 살아요?");
 });
