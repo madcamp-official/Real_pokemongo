@@ -9,6 +9,7 @@ import type {
   MediaRef,
   SightingId,
   CreatureId,
+  AudioSightingId,
 } from "./types.js";
 
 export const newUserId = () => randomUUID() as UserId;
@@ -23,3 +24,5 @@ export const asCreatureId = (s: string) => s as CreatureId;
 export const asMediaRef = (s: string) => s as MediaRef;
 export const asTaxonId = (s: string) => s as TaxonId;
 export const asSightingId = (s: string) => s as SightingId;
+export const newAudioSightingId = () => randomUUID() as AudioSightingId;
+export const asAudioSightingId = (s: string) => s as AudioSightingId;

@@ -1,0 +1,24 @@
+=== 모델 로드 ===
+
+=== A) 지속 세션(predict_session) 지연 측정: 3/6/10/15초 x 3종 x 5회 반복 ===
+[워밍업] 첫 호출: 11.068s (통계 제외)
+  3s 마지막 결과 top segment 예측: (np.str_('Eremomela pusilla_Senegal Eremomela'), 5.12386868649628e-05)
+  6s 마지막 결과 top segment 예측: (np.str_('Eremomela pusilla_Senegal Eremomela'), 5.12386868649628e-05)
+  10s 마지막 결과 top segment 예측: (np.str_('Eremomela pusilla_Senegal Eremomela'), 5.12386868649628e-05)
+  15s 마지막 결과 top segment 예측: (np.str_('Eremomela pusilla_Senegal Eremomela'), 5.12386868649628e-05)
+
+=== B) 동일 파일 반복 추론 안정성 (hypsipetes_15s, 5회) ===
+모두 동일한가? True
+  [["Eremomela icteropygialis_Yellow-bellied Eremomela", 7e-06], ["Eremomela pusilla_Senegal Eremomela", 0.0], ["Epthianura tricolor_Crimson Chat", 0.0], ["Zosterops palpebrosus_Indian White-eye", 7e-06], ["Eremomela scotops_Greencap Eremomela", 0.0]]
+  [["Eremomela icteropygialis_Yellow-bellied Eremomela", 7e-06], ["Eremomela pusilla_Senegal Eremomela", 0.0], ["Epthianura tricolor_Crimson Chat", 0.0], ["Zosterops palpebrosus_Indian White-eye", 7e-06], ["Eremomela scotops_Greencap Eremomela", 0.0]]
+  [["Eremomela icteropygialis_Yellow-bellied Eremomela", 7e-06], ["Eremomela pusilla_Senegal Eremomela", 0.0], ["Epthianura tricolor_Crimson Chat", 0.0], ["Zosterops palpebrosus_Indian White-eye", 7e-06], ["Eremomela scotops_Greencap Eremomela", 0.0]]
+  [["Eremomela icteropygialis_Yellow-bellied Eremomela", 7e-06], ["Eremomela pusilla_Senegal Eremomela", 0.0], ["Epthianura tricolor_Crimson Chat", 0.0], ["Zosterops palpebrosus_Indian White-eye", 7e-06], ["Eremomela scotops_Greencap Eremomela", 0.0]]
+  [["Eremomela icteropygialis_Yellow-bellied Eremomela", 7e-06], ["Eremomela pusilla_Senegal Eremomela", 0.0], ["Epthianura tricolor_Crimson Chat", 0.0], ["Zosterops palpebrosus_Indian White-eye", 7e-06], ["Eremomela scotops_Greencap Eremomela", 0.0]]
+
+=== C) 지연 통계 (초, 세션 재사용 기준) ===
+  3s 입력: n=15 mean=1.029s p95=1.031s min=1.028s max=1.032s
+  6s 입력: n=15 mean=1.047s p95=1.050s min=1.042s max=1.051s
+  10s 입력: n=15 mean=1.082s p95=1.087s min=1.072s max=1.088s
+  15s 입력: n=15 mean=1.096s p95=1.102s min=1.082s max=1.103s
+
+DONE

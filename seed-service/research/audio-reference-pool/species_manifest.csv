@@ -1,0 +1,19 @@
+taxon_id,kor_name,sci_name,target_clips,target_sessions,collected_clips,collected_sessions,status,notes
+taxon-hypsipetes-amaurotis,직박구리,Hypsipetes amaurotis,20,5,62,41,ready_for_review,2026-07-28 조회. 후보는 clips.csv에 있음 — quality_status(사람이 들어보고 승인) 대기
+taxon-passer-montanus,참새,Passer montanus,20,5,89,73,ready_for_review,2026-07-28 조회
+taxon-streptopelia-orientalis,멧비둘기,Streptopelia orientalis,20,5,64,53,ready_for_review,2026-07-28 조회
+taxon-ardea-cinerea,왜가리,Ardea cinerea,20,5,51,49,ready_for_review,2026-07-28 조회. 혼동종: 대백로
+taxon-corvus-macrorhynchos,큰부리까마귀,Corvus macrorhynchos,20,5,65,54,ready_for_review,2026-07-28 조회. 혼동종: 까치·물까치
+taxon-pica-serica,까치,Pica serica,20,5,76,67,ready_for_review,2026-07-28 조회. 혼동종: 큰부리까마귀·물까치
+taxon-phoenicurus-auroreus,딱새,Phoenicurus auroreus,20,5,80,62,ready_for_review,2026-07-28 조회
+taxon-larus-crassirostris,괭이갈매기,Larus crassirostris,20,5,28,23,ready_for_review,2026-07-28 조회(전체 35건 중 28건 — 원본이 적은 종이라 목표 대비 여유가 가장 적음)
+taxon-anas-platyrhynchos,청둥오리,Anas platyrhynchos,20,5,78,69,ready_for_review,2026-07-28 조회. 혼동종: 흰뺨검둥오리
+taxon-ardea-alba,대백로,Ardea alba,20,5,84,72,ready_for_review,2026-07-28 조회. 혼동종: 왜가리
+taxon-sinosuthora-webbiana,붉은머리오목눈이,Sinosuthora webbiana,20,5,80,70,ready_for_review,"원인 확인됨(2026-07-28): Xeno-canto는 이 종을 Sinosuthora webbiana로 색인함(seedData.ts의 sciName은 Suthora webbiana로 돼 있어 처음엔 검색 0건이었음 — taxonId 슬러그는 이미 sinosuthora로 맞음). 소싱용으로 여기 sci_name만 고쳤고, seedData.ts 쪽 sciName 필드 자체를 고칠지는 별도 확인 필요."
+taxon-parus-cinereus,박새,Parus cinereus,20,5,66,50,ready_for_review,2026-07-28 조회. 혼동종: 쇠박새
+taxon-poecile-palustris,쇠박새,Poecile palustris,20,5,52,45,ready_for_review,2026-07-28 조회. 혼동종: 박새
+taxon-emberiza-elegans,노랑턱멧새,Emberiza elegans,20,5,82,72,ready_for_review,2026-07-28 조회
+taxon-anas-zonorhyncha,흰뺨검둥오리,Anas zonorhyncha,20,5,27,20,ready_for_review,2026-07-28 조회(전체 36건 중 27건 — 목표 대비 여유가 가장 적은 종). 혼동종: 청둥오리
+taxon-motacilla-alba,알락할미새,Motacilla alba,20,5,83,69,ready_for_review,2026-07-28 조회
+taxon-phalacrocorax-carbo,민물가마우지,Phalacrocorax carbo,20,5,84,60,ready_for_review,2026-07-28 조회
+taxon-cyanopica-cyanus,물까치,Cyanopica cyanus,20,5,85,66,ready_for_review,2026-07-28 조회. 혼동종: 까치·큰부리까마귀

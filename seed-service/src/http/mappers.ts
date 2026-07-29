@@ -26,6 +26,10 @@ import { xpToNextLevel, type LevelCurve } from "../core/rewards/rewardTypes.js";
 import type { GardenLayout as DomainGardenLayout } from "../core/garden/gardenTypes.js";
 import { TILE_TYPE_TO_KOREAN } from "../core/garden/gardenTypes.js";
 import { BOND_MAX } from "../core/garden/bondRules.js";
+import type { AudioSighting, AudioConfirmResult } from "../core/audio/audioTypes.js";
+import type { AudioIdentificationOutcome } from "../core/audio/identification/audioIdentificationTypes.js";
+import type { SimilaritySupportedOutcome } from "../core/audio/similarity/SimilarityGateway.js";
+import type { SpeciesSoundReference } from "../core/audio/reference/referenceTypes.js";
 
 // ── 공통 ────────────────────────────────────────────────────────────────
 /** `app/src/types/api.ts`의 TaxonGroup — 도감 필터 UI가 쓰는 5종 분류. */
@@ -521,4 +525,123 @@ export function buildExploredRegions(
   currentLocation: { lat: number; lng: number } | null,
 ): ApiExploredRegionsResponse {
   return { blobs: [], home_zone: null, current_location: currentLocation };
+}
+
+// ── 소리 기능(오디오) 3단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md`의 `POST /audio/sightings/upload` 성공 응답
+ * (`fixtures/upload-success.json`과 필드 1:1 대응). */
+export function audioSightingToUploadResponse(sighting: AudioSighting) {
+  return {
+    audio_sighting_id: sighting.id,
+    status: sighting.status,
+    quality: {
+      usable: sighting.quality.usable,
+      duration_ms: sighting.quality.durationMs,
+      active_duration_ms: sighting.quality.activeDurationMs,
+      snr_db: sighting.quality.snrDb,
+      clipping_ratio: sighting.quality.clippingRatio,
+      silence_ratio: sighting.quality.silenceRatio,
+      speech_ratio: sighting.quality.speechRatio,
+      feedback_codes: sighting.quality.feedbackCodes,
+      valid_segments: sighting.quality.validSegments.map((s) => ({
+        start_ms: s.startMs,
+        end_ms: s.endMs,
+        quality_score: s.qualityScore,
+      })),
+    },
+    expires_at: sighting.expiresAt,
+  };
+}
+
+// ── 소리 기능(오디오) 6단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §2의 `POST /audio/identify` 성공 응답 —
+ * `fixtures/identify-high-confidence.json`/`identify-multiple-candidates.json`/
+ * `identify-unknown.json` 세 개와 필드 1:1 대응(unknown_reason은 unknown일 때만 존재). */
+export function audioIdentificationOutcomeToResponse(
+  audioSightingId: string,
+  outcome: AudioIdentificationOutcome,
+) {
+  const body: Record<string, unknown> = {
+    audio_sighting_id: audioSightingId,
+    candidates: outcome.candidates.map((c) => ({
+      species_id: c.speciesId,
+      common_name_ko: c.commonNameKo,
+      scientific_name: c.scientificName,
+      confidence: c.confidence,
+      confidence_level: c.confidenceLevel,
+      start_ms: c.startMs,
+      end_ms: c.endMs,
+      is_dangerous: c.isDangerous,
+    })),
+    unknown: outcome.unknown,
+    needs_user_confirmation: outcome.needsUserConfirmation,
+    model_version: outcome.modelVersion,
+    location_prior_used: outcome.locationPriorUsed,
+  };
+  if (outcome.unknown) body.unknown_reason = outcome.unknownReason;
+  return body;
+}
+
+// ── 소리 기능(오디오) 7단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §3의 `POST /audio/identify/confirm` 성공 응답 —
+ * `fixtures/confirm-success.json`과 필드 1:1 대응. 새로 만든 결과든(최초 확정) 저장해둔
+ * 스냅샷을 재생하는 것이든(멱등 재요청) 이 함수 하나로 직렬화한다 — 둘 다 같은
+ * `AudioConfirmResult` 모양이라 응답이 항상 동일하다는 걸 타입으로 보장한다. */
+export function audioConfirmResultToResponse(result: AudioConfirmResult) {
+  return {
+    observation_id: result.observationId,
+    modality: "audio" as const,
+    species_id: result.speciesId,
+    dex_updated: result.dexUpdated,
+    reward: {
+      xp: result.reward.xp,
+      quest_ids: result.reward.questIds,
+    },
+  };
+}
+
+// ── 소리 기능(오디오) 8단계 ─────────────────────────────────────────────
+/** `docs/audio/API_CONTRACT.md` §4의 `POST /audio/similarity/score` 성공 응답 —
+ * `fixtures/similarity-success.json`과 필드 1:1 대응. */
+export function audioSimilarityScoreToResponse(
+  audioSightingId: string,
+  speciesId: string,
+  outcome: SimilaritySupportedOutcome,
+) {
+  return {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    score: outcome.score,
+    grade: outcome.grade,
+    score_reliability: outcome.scoreReliability,
+    matched_segment: { start_ms: outcome.matchedSegment.startMs, end_ms: outcome.matchedSegment.endMs },
+    feedback_codes: outcome.feedbackCodes,
+    model_version: outcome.modelVersion,
+    reference_set_version: outcome.referenceSetVersion,
+  };
+}
+
+/** `docs/audio/API_CONTRACT.md` §5의 `GET /species/:species_id/sounds` 성공 응답.
+ * `playbackUrlFor`는 라우트가 만든 단기 서명 URL 생성 함수(순수 함수 원칙 유지 — 서명은
+ * 시크릿이 필요해 이 파일이 직접 하지 않는다). */
+export function speciesSoundsToResponse(
+  speciesId: string,
+  refs: SpeciesSoundReference[],
+  playbackUrlFor: (ref: SpeciesSoundReference) => string,
+) {
+  const approved = refs.filter((r) => r.qualityStatus === "approved");
+  return {
+    species_id: speciesId,
+    supported_for_similarity: approved.length > 0,
+    reference_set_version: approved[0]?.referenceSetVersion ?? "",
+    clips: approved.map((r) => ({
+      id: r.id,
+      call_type: r.callType,
+      duration_ms: r.durationMs,
+      playback_url: playbackUrlFor(r),
+      attribution: r.attribution,
+      license: r.license,
+      source_url: r.sourceUrl,
+    })),
+  };
 }

@@ -19,11 +19,15 @@ import type {
   ConsentRecord,
   Creature,
   CreatureId,
+  AudioSightingId,
 } from "../../domain/types.js";
 import type { Quest, QuestProgress } from "../../quest/questTypes.js";
 import type { EarnedBadge } from "../../rewards/rewardTypes.js";
 import type { GardenLayout } from "../../garden/gardenTypes.js";
 import { buildDefaultTiles } from "../../garden/gardenTypes.js";
+import type { AudioSighting, AudioConfirmResult } from "../../audio/audioTypes.js";
+import type { AudioIdentificationResult } from "../../audio/identification/audioIdentificationTypes.js";
+import type { SpeciesSoundReference } from "../../audio/reference/referenceTypes.js";
 import type {
   UserRepository,
   TaxonRepository,
@@ -35,6 +39,9 @@ import type {
   ConsentRepository,
   CreatureRepository,
   GardenRepository,
+  AudioSightingRepository,
+  AudioIdentificationResultRepository,
+  SpeciesSoundReferenceRepository,
 } from "../ports.js";
 
 export class InMemoryUserRepo implements UserRepository {
@@ -277,5 +284,94 @@ export class InMemoryGardenRepo implements GardenRepository {
     const layout = this.m.get(userId);
     this.m.delete(userId);
     return layout?.tiles.length ?? 0;
+  }
+}
+
+export class InMemoryAudioSightingRepo implements AudioSightingRepository {
+  private m = new Map<string, AudioSighting>();
+  async create(sighting: AudioSighting) {
+    this.m.set(sighting.id, sighting);
+  }
+  async get(id: AudioSightingId) {
+    return this.m.get(id) ?? null;
+  }
+  async findByClientRecordingId(userId: UserId, clientRecordingId: string) {
+    return (
+      [...this.m.values()].find(
+        (s) => s.userId === userId && s.clientRecordingId === clientRecordingId,
+      ) ?? null
+    );
+  }
+  async deleteByUser(userId: UserId) {
+    let n = 0;
+    for (const [k, v] of this.m) {
+      if (v.userId === userId) {
+        this.m.delete(k);
+        n++;
+      }
+    }
+    return n;
+  }
+  async listByUser(userId: UserId) {
+    return [...this.m.values()].filter((s) => s.userId === userId);
+  }
+  async findExpired(now: Date, limit: number) {
+    return [...this.m.values()]
+      .filter((s) => new Date(s.expiresAt).getTime() <= now.getTime())
+      .slice(0, limit);
+  }
+  async deleteById(id: AudioSightingId) {
+    this.m.delete(id);
+  }
+  async claimConfirmation(id: AudioSightingId, confirmationId: string) {
+    const s = this.m.get(id);
+    if (!s || s.confirmationId) return false;
+    this.m.set(id, { ...s, confirmationId });
+    return true;
+  }
+  async finalizeConfirmation(
+    id: AudioSightingId,
+    params: { observationId: ObservationId; result: AudioConfirmResult },
+  ) {
+    const s = this.m.get(id);
+    if (!s) return;
+    this.m.set(id, {
+      ...s,
+      status: "confirmed",
+      confirmedObservationId: params.observationId,
+      confirmResult: params.result,
+    });
+  }
+}
+
+/** 6단계: `/audio/identify` 결과 스냅샷. */
+export class InMemoryAudioIdentificationResultRepo implements AudioIdentificationResultRepository {
+  private m = new Map<string, AudioIdentificationResult>();
+  async upsert(result: AudioIdentificationResult) {
+    this.m.set(result.audioSightingId, result);
+  }
+  async get(audioSightingId: AudioSightingId) {
+    return this.m.get(audioSightingId) ?? null;
+  }
+}
+
+/** 8단계: 종별 라이선스 참조 음원. */
+export class InMemorySpeciesSoundReferenceRepo implements SpeciesSoundReferenceRepository {
+  private m = new Map<string, SpeciesSoundReference>();
+  async listApproved(taxonId: TaxonId) {
+    return [...this.m.values()].filter(
+      (r) => r.taxonId === taxonId && r.qualityStatus === "approved",
+    );
+  }
+  async get(id: string) {
+    return this.m.get(id) ?? null;
+  }
+  async upsertMany(refs: SpeciesSoundReference[]) {
+    for (const r of refs) this.m.set(r.id, r);
+  }
+  async countApprovedWithEmbedding() {
+    return [...this.m.values()].filter(
+      (r) => r.qualityStatus === "approved" && Boolean(r.embeddingRef),
+    ).length;
   }
 }

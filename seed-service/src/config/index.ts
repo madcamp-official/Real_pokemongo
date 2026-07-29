@@ -107,6 +107,49 @@ export interface AppConfig {
       low: number;
     };
   };
+
+  /** 소리 기능 3단계(업로드와 변환). `.env.example`의 AUDIO_* 값과 1:1 대응. */
+  audio: {
+    /** 입출력 임시 파일 + 변환된 WAV를 두는 디렉터리. */
+    tempDir: string;
+    /** 업로드 원본 최대 크기(바이트) — doc 03 3단계 "최대 10 MB". */
+    maxBytes: number;
+    /** 허용 최대 길이(초) — doc 03 3단계 "길이 최대 15초". */
+    maxDurationSeconds: number;
+    /** ffmpeg 변환 자식 프로세스 하드 타임아웃(ms) — "변환기 보호"의 시간 제한. */
+    conversionTimeoutMs: number;
+    /** 미확정 세션 TTL(시간) — doc 03 5단계 "미확정 세션은 최대 24시간". */
+    ttlHours: number;
+    /** TTL 스윕(AudioSessionCleanupService) 주기(ms) — doc 03 5단계 "삭제 작업". */
+    cleanupIntervalMs: number;
+    /** 6단계: BirdNET 기반 audio-model-service(CAMP-3, 127.0.0.1:8932). BioCLIP과 동일한
+     * 온/오프 관례 — endpoint가 비어있으면(기본) 이 프로바이더는 꺼진 상태다. */
+    model: {
+      endpoint: string;
+      timeoutMs: number;
+      /** 있으면 요청에 실어 보낸다(지금은 같은 서버 안에서만 통하는 저위험 값 — 값 자체는
+       * .env.example에 채우지 않는다). 없으면 헤더 자체를 안 붙인다. */
+      token?: string;
+      /** 9단계: doc03 "환경변수 예시" AUDIO_MODEL_NAME. audio_identification_result.
+       * model_provider 등에 쓰는 프로바이더 이름 — 지금까지 라우트에 "birdnet"으로
+       * 하드코딩돼 있던 값을 여기로 옮긴다(비밀값이 아니라 .env.example에 기본값을 그대로
+       * 보여줘도 안전 — AUDIO_MODEL_NAME=birdnet). */
+      name: string;
+      /** 9단계: 기대하는 모델 버전(운영 모니터링 전용). 실제 동정/유사도 계산에 쓰는
+       * model_version은 항상 모델 서비스가 그 순간 실제로 응답한 값을 그대로 쓴다(절대
+       * 이 값으로 대체하지 않는다 — "측정하지 않고 넘어가지 않기" 원칙). GET /audio/health가
+       * "배포된 모델이 기대한 버전과 같은가"를 알려주는 데만 쓴다. 안 채우면 비교를 생략. */
+      expectedVersion?: string;
+    };
+    /** 8단계: 라이선스 참조 음원(영구, TTL 없음) + 사전 계산된 임베딩을 두는 베이스
+     * 디렉터리. ReferenceMediaStore/ReferenceEmbeddingStore가 각각 하위 폴더로 나눠 쓴다. */
+    referenceDir: string;
+    /** 9단계: doc03 "환경변수 예시" AUDIO_REFERENCE_SET_VERSION — species_sound_reference에
+     * 적재할 때 쓰는 참조 세트 버전의 단일 진실 원천. `ingestApprovedReferenceClips.ts`는
+     * clips.csv 행의 reference_set_version 컬럼(소싱 당시 임시값)을 무시하고 이 값으로
+     * 덮어쓴다 — 버전을 바꾸고 싶으면 CSV를 고칠 필요 없이 배포 설정만 바꾸면 된다. */
+    referenceSetVersion: string;
+  };
 }
 
 export function loadConfig(): AppConfig {
@@ -182,6 +225,25 @@ export function loadConfig(): AppConfig {
         medium: envNumber("PROFESSOR_CONFIDENCE_MEDIUM", 0.5),
         low: envNumber("PROFESSOR_CONFIDENCE_LOW", 0.35),
       },
+    },
+    audio: {
+      tempDir: env("AUDIO_TEMP_DIR") ?? "./data/audio-temp",
+      maxBytes: envNumber("AUDIO_MAX_BYTES", 10 * 1024 * 1024),
+      maxDurationSeconds: envNumber("AUDIO_MAX_DURATION_SECONDS", 15),
+      conversionTimeoutMs: envNumber("AUDIO_ANALYSIS_TIMEOUT_MS", 15000),
+      ttlHours: envNumber("AUDIO_TEMP_TTL_HOURS", 24),
+      cleanupIntervalMs: envNumber("AUDIO_CLEANUP_INTERVAL_MS", 60 * 60 * 1000),
+      model: {
+        // bioclip과 동일한 온/오프 관례(위 156번째 줄 주석 참고) — 기본값을 채우면 GPU
+        // 서버 없는 테스트 환경에서도 항상 켜진 것으로 오인돼 매 요청이 실패한다.
+        endpoint: env("AUDIO_MODEL_SERVICE_URL") ?? "",
+        timeoutMs: envNumber("AUDIO_MODEL_TIMEOUT_MS", 15000),
+        token: env("AUDIO_MODEL_SERVICE_TOKEN") || undefined,
+        name: env("AUDIO_MODEL_NAME") ?? "birdnet",
+        expectedVersion: env("AUDIO_MODEL_VERSION") || undefined,
+      },
+      referenceDir: env("AUDIO_REFERENCE_DIR") ?? "./data/audio-reference",
+      referenceSetVersion: env("AUDIO_REFERENCE_SET_VERSION") ?? "kr-bird-reference@2026-07",
     },
   };
 }

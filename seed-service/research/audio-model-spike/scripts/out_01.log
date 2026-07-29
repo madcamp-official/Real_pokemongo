@@ -1,0 +1,58 @@
+=== 1) 모델 로드 (backend=pb, GPU) ===
+load time: 0.00s
+version: 2.4
+n_species: 6522
+sample_rate: 48000
+segment_size_s: 3.0
+fmin/fmax: 0 / 15000
+
+=== 2) species_list 일부 (한글 라벨 확인) ===
+total species in list: 6522
+  Hypsipetes amaurotis_직박구리
+  Passer montanus_참새
+  Patagioenas picazuro_Picazuro Pigeon
+  Pica bottanensis_Black-rumped Magpie
+  Pica hudsonia_Black-billed Magpie
+  Pica nuttalli_Yellow-billed Magpie
+  Pica pica_Eurasian Magpie
+  Pica serica_까치
+
+=== 3) predict() on WAV (GPU, n_workers=1) — hypsipetes 15s ===
+predict time: 13.759s
+<class 'birdnet.acoustic.inference.core.prediction.prediction_result.AcousticFilePredictionResult'>
+['__abstractmethods__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_abc_impl', '_get_extra_save_data', '_input_dtype', '_input_durations', '_inputs', '_model_fmax', '_model_fmin', '_model_path', '_model_precision', '_model_sr', '_model_version', '_overlap_duration_s', '_segment_duration_s', '_set_extra_load_data', '_species_ids', '_species_list', '_species_masked', '_species_probs', '_speed', '_unprocessable_inputs', 'get_unprocessed_files', 'hop_duration_s', 'input_durations', 'inputs', 'load', 'max_n_segments', 'memory_size_MiB', 'model_fmax', 'model_fmin', 'model_path', 'model_precision', 'model_sr', 'model_version', 'n_inputs', 'n_species', 'overlap_duration_s', 'save', 'segment_duration_s', 'species_ids', 'species_list', 'species_masked', 'species_probs', 'speed', 'to_arrow_table', 'to_csv', 'to_dataframe', 'to_parquet', 'to_structured_array', 'top_k', 'unprocessable_inputs']
+as dict/json-ish: {'_model_path': array(['/root/.local/share/birdnet/acoustic-models/v2.4/pb/model-fp32'],
+      dtype='<U61'), '_model_precision': array(['fp32'], dtype='<U4'), '_model_version': array(['2.4'], dtype='<U3'), '_inputs': array(['/root/audio_spike/test_clips/segments/hypsipetes_15s.wav'],
+      dtype='<U56'), '_segment_duration_s': array([3.], dtype=float16), '_overlap_duration_s': array([0.], dtype=float16), '_speed': array([1.], dtype=float16), '_input_durations': array([15.], dtype=float16), '_model_fmin': array([0], dtype=uint8), '_model_fmax': array([15000], dtype=uint16), '_model_sr': array([48000], dtype=uint16), '_species_list': array(['Abroscopus albogularis_Rufous-faced Warbler',
+       'Abroscopus schisticeps_Black-faced Warbler',
+       'Abroscopus superciliaris_Yellow-bellied Warbler', ...,
+       'Zosterops senegalensis_Northern Yellow White-eye',
+       'Zosterops simplex_작은동박새', 'Zosterops virens_Cape White-eye'],
+      shape=(6522,), dtype='<U62'), '_species_probs': array([[[6.6463476e-06, 3.8671988e-07, 2.0114130e-05, 1.7187175e-01,
+         5.5101621e-01],
+        [3.0590220e-07, 3.0590220e-07, 3.0590220e-07, 3.0590220e-07,
+         4.8809758e-01],
+        [4.7703315e-07, 1.5026176e-06, 2.0847703e-05, 4.9694836e-01,
+         6.3693857e-01],
+        [6.7393498e-06, 3.7001746e-07, 5.4559341e-06, 3.0590220e-07,
+         8.8806985e-07],
+        [3.0590220e-07, 3.0590220e-07, 1.7435552e-06, 1.1370585e-01,
+         1.2156286e-01]]], dtype=float32), '_species_ids': array([[[2169, 2168, 2167, 1215, 1217],
+        [2170, 2169, 2168, 2167, 2888],
+        [2167, 2166, 2165, 3585, 3584],
+        [6518, 6519, 6520, 6521,    0],
+        [2171, 2170, 2169, 1578, 1579]]], dtype=uint16), '_species_masked': array([[[ True,  True,  True, False, False],
+        [ True,  True,  True,  True, False],
+        [ True,  True,  True, False, False],
+        [ True,  True,  True,  True,  True],
+        [ True,  True,  True, False, False]]]), '_unprocessable_inputs': array([], dtype=uint8)}
+
+=== 4) encode() on same file (GPU, n_workers=1) ===
+encode time: 12.418s
+<class 'birdnet.acoustic.inference.core.encoding.encoding_result.AcousticFileEncodingResult'>
+['__abstractmethods__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__slots__', '__str__', '__subclasshook__', '__weakref__', '_abc_impl', '_embeddings', '_embeddings_masked', '_get_extra_save_data', '_input_dtype', '_input_durations', '_inputs', '_model_fmax', '_model_fmin', '_model_path', '_model_precision', '_model_sr', '_model_version', '_overlap_duration_s', '_segment_duration_s', '_set_extra_load_data', '_speed', '_unprocessable_inputs', 'emb_dim', 'embeddings', 'embeddings_masked', 'hop_duration_s', 'input_durations', 'inputs', 'load', 'max_n_segments', 'memory_size_MiB', 'model_fmax', 'model_fmin', 'model_path', 'model_precision', 'model_sr', 'model_version', 'n_inputs', 'overlap_duration_s', 'save', 'segment_duration_s', 'speed', 'to_arrow_table', 'to_csv', 'to_dataframe', 'to_parquet', 'to_structured_array', 'unprocessable_inputs']
+
+=== 5) M4A 입력 지원 여부 (CPU, n_workers=1) ===
+M4A predict FAILED as expected: ValueError("Input file '/root/audio_spike/test_clips/segments/hypsipetes_test.m4a' is not a supported audio format! Supported formats: ['.AIFC', '.AIFF', '.AU', '.AVR', '.CAF', '.FLAC', '.HTK', '.IRCAM', '.MAT4', '.MAT5', '.MP3', '.MPC2K', '.NIST', '.OGG', '.OPUS', '.PAF', '.PVF', '.RAW', '.RF64', '.SD2', '.SDS', '.SVX', '.VOC', '.W64', '.WAV', '.WAVEX', '.WVE', '.XI'].")
+
+DONE

@@ -16,6 +16,7 @@ dist/
 app/.expo-*-verify/
 
 # 로컬 실행 로그
+app/.runtime/
 seed-service/.runtime/
 
 # Python 워커 로컬 캐시/패키징 산출물
@@ -29,6 +30,9 @@ __pycache__/
 seed-service/data/*
 !seed-service/data/professor-knowledge.json
 !seed-service/data/professor-knowledge-vectors.json
+
+# 소리 기능: 참조 음원 원본/캐시(저작권 있는 오디오 바이트) — 커밋 대상 아님, CAMP-3에 별도 보관
+seed-service/research/audio-reference-pool/downloads/
 
 # 세션 간 인수인계용 개인 메모(커밋 대상 아님)
 HANDOFF_NEXT_SESSION.md

@@ -25,6 +25,13 @@ export type MediaRef = Brand<string, "MediaRef">;
 export type SightingId = Brand<string, "SightingId">;
 /** D단계: 개체(친구) 식별자(F9/F16). */
 export type CreatureId = Brand<string, "CreatureId">;
+/**
+ * 소리 기능(오디오) 3단계: 업로드~변환 뒤 만들어지는 영속 세션의 식별자.
+ * PendingSightingStore(SightingId, 인메모리)와 달리 DB에 24시간 TTL로 저장된다 —
+ * `03_소리기능_서버_GPU_구현계획_팀원.md` 5단계가 요구하는 영속 요구사항 때문에 사진
+ * 파이프라인과 의도적으로 다른 저장 성격을 갖는다(core/audio/audioTypes.ts 참고).
+ */
+export type AudioSightingId = Brand<string, "AudioSightingId">;
 
 // ---------------------------------------------------------------------------
 // 공통 열거형
@@ -135,12 +142,17 @@ export interface PreciseCoordinate {
   lng: number;
 }
 
+/** 5단계(DB와 임시 세션) — docs/audio/DATA_CONTRACT.md "Existing observation extension".
+ * 기존 관찰은 전부 "photo"로 해석된다(마이그레이션 DEFAULT가 보증, 0003_audio_stage5.sql). */
+export type ObservationModality = "photo" | "audio";
+
 export interface Observation {
   id: ObservationId;
   userId: UserId;
   taxonId: TaxonId | null; // 동정 실패/상위분류만 된 경우 null 가능
   taxonRank: TaxonRank | null; // 어느 계급까지 확정됐는지 (species가 아닐 수 있음)
   timestamp: string; // ISO8601
+  modality: ObservationModality;
 
   region: ObservedRegion | null; // 위치 저장 OFF면 null(동의 게이트, 기존과 동일)
   preciseCoord: PreciseCoordinate | null; // 클라이언트가 좌표를 안 줬으면 null(D단계, 동의 무관)

@@ -22,10 +22,17 @@ async function main() {
   );
   console.log(`저장소: ${app.dbPool ? "PostgreSQL(실DB)" : "InMemory(개발용, 재시작 시 소실)"}`);
 
+  // 5단계: 오디오 세션 TTL 스윕. 실제 프로세스 부팅 경로에서만 시작한다(buildApp() 자체는
+  // 시작하지 않음 — composition.ts/AudioSessionCleanupService.ts 주석 참고, 테스트가
+  // buildApp()을 여러 번 호출해도 백그라운드 타이머가 쌓이지 않도록 하기 위함).
+  app.audioCleanup.start(config.audio.cleanupIntervalMs);
+  console.log(`오디오 TTL 스윕: ${config.audio.cleanupIntervalMs}ms마다 실행`);
+
   // DB 커넥션 풀을 쓰는 경우, 종료 시그널에 정상적으로 풀을 닫는다(터널이 끊겨도 프로세스가
   // 좀비 커넥션을 붙들고 있지 않도록).
   const shutdown = async (signal: string) => {
     console.log(`\n${signal} 수신 — 서버를 종료합니다.`);
+    app.audioCleanup.stop();
     await server.close();
     if (app.dbPool) await app.dbPool.end();
     process.exit(0);
