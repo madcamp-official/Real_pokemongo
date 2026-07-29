@@ -572,6 +572,7 @@ export function audioIdentificationOutcomeToResponse(
       start_ms: c.startMs,
       end_ms: c.endMs,
       is_dangerous: c.isDangerous,
+      supported: c.supported,
     })),
     unknown: outcome.unknown,
     needs_user_confirmation: outcome.needsUserConfirmation,

@@ -64,38 +64,45 @@ test("CLIPPED: 풀스케일을 넘겨 저장된 톤은 clipping_ratio가 임계�
   assert.equal(q.usable, false);
 });
 
-test("TOO_NOISY: 시끄러운 백색잡음은 SNR이 낮게 잡혀 거부된다", async () => {
+// CR-20260729-noisy-audio-reaches-model: TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP은 더 이상
+// usable을 막지 않는다 — 대신 `noisy` 플래그로 남아 AudioIdentificationGateway의 고확신 전용
+// 안전장치를 켠다. feedback_codes에는 이 세 코드가 더 이상 나오지 않는다.
+test("TOO_NOISY: 시끄러운 백색잡음은 SNR이 낮게 잡히지만 차단하지 않고 noisy=true만 남긴다", async () => {
   const wav = await makeWhiteNoise(5, 0.5);
   const q = await analyzeWav(wav);
-  assert.ok(q.feedbackCodes.includes("TOO_NOISY"), JSON.stringify(q.feedbackCodes) + ` snr=${q.snrDb}`);
-  assert.equal(q.usable, false);
+  assert.equal(q.usable, true, JSON.stringify(q.feedbackCodes) + ` snr=${q.snrDb}`);
+  assert.equal(q.noisy, true, `snr=${q.snrDb}`);
+  assert.ok(!q.feedbackCodes.includes("TOO_NOISY"));
 });
 
-test("SPEECH_DETECTED: 실제 사람 음성(TTS) 2건 모두 거부되고, 톤/처프는 걸리지 않는다", async () => {
+test("SPEECH_DETECTED: 실제 사람 음성(TTS) 2건 모두 noisy=true지만 usable은 막히지 않고, 톤/처프는 noisy에 안 걸린다", async () => {
   const speech1 = await analyzeWav(
     await makeRealSpeech("The quick brown fox jumps over the lazy dog near the river."),
   );
-  assert.ok(speech1.feedbackCodes.includes("SPEECH_DETECTED"), JSON.stringify(speech1));
-  assert.equal(speech1.usable, false);
+  assert.equal(speech1.usable, true, JSON.stringify(speech1));
+  assert.equal(speech1.noisy, true, JSON.stringify(speech1));
+  assert.ok(!speech1.feedbackCodes.includes("SPEECH_DETECTED"));
 
   const speech2 = await analyzeWav(
     await makeRealSpeech("Please remember to bring your umbrella tomorrow afternoon."),
   );
-  assert.ok(speech2.feedbackCodes.includes("SPEECH_DETECTED"), JSON.stringify(speech2));
+  assert.equal(speech2.noisy, true, JSON.stringify(speech2));
 
-  // 거짓 양성 방지: 순음/처프는 SPEECH_DETECTED가 걸리면 안 된다.
+  // 거짓 양성 방지: 순음/처프는 사람 음성 때문에 noisy=true가 되면 안 된다(다른 이유로
+  // noisy가 될 수는 있으니 speechRatio 자체를 직접 확인한다).
   const tone = await analyzeWav(await makeTone(4, 2500, 6));
-  assert.ok(!tone.feedbackCodes.includes("SPEECH_DETECTED"), JSON.stringify(tone));
+  assert.ok(tone.speechRatio <= 0.42, JSON.stringify(tone));
   const chirp = await analyzeWav(await makeChirp(4, 1500, 800));
-  assert.ok(!chirp.feedbackCodes.includes("SPEECH_DETECTED"), JSON.stringify(chirp));
+  assert.ok(chirp.speechRatio <= 0.42, JSON.stringify(chirp));
 });
 
-test("음성 우세 파일은 BirdNET에 전달될 여지가 없다(usable=false, valid_segments=[])", async () => {
+test("음성 우세 파일도 이제 BirdNET까지 전달된다(usable=true, noisy=true, valid_segments 있음)", async () => {
   const q = await analyzeWav(
     await makeRealSpeech("This sentence is definitely spoken by a human voice, not a bird."),
   );
-  assert.equal(q.usable, false);
-  assert.deepEqual(q.validSegments, []);
+  assert.equal(q.usable, true);
+  assert.equal(q.noisy, true);
+  assert.ok(q.validSegments.length > 0, "usable=true면 valid_segments가 비어있으면 안 된다");
 });
 
 test("UNSUPPORTED_SOUND: 주파수가 고정된 지속음(순음)은 걸리고, 처프(주파수 변조)는 안 걸린다", async () => {

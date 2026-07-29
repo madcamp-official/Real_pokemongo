@@ -228,7 +228,7 @@ export function registerAudioRoutes(
       }
 
       try {
-        const outcome = await app.audioIdentification.identify(wavBytes);
+        const outcome = await app.audioIdentification.identify(wavBytes, { noisy: sighting.quality.noisy });
         await app.repos.audioIdentificationResults.upsert({
           audioSightingId: sighting.id,
           candidates: outcome.candidates,
@@ -283,6 +283,14 @@ export function registerAudioRoutes(
         return reply
           .code(400)
           .send(audioError("invalid_species_id", "동정 후보에 없는 종입니다."));
+      }
+      // CR-20260729-species-outside-db: speciesId=null(taxon DB 밖 종)은 애초에
+      // request.body.species_id(항상 non-empty string)와 절대 같을 수 없어 위 find에서
+      // 이미 걸러지지만, chosen.speciesId를 TaxonId로 좁히기 위해 명시적으로 한 번 더 막는다.
+      if (!chosen.supported || !chosen.speciesId) {
+        return reply
+          .code(400)
+          .send(audioError("unsupported_species", "아직 도감에 등록할 수 없는 종이에요.", { retryable: false }));
       }
 
       // 원자적 클레임 — WHERE confirmation_id IS NULL이라 동시에 도착한 여러 확정 요청 중

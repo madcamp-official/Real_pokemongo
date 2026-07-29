@@ -96,7 +96,8 @@ export interface AudioSightingUploadResponse {
 }
 
 export interface AudioIdentifyCandidate {
-  species_id: ID;
+  /** CR-20260729-species-outside-db: supported=false면 null(도감 DB 밖 종 — 모델 원시 라벨만 있음). */
+  species_id: ID | null;
   common_name_ko: string;
   scientific_name: string;
   confidence: number;
@@ -104,6 +105,8 @@ export interface AudioIdentifyCandidate {
   start_ms: number;
   end_ms: number;
   is_dangerous: boolean;
+  /** false면 도감에 없는 종 — "기록하기"/"소리 비교하기"를 비활성화해야 한다. */
+  supported: boolean;
 }
 
 export interface AudioIdentifyResponse {

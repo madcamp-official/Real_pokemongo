@@ -33,6 +33,7 @@ function makeSighting(overrides: Partial<AudioSighting> = {}): AudioSighting {
     sha256: "a".repeat(64),
     quality: {
       usable: true,
+      noisy: false,
       durationMs: 4000,
       activeDurationMs: 4000,
       snrDb: 20,

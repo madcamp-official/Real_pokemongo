@@ -34,6 +34,11 @@ export interface AudioQualityValidSegment {
  */
 export interface AudioQuality {
   usable: boolean;
+  /** CR-20260729-noisy-audio-reaches-model: TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP 조건 중
+   * 하나라도 해당하면 true. usable을 더 이상 막지 않는 대신, AudioIdentificationGateway가 이
+   * 플래그를 보고 고확신 후보만 인정하는 안전장치를 켠다. 계약 필드가 아니라 HTTP 응답에는
+   * 절대 노출하지 않는다(내부 신호 전용). */
+  noisy: boolean;
   durationMs: number;
   activeDurationMs: number;
   snrDb: number | null;

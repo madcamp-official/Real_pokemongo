@@ -171,6 +171,7 @@ function newAudioSightingRow(userId: User["id"], overrides: Partial<AudioSightin
     storagePath: "local://audio-it-test.bin",
     quality: {
       usable: true,
+      noisy: false,
       durationMs: 4000,
       activeDurationMs: 4000,
       snrDb: 20,
@@ -230,6 +231,7 @@ test("PgAudioIdentificationResultRepo: candidates_json이 왕복되고, 재동�
           speciesId: "taxon-hypsipetes-amaurotis" as any,
           commonNameKo: "직박구리",
           scientificName: "Hypsipetes amaurotis",
+          supported: true,
           confidence: 0.87,
           confidenceLevel: "high",
           startMs: 1100,
