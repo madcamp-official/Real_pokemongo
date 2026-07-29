@@ -107,6 +107,9 @@ test("GET /map.html: 인증 없이도 200, 카카오 SDK 스크립트와 키가 
   assert.match(res.body, /dapi\.kakao\.com\/v2\/maps\/sdk\.js\?appkey=test-kakao-key/);
   assert.match(res.body, /pin-initial/);
   assert.match(res.body, /function displayPosition/);
+  assert.match(res.body, /set_explorer_image/);
+  assert.match(res.body, /className = "me-explorer"/);
+  assert.match(res.body, /function moveExplorerTo/);
   assert.doesNotMatch(res.body, /pin-card/);
 });
 

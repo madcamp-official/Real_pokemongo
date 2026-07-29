@@ -50,6 +50,15 @@ export function hasGardenCreatureArt(speciesId: string): boolean {
   return hasGardenIllustratedArt(speciesId) || normalizeId(speciesId) in GARDEN_ART;
 }
 
+/**
+ * 도감처럼 정적인 종별 PNG가 필요한 화면에서 사용하는 원본 에셋 조회 함수.
+ * 홈가든의 벡터 우선·날갯짓 규칙을 거치지 않으므로 assets/species에 저장한 그림을
+ * 그대로 표시하거나, tintColor를 적용해 종별 실루엣을 만들 수 있다.
+ */
+export function getGardenCreatureImageSource(speciesId: string): ImageSourcePropType | undefined {
+  return GARDEN_ART[normalizeId(speciesId)];
+}
+
 /** 넓은 비행 이동과 날갯짓을 적용할 수 있는 곤충인지 확인한다. */
 export function hasWingedInsectArt(speciesId: string): boolean {
   return WINGED_INSECT_SPECIES.has(normalizeId(speciesId));
@@ -136,6 +145,8 @@ const POECILE_PALUSTRIS = require('../../../assets/species/garden-v2/game/poecil
 const EMBERIZA_ELEGANS = require('../../../assets/species/garden-v2/game/emberiza-elegans.png') as ImageSourcePropType;
 const ANAS_ZONORHYNCHA = require('../../../assets/species/garden-v2/game/anas-zonorhyncha.png') as ImageSourcePropType;
 const MOTACILLA_ALBA = require('../../../assets/species/garden-v2/game/motacilla-alba.png') as ImageSourcePropType;
+const ANAS_PLATYRHYNCHOS = require('../../../assets/species/garden-v2/game/anas-platyrhynchos.png') as ImageSourcePropType;
+const PASSER_MONTANUS = require('../../../assets/species/garden-v2/game/passer-montanus.png') as ImageSourcePropType;
 const FLY_AGARIC = require('../../../assets/species/garden-v2/game/amanita-muscaria.png') as ImageSourcePropType;
 const RHABDOPHIS_TIGRINUS = require('../../../assets/species/garden-v2/game/rhabdophis-tigrinus.png') as ImageSourcePropType;
 
@@ -167,6 +178,7 @@ const PUERARIA_MONTANA = require('../../../assets/species/garden-v4/game/puerari
 const BOEHMERIA_JAPONICA = require('../../../assets/species/garden-v4/game/boehmeria-japonica.png') as ImageSourcePropType;
 const CHELIDONIUM_MAJUS = require('../../../assets/species/garden-v4/game/chelidonium-majus.png') as ImageSourcePropType;
 const RUBUS_CRATAEGIFOLIUS = require('../../../assets/species/garden-v4/game/rubus-crataegifolius.png') as ImageSourcePropType;
+const VESPA_MANDARINIA = require('../../../assets/species/garden-v4/game/vespa-mandarinia.png') as ImageSourcePropType;
 
 // 홈 가든 v5 곤충 일러스트.
 const POLYGONIA_C_AUREUM = require('../../../assets/species/garden-v5/game/polygonia-c-aureum.png') as ImageSourcePropType;
@@ -195,6 +207,8 @@ const CARBULA_PUTONI = require('../../../assets/species/garden-v5/game/carbula-p
 // 홈 가든 v6: v5에서 공용 아트로 표시했던 네 종의 전용 일러스트.
 const APIS_MELLIFERA = require('../../../assets/species/garden-v6/game/apis-mellifera.png') as ImageSourcePropType;
 const PIERIS_RAPAE = require('../../../assets/species/garden-v6/game/pieris-rapae.png') as ImageSourcePropType;
+const COCCINELLA_SEPTEMPUNCTATA = require('../../../assets/species/garden-v6/game/coccinella-septempunctata.png') as ImageSourcePropType;
+const HARMONIA_AXYRIDIS = require('../../../assets/species/garden-v6/game/harmonia-axyridis.png') as ImageSourcePropType;
 
 const GARDEN_ART: Record<string, ImageSourcePropType> = {
   // v2 식물
@@ -283,19 +297,30 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
   'emberiza-elegans': EMBERIZA_ELEGANS,
   'anas-zonorhyncha': ANAS_ZONORHYNCHA,
   'motacilla-alba': MOTACILLA_ALBA,
+  'anas-platyrhynchos': ANAS_PLATYRHYNCHOS,
+  'passer-montanus': PASSER_MONTANUS,
+  // 별도 PNG가 없는 두 조류는 가장 가까운 기존 조류 일러스트를 사용한다.
+  // generic 물음표보다 실제 생물 윤곽을 유지하기 위한 안전 폴백이다.
+  'cyanopica-cyanus': PICA_SERICA,
+  'phalacrocorax-carbo': LARUS_CRASSIROSTRIS,
 
   // v2 기타 생물
   'fly-agaric': FLY_AGARIC,
+  'lacquer-tree': TOXICODENDRON_VERNICIFLUUM,
   'rhabdophis-tigrinus': RHABDOPHIS_TIGRINUS,
 
   // v1 식물(교체 그림 없음)
   dandelion: DANDELION,
   dayflower: DAYFLOWER,
 
-  // 곤충 — 꿀벌·배추흰나비는 기존 전용 PNG를 유지하고, 무당벌레 두 종은
-  // GardenIllustratedArt의 그림자 없는 게임 일러스트를 사용한다.
+  // 곤충 — 홈가든은 대표 네 종에 GardenIllustratedArt를 우선하지만, 도감은 이
+  // PNG 레지스트리를 직접 사용해 사용자가 만든 종별 원본과 실루엣을 표시한다.
   'cabbage-white': PIERIS_RAPAE,
   honeybee: APIS_MELLIFERA,
+  ladybug: HARMONIA_AXYRIDIS,
+  'harmonia-axyridis': HARMONIA_AXYRIDIS,
+  'coccinella-septempunctata': COCCINELLA_SEPTEMPUNCTATA,
+  'vespa-mandarinia': VESPA_MANDARINIA,
 
   // 초기 mock ID 호환 — 같은 종을 가리키므로 위와 동일한 v6 그림을 쓴다.
   butterfly: PIERIS_RAPAE,

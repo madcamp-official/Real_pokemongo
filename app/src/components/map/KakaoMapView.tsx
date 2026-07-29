@@ -2,7 +2,8 @@ import { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useSta
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 import { fetchMapHtml, KAKAO_ALLOWED_ORIGIN } from '@/api/map';
-import { getSpeciesVisual } from '@/theme/species';
+import { getMapExplorerImageDataUri } from '@/components/map/mapExplorerImage';
+import { getMapPinImageDataUri } from '@/components/map/mapPinImages';
 import { colors } from '@/theme/colors';
 import type { MapPin } from '@/types/api';
 
@@ -32,8 +33,8 @@ interface Props {
  * `/map.html`(카카오맵 JS SDK 임베드)을 띄운다. RN ↔ 페이지 사이는 postMessage
  * 브릿지로만 데이터를 주고받는다(핀 주입 · 현위치 갱신 · 핀 클릭 수신).
  *
- * 종 그림(이모지)은 앱이 알고 있으므로 핀을 넘길 때 함께 실어 보낸다 —
- * 서버가 종별 비주얼을 따로 관리하지 않게 하려는 의도(단일 출처는 theme/species).
+ * 종 그림은 앱 번들의 assets/species가 단일 출처다. 작은 PNG data URI로 변환해
+ * WebView의 https origin에서도 파일 권한이나 혼합 콘텐츠 문제없이 그리게 한다.
  */
 export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function KakaoMapView(
   { onPinPress, onMapPress, onError, onLocationLabel },
@@ -43,6 +44,8 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
   const isReady = useRef(false);
   /** ready 이전에 들어온 명령은 모아뒀다가 준비되면 한 번에 흘려보낸다. */
   const pending = useRef<unknown[]>([]);
+  /** 필터를 빠르게 바꿀 때 늦게 끝난 이전 이미지 변환 결과가 최신 핀을 덮지 않게 한다. */
+  const pinRequestVersion = useRef(0);
   const readyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [loading, setLoading] = useState(true);
   const [html, setHtml] = useState<string | null>(null);
@@ -88,23 +91,37 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
     webviewRef.current?.postMessage(JSON.stringify(msg));
   }, []);
 
+  // 탐험가 이미지는 GPS 좌표와 분리해 페이지에 한 번만 전달한다. 좌표가 자주
+  // 갱신되어도 큰 base64 문자열을 반복 전송하지 않아 실기기 움직임이 끊기지 않는다.
+  useEffect(() => {
+    let cancelled = false;
+    void getMapExplorerImageDataUri().then((imageUri) => {
+      if (!cancelled && imageUri) {
+        post({ type: 'set_explorer_image', image_uri: imageUri });
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [post]);
+
   useImperativeHandle(
     ref,
     () => ({
-      setPins: (pins: MapPin[]) =>
-        post({
-          type: 'set_pins',
-          pins: pins.map((p) => {
-            const visual = getSpeciesVisual(p.species_id);
-            return {
-              ...p,
-              // 매핑이 없는 종을 ❓로 표시하면 이미지 로드 실패처럼 보인다.
-              // 그 경우 종 이름 첫 글자를 쓰는 고유 마커로 자연스럽게 폴백한다.
-              emoji: visual.emoji === '❓' ? '' : visual.emoji,
-              marker_label: p.species_name.trim().slice(0, 1) || '새',
-            };
-          }),
-        }),
+      setPins: (pins: MapPin[]) => {
+        const requestVersion = ++pinRequestVersion.current;
+        void Promise.all(
+          pins.map(async (pin) => ({
+            ...pin,
+            image_uri: await getMapPinImageDataUri(pin.species_id),
+            // 신규 종이 앱 에셋보다 먼저 배포된 경우에만 쓰는 최후 폴백.
+            marker_label: pin.species_name.trim().slice(0, 1) || '새',
+          })),
+        ).then((resolvedPins) => {
+          if (requestVersion !== pinRequestVersion.current) return;
+          post({ type: 'set_pins', pins: resolvedPins });
+        });
+      },
       setCenter: (lat: number, lng: number) => post({ type: 'set_center', lat, lng }),
       setZoomLevel: (level: number) => post({ type: 'set_level', level }),
       setMe: (lat: number, lng: number, zoneRadiusM: number, zoneLabel?: string) =>

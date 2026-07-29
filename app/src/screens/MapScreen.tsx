@@ -11,7 +11,12 @@ import { fetchDex } from '@/api/dex';
 import { KakaoMapView, type KakaoMapViewHandle } from '@/components/map/KakaoMapView';
 import { RadialMenu } from '@/components/nav/RadialMenu';
 import { PinDetailSheet } from '@/components/map/PinDetailSheet';
-import { requestLocationAndGet, type Coord } from '@/services/location';
+import {
+  requestLocationAndGet,
+  watchForegroundLocation,
+  type Coord,
+  type StopLocationWatch,
+} from '@/services/location';
 import { colors } from '@/theme/colors';
 import type { RootStackParamList, RootTabParamList } from '@/navigation/types';
 import type { MapPin } from '@/types/api';
@@ -30,6 +35,7 @@ export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const mapRef = useRef<KakaoMapViewHandle>(null);
+  const hasInitiallyCentered = useRef(false);
 
   const [deviceLocation, setDeviceLocation] = useState<Coord | null>(null);
   const [locationDenied, setLocationDenied] = useState(false);
@@ -69,7 +75,30 @@ export default function MapScreen() {
     };
   }, []);
 
-  useFocusEffect(readLocation);
+  useFocusEffect(
+    useCallback(() => {
+      let active = true;
+      let stopWatching: StopLocationWatch | null = null;
+
+      void watchForegroundLocation((coord) => {
+        if (!active) return;
+        setDeviceLocation(coord);
+        setLocationDenied(false);
+      }).then((stop) => {
+        if (!active) {
+          stop?.();
+          return;
+        }
+        stopWatching = stop;
+        if (!stop) setLocationDenied(true);
+      });
+
+      return () => {
+        active = false;
+        stopWatching?.();
+      };
+    }, []),
+  );
 
   const currentLocation = deviceLocation ?? regionsQuery.data?.current_location ?? null;
 
@@ -81,8 +110,16 @@ export default function MapScreen() {
   useEffect(() => {
     if (!currentLocation) return;
     mapRef.current?.setMe(currentLocation.lat, currentLocation.lng, HOME_ZONE_RADIUS_M, locationLabel);
-    mapRef.current?.setCenter(currentLocation.lat, currentLocation.lng);
   }, [currentLocation, locationLabel]);
+
+  // 실시간 GPS 갱신 때마다 지도를 강제로 중앙으로 당기면 사용자의 드래그가 깨진다.
+  // 첫 유효 위치에서만 자동 중앙 정렬하고 이후에는 탐험가만 부드럽게 이동시킨다.
+  useEffect(() => {
+    if (!currentLocation || hasInitiallyCentered.current) return;
+    if (!deviceLocation && !locationDenied) return;
+    hasInitiallyCentered.current = true;
+    mapRef.current?.setCenter(currentLocation.lat, currentLocation.lng);
+  }, [currentLocation, deviceLocation, locationDenied]);
 
   const weekCount = useMemo(() => {
     const since = Date.now() - WEEK_MS;
@@ -167,7 +204,7 @@ export default function MapScreen() {
       </View>
 
       {/* 지도 조작은 같은 형태의 원형 컨트롤 레일로 모은다.
-          설정은 하단 자연 메뉴 안에 있어 지도 위 중복 아이콘을 만들지 않는다. */}
+          설정은 하단 자연 메뉴에만 두고 지도 위 중복 버튼은 표시하지 않는다. */}
       <View pointerEvents="box-none" style={[styles.controlRail, { top: insets.top + 18 }]}>
         <Pressable
           onPress={recenter}
@@ -194,14 +231,6 @@ export default function MapScreen() {
           style={({ pressed }) => [styles.controlButton, filterOpen && styles.controlButtonActive, pressed && styles.pressed]}
         >
           <Text style={styles.controlIcon}>⌄</Text>
-        </Pressable>
-        <Pressable
-          onPress={() => navigation.navigate('Settings')}
-          accessibilityRole="button"
-          accessibilityLabel="설정"
-          style={({ pressed }) => [styles.controlButton, pressed && styles.pressed]}
-        >
-          <Text style={styles.controlIcon}>⚙</Text>
         </Pressable>
       </View>
 

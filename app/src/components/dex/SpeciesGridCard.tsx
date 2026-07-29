@@ -1,14 +1,13 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
-import { UnknownSpeciesSilhouette } from '@/components/dex/UnknownSpeciesSilhouette';
+import { DexSpeciesArt } from '@/components/dex/DexSpeciesArt';
 import type { DexEntry } from '@/types/api';
 
 /**
  * 도감 그리드 카드 (F5).
- * 발견된 종: 컬러 원형 썸네일 + 이름.
- * 미발견 종: 회색 실루엣(그림만 가림) + 실제 이름(뭘 찾아야 하는지는 알 수 있게).
+ * 발견된 종: assets/species의 컬러 PNG + 이름.
+ * 미발견 종: 같은 PNG의 회색 종별 실루엣 + 이름 비공개.
  */
 interface Props {
   entry: DexEntry;
@@ -22,7 +21,12 @@ export function SpeciesGridCard({ entry, onPress, index }: Props) {
       <View accessibilityLabel="미수집 종" style={[styles.card, styles.lockedCard]}>
         <Text style={styles.catalogNumber}>#{String(index + 1).padStart(3, '0')}</Text>
         <View style={[styles.thumb, styles.lockedThumb]}>
-          <UnknownSpeciesSilhouette group={entry.group} size={55} />
+          <DexSpeciesArt
+            speciesId={entry.species_id}
+            group={entry.group}
+            size={58}
+            silhouette
+          />
         </View>
         <Text style={styles.lockedName}>미발견</Text>
       </View>
@@ -37,7 +41,7 @@ export function SpeciesGridCard({ entry, onPress, index }: Props) {
       onPress={() => onPress(entry)}
     >
       <View style={[styles.thumb, { backgroundColor: getPastel(visual.pastel) }]}>
-        <GardenCreatureArt speciesId={entry.species_id} size={44} />
+        <DexSpeciesArt speciesId={entry.species_id} group={entry.group} size={58} />
       </View>
       <Text style={styles.name}>
         {entry.name}

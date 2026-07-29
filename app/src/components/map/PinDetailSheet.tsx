@@ -2,7 +2,7 @@ import { ActivityIndicator, Modal, Pressable, ScrollView, StyleSheet, Text, View
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSpeciesCard } from '@/api/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { DexSpeciesArt } from '@/components/dex/DexSpeciesArt';
 import { colors } from '@/theme/colors';
 import type { MapPin } from '@/types/api';
 
@@ -52,7 +52,7 @@ export function PinDetailSheet({ pin, onClose, onOpenCard }: Props) {
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.header}>
             <View style={styles.thumb}>
-              {pin && <CreatureArt speciesId={pin.species_id} size={62} />}
+              {pin && <DexSpeciesArt speciesId={pin.species_id} group={pin.group} size={76} />}
             </View>
             <View style={styles.headerText}>
               <View style={[styles.tag, { backgroundColor: tag.bg }]}>

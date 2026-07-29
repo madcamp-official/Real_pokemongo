@@ -5,8 +5,8 @@
  *   - 타일에 CSS 필터를 걸어 온화한 녹색/세피아 톤으로 맞춘다
  *     (카카오맵 JS SDK 는 구글맵처럼 타일 스타일 커스터마이즈를 지원하지 않아,
  *      색보정은 이 방법이 사실상 유일하다)
- *   - 발견 핀은 기본 마커 대신 분류색 원형 CustomOverlay 로 그린다.
- *     아이콘이 없는 종은 이름 첫 글자로, 같은 좌표의 핀은 작은 원형으로 펼쳐 보인다.
+ *   - 발견 핀은 기본 마커 대신 종별 PNG가 담긴 분류색 CustomOverlay 로 그린다.
+ *     이미지가 없는 신규 종만 이름 첫 글자로, 같은 좌표의 핀은 작은 원형으로 펼쳐 보인다.
  *   - 현재 위치는 파란 점 + 퍼지는 펄스 링
  *   - "나만의 탐험 구역"은 점선 원(Circle)으로 그린다
  *
@@ -54,6 +54,8 @@ export function mapHtml(kakaoJsKey: string): string {
     box-shadow:0 5px 14px rgba(45,65,40,.25);}
   .pin-body{width:31px;height:31px;border-radius:50%;display:flex;
     align-items:center;justify-content:center;font-size:18px;line-height:1;}
+  .pin-image{width:29px;height:29px;display:block;object-fit:contain;
+    border-radius:50%;}
   .pin-initial{font-size:14px;font-weight:900;color:#344832;}
   .pin-tail{width:9px;height:9px;margin:-8px auto 0;background:#fff;
     border-right:3px solid;border-bottom:3px solid;transform:rotate(45deg);}
@@ -64,16 +66,24 @@ export function mapHtml(kakaoJsKey: string): string {
 
   /* ── 현재 위치 ───────────────────────────────────────────── */
   .me{position:relative;width:0;height:0;}
-  .me-dot{position:absolute;left:-11px;top:-11px;width:22px;height:22px;border-radius:50%;
-    box-sizing:border-box;background:#3478C8;border:4px solid #fff;
-    box-shadow:0 3px 9px rgba(39,77,119,.32);}
+  .me-explorer{position:absolute;left:-34px;top:-61px;width:68px;height:68px;
+    object-fit:contain;transform-origin:50% 88%;
+    animation:exploreridle 1.05s ease-in-out infinite alternate;
+    filter:drop-shadow(0 2px 2px rgba(45,65,40,.16));}
+  .me-dot{position:absolute;left:-8px;top:-8px;width:16px;height:16px;border-radius:50%;
+    box-sizing:border-box;background:#3C805F;border:3px solid #fff;
+    box-shadow:0 2px 7px rgba(45,91,66,.25);}
   .me-ring{position:absolute;left:-36px;top:-36px;width:72px;height:72px;border-radius:50%;
-    background:rgba(52,120,200,.20);animation:pulsering 2.8s ease-out infinite;}
-  .me-caption{position:absolute;top:18px;left:50%;transform:translateX(-50%);
+    background:rgba(60,128,95,.17);animation:pulsering 2.8s ease-out infinite;}
+  .me-caption{position:absolute;top:11px;left:50%;transform:translateX(-50%);
     padding:4px 8px;border-radius:11px;background:rgba(255,255,255,.94);
-    color:#315679;font-size:10px;font-weight:800;white-space:nowrap;
-    box-shadow:0 2px 7px rgba(39,77,119,.16);}
+    color:#315F48;font-size:10px;font-weight:800;white-space:nowrap;
+    box-shadow:0 2px 7px rgba(45,91,66,.16);}
   @keyframes pulsering{0%{transform:scale(.35);opacity:.55;}70%{opacity:0;}100%{transform:scale(1);opacity:0;}}
+  @keyframes exploreridle{
+    0%{transform:translateY(0) rotate(-1.2deg);}
+    100%{transform:translateY(-2px) rotate(1.2deg);}
+  }
 
   /* 참조 시안의 탐험 구역 캡션. Circle 자체에는 라벨 기능이 없어서 같은 좌표계를
      쓰는 CustomOverlay로 붙인다. 지도 확대/이동에도 원과 함께 자연스럽게 움직인다. */
@@ -127,7 +137,12 @@ if (!window.kakao || !window.kakao.maps) {
     var pinOverlays = [];
     var latestPins = [];
     var mePosition = null;
+    var displayedMePosition = null;
     var meOverlay = null;
+    var meExplorerElement = null;
+    var meDotElement = null;
+    var explorerImageUri = "";
+    var meAnimationFrame = null;
     var zoneCircle = null;
     var zoneLabelOverlay = null;
     var zoneLabelElement = null;
@@ -153,8 +168,17 @@ if (!window.kakao || !window.kakao.maps) {
       var body = document.createElement("div");
       body.className = "pin-body";
       body.style.background = color + "22";
-      if (pin.emoji) {
-        body.textContent = pin.emoji;
+      if (pin.image_uri) {
+        var image = document.createElement("img");
+        image.className = "pin-image";
+        image.src = pin.image_uri;
+        image.alt = "";
+        image.addEventListener("error", function(){
+          image.remove();
+          body.className += " pin-initial";
+          body.textContent = pin.marker_label || "새";
+        });
+        body.appendChild(image);
       } else {
         body.className += " pin-initial";
         body.textContent = pin.marker_label || "새";
@@ -263,6 +287,56 @@ if (!window.kakao || !window.kakao.maps) {
       });
     }
 
+    function updateExplorerImage(){
+      if (!meExplorerElement) return;
+      if (!explorerImageUri) {
+        meExplorerElement.style.display = "none";
+        if (meDotElement) meDotElement.style.display = "block";
+        return;
+      }
+      meExplorerElement.onload = function(){
+        meExplorerElement.style.display = "block";
+        if (meDotElement) meDotElement.style.display = "none";
+      };
+      meExplorerElement.onerror = function(){
+        meExplorerElement.style.display = "none";
+        if (meDotElement) meDotElement.style.display = "block";
+      };
+      if (meExplorerElement.src !== explorerImageUri) meExplorerElement.src = explorerImageUri;
+    }
+
+    function moveExplorerTo(lat, lng){
+      if (!meOverlay) return;
+      if (meAnimationFrame) cancelAnimationFrame(meAnimationFrame);
+
+      if (!displayedMePosition) {
+        displayedMePosition = { lat: lat, lng: lng };
+        meOverlay.setPosition(new kakao.maps.LatLng(lat, lng));
+        return;
+      }
+
+      var startLat = displayedMePosition.lat;
+      var startLng = displayedMePosition.lng;
+      var northM = (lat - startLat) * 111000;
+      var eastM = (lng - startLng) * 111000 * Math.cos(lat * Math.PI / 180);
+      var distanceM = Math.sqrt(northM * northM + eastM * eastM);
+      if (distanceM < .2) return;
+
+      var startedAt = performance.now();
+      var duration = Math.max(320, Math.min(900, distanceM * 38));
+      function step(now){
+        var progress = Math.min(1, (now - startedAt) / duration);
+        var eased = 1 - Math.pow(1 - progress, 3);
+        var nextLat = startLat + (lat - startLat) * eased;
+        var nextLng = startLng + (lng - startLng) * eased;
+        displayedMePosition = { lat: nextLat, lng: nextLng };
+        meOverlay.setPosition(new kakao.maps.LatLng(nextLat, nextLng));
+        if (progress < 1) meAnimationFrame = requestAnimationFrame(step);
+        else meAnimationFrame = null;
+      }
+      meAnimationFrame = requestAnimationFrame(step);
+    }
+
     function renderMe(lat, lng, zoneRadius, zoneLabel){
       var pos = new kakao.maps.LatLng(lat, lng);
       mePosition = { lat: lat, lng: lng };
@@ -272,14 +346,20 @@ if (!window.kakao || !window.kakao.maps) {
         el.className = "me";
         var ring = document.createElement("div"); ring.className = "me-ring";
         var dot = document.createElement("div"); dot.className = "me-dot";
+        var explorer = document.createElement("img");
+        explorer.className = "me-explorer";
+        explorer.alt = "";
         var caption = document.createElement("div"); caption.className = "me-caption";
         caption.textContent = "현재 위치";
-        el.appendChild(ring); el.appendChild(dot); el.appendChild(caption);
-        meOverlay = new kakao.maps.CustomOverlay({ position: pos, content: el, zIndex: 5 });
+        el.appendChild(ring); el.appendChild(dot); el.appendChild(explorer); el.appendChild(caption);
+        meExplorerElement = explorer;
+        meDotElement = dot;
+        meOverlay = new kakao.maps.CustomOverlay({ position: pos, content: el, zIndex: 30 });
         meOverlay.setMap(map);
-      } else {
-        meOverlay.setPosition(pos);
+        displayedMePosition = { lat: lat, lng: lng };
+        updateExplorerImage();
       }
+      moveExplorerTo(lat, lng);
 
       // 현위치와 같은 좌표의 관찰 핀은 파란 점 위에 겹치지 않게 다시 펼친다.
       if (latestPins.length) renderPins(latestPins);
@@ -319,6 +399,10 @@ if (!window.kakao || !window.kakao.maps) {
       try {
         var data = JSON.parse(e.data);
         if (data.type === "set_pins") renderPins(data.pins);
+        if (data.type === "set_explorer_image") {
+          explorerImageUri = typeof data.image_uri === "string" ? data.image_uri : "";
+          updateExplorerImage();
+        }
         if (data.type === "set_center" && typeof data.lat === "number") {
           map.setCenter(new kakao.maps.LatLng(data.lat, data.lng));
         }
