@@ -74,6 +74,53 @@ test("POST /professor/ask: 식용 질문은 검색보다 먼저 고정 안전 �
   assert.match(body.answer, /입에 넣지/);
 });
 
+test("POST /professor/ask: 종의 먹이를 묻는 생태 질문은 안전 문구로 막히지 않는다(2026-07-30)", async () => {
+  // 예전엔 "먹어" 단어 하나만으로 EDIBILITY_PATTERN이 걸려, 종의 먹이를 묻는
+  // 생태 질문까지 전부 "입에 넣지 마세요" 고정 안전 문구로 막혀버렸다.
+  const dietQuestions = [
+    "까치는 뭘 먹어요?",
+    "무당벌레 뭐 먹어?",
+    "잠자리는 무엇을 먹어요?",
+    "까치는 벌레를 먹어요?",
+  ];
+  const { server } = await serverPromise;
+  const { token } = await signup();
+  for (const question of dietQuestions) {
+    const response = await server.inject({
+      method: "POST",
+      url: "/professor/ask",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { question },
+    });
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.notEqual(body.response_source, "fixed_safety", `"${question}" 질문이 안전 문구로 막혔다`);
+  }
+});
+
+test("POST /professor/ask: 사람이 직접 먹어도 되는지 묻는 질문은 계속 안전 문구로 막는다(2026-07-30)", async () => {
+  const selfEdibilityQuestions = [
+    "이거 먹어도 돼요?",
+    "이 버섯 식용인가요?",
+    "민들레 먹을 수 있어?",
+    "이 열매 먹어도 되나요?",
+    "이거 독버섯이야?",
+  ];
+  const { server } = await serverPromise;
+  const { token } = await signup();
+  for (const question of selfEdibilityQuestions) {
+    const response = await server.inject({
+      method: "POST",
+      url: "/professor/ask",
+      headers: { authorization: `Bearer ${token}` },
+      payload: { question },
+    });
+    assert.equal(response.statusCode, 200);
+    const body = response.json();
+    assert.equal(body.response_source, "fixed_safety", `"${question}" 질문이 차단되지 않았다`);
+  }
+});
+
 test("POST /professor/ask: 직접 이름을 물은 미발견 생물은 답하지만 도감에는 등록하지 않는다", async () => {
   const { app, server } = await serverPromise;
   const { token, userId } = await signup();
