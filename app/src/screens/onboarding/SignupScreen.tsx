@@ -66,7 +66,12 @@ export default function SignupScreen({ navigation, route }: Props) {
       }
 
       completeOnboarding();
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      // 게스트 전환은 이미 탐험을 경험한 사용자라 인트로 없이 바로 메인으로 보낸다.
+      // 신규 가입만 "아울 박사" 인트로 컷씬을 한 번 거친다.
+      navigation.reset({
+        index: 0,
+        routes: [{ name: mode === 'convert' ? 'Main' : 'Intro' }],
+      });
     } catch {
       Alert.alert('계정 생성 실패', '잠시 후 다시 시도해 주세요.');
     } finally {

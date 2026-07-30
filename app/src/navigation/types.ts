@@ -23,6 +23,8 @@ export type RootStackParamList = {
   Login: undefined;
   Consent: { mode: AuthFlowMode };
   Signup: { mode: AuthFlowMode; consent: ConsentPayload };
+  /** 신규 가입 직후 1회 재생되는 "아울 박사" 인트로 컷씬. */
+  Intro: undefined;
   // ── 메인 앱 ──────────────────────────────────────────
   Main: undefined;
   // ── 상세 (F4/F6) ─────────────────────────────────────
