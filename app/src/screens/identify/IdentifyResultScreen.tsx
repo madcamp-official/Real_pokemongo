@@ -17,7 +17,7 @@ import { queryClient } from '@/api/queryClient';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { colors, discoveryGradient, alertGradient } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
 import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'IdentifyResult'>;
@@ -127,7 +127,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
           <Text style={styles.eyebrowDanger}>⚠️ CAREFUL ⚠️</Text>
           <Text style={styles.title}>조심해야 할{'\n'}친구예요</Text>
           <Halo tint={colors.dangerBg}>
-            <CreatureArt speciesId={top.species_id} size={124} />
+            <GardenCreatureArt speciesId={top.species_id} size={124} />
           </Halo>
           <Text style={styles.speciesName}>{nameOf(top.species_id)}일 수 있어요</Text>
           <Text style={styles.subText}>가까이 가기 전에 안전 정보를 먼저 확인해요.</Text>
@@ -153,7 +153,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
                   onPress={() => void confirmAndOpen(c.species_id)}
                 >
                   <View style={[styles.candidateThumb, { backgroundColor: getPastel(v.pastel) }]}>
-                    <CreatureArt speciesId={c.species_id} size={38} />
+                    <GardenCreatureArt speciesId={c.species_id} size={38} />
                   </View>
                   <Text style={styles.candidateName}>{nameOf(c.species_id)}</Text>
                   <Text style={styles.candidatePct}>{Math.round(c.confidence * 100)}%</Text>
@@ -171,7 +171,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
           <Text style={styles.eyebrow}>✦ NEW FRIEND ✦</Text>
           <Text style={styles.title}>새로운 친구를{'\n'}발견했어요!</Text>
           <Halo tint={getPastel(visual.pastel)}>
-            <CreatureArt speciesId={top.species_id} size={124} />
+            <GardenCreatureArt speciesId={top.species_id} size={124} />
           </Halo>
           <Text style={styles.speciesName}>{nameOf(top.species_id)}</Text>
           <View style={styles.confidenceChip}>

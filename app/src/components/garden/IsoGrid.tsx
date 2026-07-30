@@ -1,7 +1,7 @@
 import { forwardRef } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { GRID_WIDTH, GRID_HEIGHT, TILE_H, tileCenter } from '@/theme/garden';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
 import type { GardenTile, Placement } from '@/types/api';
 import { IsoTile } from '@/components/garden/IsoTile';
 
@@ -54,7 +54,7 @@ export const IsoGrid = forwardRef<View, Props>(function IsoGrid(
               { left: x - MARKER / 2, top: y - MARKER + TILE_H / 2 },
             ]}
           >
-            <CreatureArt speciesId={p.species_id} size={MARKER * 0.86} />
+            <GardenCreatureArt speciesId={p.species_id} size={MARKER * 0.86} />
           </Pressable>
         );
       })}
