@@ -120,6 +120,37 @@ test("GET /garden/bootstrap: 3D 카탈로그와 같은 종의 모든 보유 개�
   );
 });
 
+test("GET /garden/bootstrap: 앱에서 새로 수집한 개체를 별도 지급 절차 없이 다음 동기화에 바로 내려준다", async () => {
+  const { app, server } = await testServer();
+  const { token } = await signupWithUser(server);
+  const headers = { authorization: `Bearer ${token}` };
+
+  const before = await server.inject({
+    method: "GET",
+    url: "/garden/bootstrap",
+    headers,
+  });
+  assert.equal(before.statusCode, 200);
+  assert.equal(before.json().creatures.length, 0);
+
+  await observeDandelion(app, token, server);
+
+  const after = await server.inject({
+    method: "GET",
+    url: "/garden/bootstrap",
+    headers,
+  });
+  assert.equal(after.statusCode, 200);
+  const body = after.json();
+  assert.equal(body.creatures.length, 1);
+  assert.equal(body.creatures[0].speciesId, "taxon-dandelion");
+  assert.equal(
+    body.inventory.find((entry: any) => entry.speciesId === "taxon-dandelion")
+      .ownedCount,
+    1,
+  );
+});
+
 test("PUT → GET 왕복: 저장한 배치가 그대로 조회되고 species_id도 채워진다", async () => {
   const { app, server } = await testServer();
   const { token, userId } = await signupWithUser(server);

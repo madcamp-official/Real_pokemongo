@@ -95,6 +95,11 @@ public sealed class PCGardenController : MonoBehaviour
     private string creatureSearchQuery = string.Empty;
     private string lastCreatureSearchQuery = string.Empty;
     private int creatureSearchIndex = -1;
+    private const float ServerSyncIntervalSeconds = 8f;
+    private float nextServerSyncAt;
+    private bool serverSyncInProgress;
+    private bool layoutSaveInProgress;
+    private string lastServerBootstrapJson = string.Empty;
 
     public int SpawnedCreatureCount => spawnedCreatures.Count;
     public string Status => status;
@@ -122,7 +127,9 @@ public sealed class PCGardenController : MonoBehaviour
                 error => serverError = error);
             if (!string.IsNullOrWhiteSpace(serverJson))
             {
+                lastServerBootstrapJson = serverJson;
                 InitializeGarden(serverJson);
+                nextServerSyncAt = Time.unscaledTime + ServerSyncIntervalSeconds;
                 yield break;
             }
             Debug.LogWarning("PC 홈가든 서버 연결 실패, 로컬 데이터 사용: " + serverError);
@@ -149,6 +156,18 @@ public sealed class PCGardenController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F11))
             Screen.fullScreen = !Screen.fullScreen;
+
+        if (apiClient != null
+            && apiClient.IsConfigured
+            && !serverSyncInProgress
+            && !layoutSaveInProgress
+            && !loginInProgress
+            && !showLogin
+            && !IsInventoryDragging
+            && Time.unscaledTime >= nextServerSyncAt)
+        {
+            StartCoroutine(RefreshGardenFromServer(false));
+        }
     }
 
     public void InitializeGarden(string json)
@@ -2121,15 +2140,82 @@ public sealed class PCGardenController : MonoBehaviour
 
         if (apiClient != null && apiClient.IsConfigured)
         {
+            layoutSaveInProgress = true;
             StartCoroutine(apiClient.SaveLayout(
                 bootstrap,
-                () => status = message + " · 서버 저장 완료",
+                () =>
+                {
+                    layoutSaveInProgress = false;
+                    nextServerSyncAt =
+                        Time.unscaledTime + ServerSyncIntervalSeconds;
+                    status = message + " · 서버 저장 완료";
+                },
                 error =>
                 {
+                    layoutSaveInProgress = false;
+                    nextServerSyncAt =
+                        Time.unscaledTime + ServerSyncIntervalSeconds;
                     status = message + " · 서버 저장 재시도 필요";
                     Debug.LogWarning("PC 홈가든 서버 저장 실패: " + error);
                 }));
         }
+    }
+
+    private IEnumerator RefreshGardenFromServer(bool userInitiated)
+    {
+        if (apiClient == null
+            || !apiClient.IsConfigured
+            || serverSyncInProgress
+            || layoutSaveInProgress)
+            yield break;
+
+        serverSyncInProgress = true;
+        nextServerSyncAt = Time.unscaledTime + ServerSyncIntervalSeconds;
+        if (userInitiated)
+            status = "모바일 앱에서 새로 수집한 종을 확인하는 중입니다.";
+
+        string json = null;
+        string error = null;
+        yield return apiClient.LoadBootstrap(
+            value => json = value,
+            value => error = value);
+
+        serverSyncInProgress = false;
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            if (userInitiated)
+                status = "수집 동기화 실패 · 서버 연결을 확인해 주세요.";
+            Debug.LogWarning("PC 홈가든 수집 동기화 실패: " + error);
+            yield break;
+        }
+
+        // 요청을 보낸 뒤 사용자가 배치를 시작했거나 저장이 시작된 경우에는
+        // 서버 응답으로 현재 조작을 덮지 않고 다음 자동 동기화에서 다시 받는다.
+        if (IsInventoryDragging || layoutSaveInProgress)
+        {
+            nextServerSyncAt = Time.unscaledTime + ServerSyncIntervalSeconds;
+            yield break;
+        }
+
+        if (string.Equals(
+                json,
+                lastServerBootstrapJson,
+                StringComparison.Ordinal))
+        {
+            if (userInitiated)
+                status = "수집 동기화 완료 · 새로 추가된 종이 없습니다.";
+            yield break;
+        }
+
+        int previousOwned = bootstrap?.creatures?.Length ?? 0;
+        lastServerBootstrapJson = json;
+        InitializeGarden(json);
+        int currentOwned = bootstrap?.creatures?.Length ?? 0;
+        int added = Mathf.Max(0, currentOwned - previousOwned);
+        status = added > 0
+            ? "수집 동기화 완료 · 새 생태 친구 " + added
+                + "마리가 보관함에 들어왔습니다."
+            : "수집 동기화 완료 · 최신 정원 상태를 불러왔습니다.";
     }
 
     private void BeginLogin()
@@ -2180,6 +2266,8 @@ public sealed class PCGardenController : MonoBehaviour
         }
 
         InitializeGarden(json);
+        lastServerBootstrapJson = json;
+        nextServerSyncAt = Time.unscaledTime + ServerSyncIntervalSeconds;
         showLogin = false;
         loginPassword = string.Empty;
         loginInProgress = false;
@@ -2431,24 +2519,42 @@ public sealed class PCGardenController : MonoBehaviour
 
         float controlsX = Screen.width - 492f;
         string connectionLabel = apiClient != null && apiClient.IsConfigured
-            ? "DB 다시 연결"
-            : "실제 DB 연결";
-        if (GUI.Button(new Rect(controlsX, 28f, 112f, 38f), connectionLabel))
+            ? "DB 재연결"
+            : "DB 연결";
+
+        GUI.enabled = apiClient != null
+            && apiClient.IsConfigured
+            && !serverSyncInProgress
+            && !layoutSaveInProgress
+            && !IsInventoryDragging;
+        if (GUI.Button(
+                new Rect(controlsX, 28f, 88f, 38f),
+                serverSyncInProgress ? "동기화 중" : "수집 동기화"))
+            StartCoroutine(RefreshGardenFromServer(true));
+        GUI.enabled = true;
+
+        if (GUI.Button(
+                new Rect(controlsX + 96f, 28f, 88f, 38f),
+                connectionLabel))
         {
             loginMessage = "모바일 앱에서 사용하는 계정으로 로그인하세요.";
             showLogin = true;
         }
-        if (GUI.Button(new Rect(controlsX + 120f, 28f, 104f, 38f), "전체 보기")
+        if (GUI.Button(
+                new Rect(controlsX + 192f, 28f, 88f, 38f),
+                "전체 보기")
             && orbitCamera != null)
             orbitCamera.ShowOverview();
 
         string labelToggle = showCreatureLabels ? "이름 끄기" : "이름 켜기";
         if (GUI.Button(
-                new Rect(controlsX + 232f, 28f, 104f, 38f),
+                new Rect(controlsX + 288f, 28f, 88f, 38f),
                 labelToggle))
             showCreatureLabels = !showCreatureLabels;
 
-        if (GUI.Button(new Rect(controlsX + 344f, 28f, 104f, 38f), "종료"))
+        if (GUI.Button(
+                new Rect(controlsX + 384f, 28f, 88f, 38f),
+                "종료"))
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;

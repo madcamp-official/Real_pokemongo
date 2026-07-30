@@ -1,4 +1,4 @@
--- 0006_audio_sighting_coord: 소리 동정으로 확정된 관찰이 탐험 지도에 뜨지 않는 문제 수정.
+-- 0011_audio_sighting_coord: 소리 동정으로 확정된 관찰이 탐험 지도에 뜨지 않는 문제 수정.
 --
 -- 0002_audio_sighting.sql이 당시(3단계) lat/lng을 "파싱만 하고 저장 컬럼 없이 버린다"고
 -- 명시적으로 미뤄뒀는데(API_CONTRACT.md에는 이미 정의돼 있었음), /audio/identify/confirm이
@@ -10,7 +10,8 @@
 -- 이 마이그레이션 이전에 확정된 소리 관찰은 좌표가 없었으므로 지어낼 수 없다.
 BEGIN;
 
-ALTER TABLE audio_sighting ADD COLUMN precise_lat DOUBLE PRECISION;
-ALTER TABLE audio_sighting ADD COLUMN precise_lng DOUBLE PRECISION;
+-- 병합 전 브랜치에서 같은 변경이 0006 이름으로 적용된 DB도 안전하게 통과한다.
+ALTER TABLE audio_sighting ADD COLUMN IF NOT EXISTS precise_lat DOUBLE PRECISION;
+ALTER TABLE audio_sighting ADD COLUMN IF NOT EXISTS precise_lng DOUBLE PRECISION;
 
 COMMIT;
