@@ -37,9 +37,8 @@ export function registerDexRoutes(
       const entries = await Promise.all(
         taxa.map(async (t) => {
           const entry = await app.repos.collection.get(ctx.userId, t.id);
-          // D단계: 종당 최대 1마리 규칙이라 0개 또는 1개. getByUserAndTaxon으로 바로 조회.
-          const creature = await app.repos.creatures.getByUserAndTaxon(ctx.userId, t.id);
-          return collectionEntryToDexEntry(t, entry, creature ? [creature] : []);
+          const creatures = await app.repos.creatures.listByUserAndTaxon(ctx.userId, t.id);
+          return collectionEntryToDexEntry(t, entry, creatures);
         }),
       );
 

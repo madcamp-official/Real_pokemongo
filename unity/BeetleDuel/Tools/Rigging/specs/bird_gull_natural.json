@@ -1,0 +1,6 @@
+{
+  "extends": "bird_gull.json",
+  "profile": "bird-gull-natural-source-wings",
+  "body_excluded_bones": [],
+  "procedural_wings": null
+}

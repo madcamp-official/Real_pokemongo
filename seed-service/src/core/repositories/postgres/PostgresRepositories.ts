@@ -11,6 +11,7 @@
  * 헬퍼만 예외적으로 둔다(전체 포트가 아니라 FK 충족용 write-only 함수).
  */
 import pg from "pg";
+import type { GardenAssetDefinition } from "../../../seed/gardenAssetCatalog.js";
 import type {
   User,
   UserId,
@@ -517,6 +518,16 @@ export class PgCreatureRepo implements CreatureRepository {
     return r.rows[0] ? rowToCreature(r.rows[0]) : null;
   }
 
+  async listByUserAndTaxon(userId: UserId, taxonId: TaxonId) {
+    const r = await this.pool.query(
+      `SELECT * FROM creature
+       WHERE user_id = $1 AND taxon_id = $2
+       ORDER BY created_at, id`,
+      [userId, taxonId],
+    );
+    return r.rows.map(rowToCreature);
+  }
+
   async listByUser(userId: UserId) {
     const r = await this.pool.query(`SELECT * FROM creature WHERE user_id = $1`, [userId]);
     return r.rows.map(rowToCreature);
@@ -525,6 +536,50 @@ export class PgCreatureRepo implements CreatureRepository {
   async deleteByUser(userId: UserId) {
     const r = await this.pool.query(`DELETE FROM creature WHERE user_id = $1 RETURNING id`, [userId]);
     return r.rowCount ?? 0;
+  }
+}
+
+export async function upsertGardenAssetCatalog(
+  pool: Pool,
+  assets: GardenAssetDefinition[],
+): Promise<void> {
+  const client = await pool.connect();
+  try {
+    await client.query("BEGIN");
+    for (const asset of assets) {
+      await client.query(
+        `INSERT INTO garden_asset_catalog
+           (asset_key, taxon_id, display_name, category, resource_path,
+            behaviour_profile, display_scale, minimum_altitude, enabled, updated_at)
+         VALUES ($1,$2,$3,$4,$5,$6,$7,$8,TRUE,now())
+         ON CONFLICT (asset_key) DO UPDATE SET
+           taxon_id = EXCLUDED.taxon_id,
+           display_name = EXCLUDED.display_name,
+           category = EXCLUDED.category,
+           resource_path = EXCLUDED.resource_path,
+           behaviour_profile = EXCLUDED.behaviour_profile,
+           display_scale = EXCLUDED.display_scale,
+           minimum_altitude = EXCLUDED.minimum_altitude,
+           enabled = TRUE,
+           updated_at = now()`,
+        [
+          asset.assetKey,
+          asset.taxonId ?? null,
+          asset.displayName,
+          asset.category,
+          asset.resourcePath,
+          asset.behaviourProfile,
+          asset.displayScale,
+          asset.minimumAltitude,
+        ],
+      );
+    }
+    await client.query("COMMIT");
+  } catch (error) {
+    await client.query("ROLLBACK");
+    throw error;
+  } finally {
+    client.release();
   }
 }
 
@@ -796,12 +851,18 @@ export class PgGardenRepo implements GardenRepository {
       type: r.type as TileType,
     }));
     const placementRows = await this.pool.query(
-      `SELECT "row", col, creature_id FROM creature_placement WHERE user_id = $1`,
+      `SELECT "row", col, creature_id, placement_mode, world_x, world_y, world_z
+         FROM creature_placement
+        WHERE user_id = $1`,
       [userId],
     );
     const placements: CreaturePlacement[] = placementRows.rows.map((r) => ({
-      row: r.row,
-      col: r.col,
+      placementMode: r.placement_mode as "slot" | "free",
+      row: r.row ?? undefined,
+      col: r.col ?? undefined,
+      worldX: r.world_x ?? undefined,
+      worldY: r.world_y ?? undefined,
+      worldZ: r.world_z ?? undefined,
       creatureId: r.creature_id as CreatureId,
     }));
     return { tiles, placements };
@@ -825,9 +886,22 @@ export class PgGardenRepo implements GardenRepository {
         );
       }
       for (const p of layout.placements) {
+        const mode = p.placementMode ?? "slot";
         await client.query(
-          `INSERT INTO creature_placement (user_id, "row", col, creature_id) VALUES ($1,$2,$3,$4)`,
-          [userId, p.row, p.col, p.creatureId],
+          `INSERT INTO creature_placement (
+               user_id, "row", col, creature_id,
+               placement_mode, world_x, world_y, world_z
+           ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8)`,
+          [
+            userId,
+            mode === "slot" ? p.row : null,
+            mode === "slot" ? p.col : null,
+            p.creatureId,
+            mode,
+            mode === "free" ? p.worldX : null,
+            mode === "free" ? p.worldY : null,
+            mode === "free" ? p.worldZ : null,
+          ],
         );
       }
       await client.query("COMMIT");

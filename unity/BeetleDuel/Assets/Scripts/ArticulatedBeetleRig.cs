@@ -155,7 +155,9 @@ public sealed class ArticulatedBeetleRig : MonoBehaviour
         Destroy(meshRenderer);
         Destroy(meshFilter);
 
-        motionReference = transform.parent != null ? transform.parent : transform;
+        // 정원에서는 모델 루트 자체가 이동한다. 월드 위치를 추적하면 부모가
+        // 움직이는 관찰 장면과 루트가 움직이는 정원 장면을 모두 지원한다.
+        motionReference = transform;
         previousReferencePosition = motionReference.position;
         restLocalPosition = transform.localPosition;
         gaitPhase = phaseOffset;

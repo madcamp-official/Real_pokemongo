@@ -218,18 +218,16 @@ export class ObservationFlow {
     const unlock = await this.deps.collection.applyObservation(observation);
     const progress = await this.deps.collection.progress(ctx.userId);
 
-    // ── D단계: 개체(Creature) 자동 생성 — 이 종의 첫 해금일 때만(종당 최대 1마리,
-    // newlyUnlocked가 곧 "이 유저가 이 종을 처음 해금했다"는 뜻이라 별도 중복 체크 불필요).
-    if (unlock?.newlyUnlocked) {
-      await this.deps.creatures.save({
-        id: newCreatureId(),
-        userId: ctx.userId,
-        taxonId: taxon.id,
-        originObservationId: observation.id,
-        bond: 1,
-        createdAt: now.toISOString(),
-      });
-    }
+    // 확정 관찰 1회당 정원에 놓을 수 있는 실제 개체 1마리를 지급한다.
+    // DB는 origin_observation_id UNIQUE로 동일 관찰 재처리만 차단한다.
+    await this.deps.creatures.save({
+      id: newCreatureId(),
+      userId: ctx.userId,
+      taxonId: taxon.id,
+      originObservationId: observation.id,
+      bond: 1,
+      createdAt: now.toISOString(),
+    });
 
     // ── F7 퀘스트 반영 ────────────────────────────────────────────────────
     // completed=true만 기록한다. 보상(XP)은 더 이상 여기서 자동 지급하지 않는다 —

@@ -1,0 +1,5 @@
+{
+  "extends": "ground_longwing_base.json",
+  "profile": "ground-longwing-minus90",
+  "pre_rotation_degrees": [0, 0, -90]
+}

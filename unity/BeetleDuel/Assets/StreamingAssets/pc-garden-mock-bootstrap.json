@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 2,
+  "userId": "mock-user",
+  "displayName": "Nature Go 탐험가",
+  "assets": [
+    {
+      "assetKey": "large-billed-crow",
+      "speciesId": "taxon-corvus-macrorhynchos",
+      "displayName": "큰부리까마귀",
+      "category": "bird",
+      "resourcePath": "Models/Birds/LargeBilledCrow",
+      "behaviourProfile": "bird-flight",
+      "displayScale": 3.15,
+      "minimumAltitude": 6.8
+    },
+    {
+      "assetKey": "rhinoceros-beetle",
+      "speciesId": "taxon-rhinoceros-beetle",
+      "displayName": "장수풍뎅이",
+      "category": "insect",
+      "resourcePath": "Models/GroundInsects/RhinocerosBeetle",
+      "behaviourProfile": "ground-insect",
+      "displayScale": 3.5,
+      "minimumAltitude": 0.32
+    }
+  ],
+  "creatures": [
+    {
+      "creatureId": "mock-crow-1",
+      "speciesId": "taxon-corvus-macrorhynchos",
+      "displayName": "큰부리까마귀",
+      "modelKey": "large-billed-crow",
+      "bond": 3
+    },
+    {
+      "creatureId": "mock-rhino-1",
+      "speciesId": "taxon-rhinoceros-beetle",
+      "displayName": "장수풍뎅이",
+      "modelKey": "rhinoceros-beetle",
+      "bond": 2
+    },
+    {
+      "creatureId": "mock-rhino-2",
+      "speciesId": "taxon-rhinoceros-beetle",
+      "displayName": "장수풍뎅이 · 둘째",
+      "modelKey": "rhinoceros-beetle",
+      "bond": 1
+    },
+    {
+      "creatureId": "mock-rhino-3",
+      "speciesId": "taxon-rhinoceros-beetle",
+      "displayName": "장수풍뎅이 · 셋째",
+      "modelKey": "rhinoceros-beetle",
+      "bond": 1
+    }
+  ],
+  "placements": [
+    {
+      "creatureId": "mock-crow-1",
+      "row": 4,
+      "col": 4
+    },
+    {
+      "creatureId": "mock-rhino-1",
+      "row": 2,
+      "col": 2
+    }
+  ],
+  "tiles": [
+    { "row": 0, "col": 0, "type": "잔디" },
+    { "row": 0, "col": 1, "type": "잔디" },
+    { "row": 0, "col": 2, "type": "잔디" },
+    { "row": 0, "col": 3, "type": "잔디" },
+    { "row": 0, "col": 4, "type": "잔디" },
+    { "row": 0, "col": 5, "type": "잔디" },
+    { "row": 1, "col": 0, "type": "잔디" },
+    { "row": 1, "col": 1, "type": "잔디" },
+    { "row": 1, "col": 2, "type": "잔디" },
+    { "row": 1, "col": 3, "type": "잔디" },
+    { "row": 1, "col": 4, "type": "잔디" },
+    { "row": 1, "col": 5, "type": "잔디" },
+    { "row": 2, "col": 0, "type": "잔디" },
+    { "row": 2, "col": 1, "type": "잔디" },
+    { "row": 2, "col": 2, "type": "흙" },
+    { "row": 2, "col": 3, "type": "흙" },
+    { "row": 2, "col": 4, "type": "잔디" },
+    { "row": 2, "col": 5, "type": "잔디" },
+    { "row": 3, "col": 0, "type": "잔디" },
+    { "row": 3, "col": 1, "type": "흙" },
+    { "row": 3, "col": 2, "type": "흙" },
+    { "row": 3, "col": 3, "type": "잔디" },
+    { "row": 3, "col": 4, "type": "잔디" },
+    { "row": 3, "col": 5, "type": "돌" },
+    { "row": 4, "col": 0, "type": "꽃밭" },
+    { "row": 4, "col": 1, "type": "잔디" },
+    { "row": 4, "col": 2, "type": "잔디" },
+    { "row": 4, "col": 3, "type": "잔디" },
+    { "row": 4, "col": 4, "type": "돌" },
+    { "row": 4, "col": 5, "type": "돌" },
+    { "row": 5, "col": 0, "type": "꽃밭" },
+    { "row": 5, "col": 1, "type": "꽃밭" },
+    { "row": 5, "col": 2, "type": "잔디" },
+    { "row": 5, "col": 3, "type": "흙" },
+    { "row": 5, "col": 4, "type": "흙" },
+    { "row": 5, "col": 5, "type": "잔디" }
+  ]
+}

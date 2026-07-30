@@ -314,10 +314,8 @@ ALTER TABLE quest
 -- 레코드를 그대로 반환한다(collectionEntryToDexEntry, D단계).
 --
 -- 제품 결정 확정(예전 Q1/Q2, ObservationFlow.recordIdentification 참고):
---   - 개체는 종을 "처음" 해금하는 순간(collection.applyObservation의 newlyUnlocked=true)
---     자동으로 1개 생성된다. 사용자가 명시적으로 만드는 액션은 없다.
---   - 종당 최대 1마리(UNIQUE(user_id, taxon_id) 제약으로 DB 레벨에서도 강제 — 코드가 이미
---     newlyUnlocked일 때만 만들어서 보장하지만, 이중 안전장치).
+--   - 확정 관찰 1회마다 홈가든에 놓을 수 있는 독립 개체 1마리가 생성된다.
+--   - 같은 종을 여러 번 관찰하면 그 수만큼 서로 다른 creature.id를 보유할 수 있다.
 -- ★ 아직 미해결(범위 밖, F9 Bond 상호작용 전체 구현 시 확정): bond_max(현재 프론트 상수 5)를
 --   개체별로 달리할지 — 지금은 앱 상수로 두고 컬럼화하지 않음(상수 중복 저장 회피).
 CREATE TABLE creature (
@@ -329,10 +327,13 @@ CREATE TABLE creature (
     origin_observation_id UUID REFERENCES observation(id) ON DELETE SET NULL,
     bond                 INTEGER NOT NULL DEFAULT 1 CHECK (bond >= 0),
     last_interaction_at  TIMESTAMPTZ,                   -- 재회(reunion) 판정 기준(F9, 범위 밖)
-    created_at           TIMESTAMPTZ NOT NULL DEFAULT now(),  -- days_together 파생 기준
-    UNIQUE (user_id, taxon_id)                          -- 종당 최대 1마리(제품 결정, D단계)
+    created_at           TIMESTAMPTZ NOT NULL DEFAULT now()   -- days_together 파생 기준
 );
 CREATE INDEX creature_user_idx ON creature (user_id);
+CREATE INDEX creature_user_taxon_idx ON creature (user_id, taxon_id);
+CREATE UNIQUE INDEX creature_origin_observation_unique_idx
+    ON creature (origin_observation_id)
+    WHERE origin_observation_id IS NOT NULL;
 -- days_together, is_reunion, status_message 는 전부 파생값(저장 안 함) — core/garden/bondRules.ts가
 -- 요청마다 계산한다: days_together = now - created_at, is_reunion = now - (last_interaction_at ??
 -- created_at) > 임계(3일), status_message = 규칙 기반(재회/최대 유대감/그 외 소수 문구 중 결정).
@@ -358,16 +359,49 @@ CREATE TABLE garden_tile (
     PRIMARY KEY (user_id, "row", col)
 );
 
--- 개체 배치: 한 개체는 한 자리에만(creature_id UNIQUE), 한 타일엔 최대 한 개체((user,row,col) PK).
+-- 개체 배치: 식물/나무는 슬롯, 동물/곤충/새는 PC 온실 바닥 자유 좌표를 사용한다.
 CREATE TABLE creature_placement (
     user_id     UUID NOT NULL REFERENCES app_user(id) ON DELETE CASCADE,
-    "row"       INTEGER NOT NULL,
-    col         INTEGER NOT NULL,
+    "row"       INTEGER,
+    col         INTEGER,
     creature_id UUID NOT NULL UNIQUE REFERENCES creature(id) ON DELETE CASCADE,
-    PRIMARY KEY (user_id, "row", col),
-    -- 배치 좌표는 실제 존재하는 타일이어야 한다(유효 타일 강제).
+    placement_mode TEXT NOT NULL DEFAULT 'slot'
+                   CHECK (placement_mode IN ('slot', 'free')),
+    world_x REAL,
+    world_y REAL,
+    world_z REAL,
+    CHECK (
+        (placement_mode = 'slot'
+         AND "row" IS NOT NULL AND col IS NOT NULL
+         AND world_x IS NULL AND world_y IS NULL AND world_z IS NULL)
+        OR
+        (placement_mode = 'free'
+         AND "row" IS NULL AND col IS NULL
+         AND world_x IS NOT NULL AND world_y IS NOT NULL AND world_z IS NOT NULL)
+    ),
     FOREIGN KEY (user_id, "row", col) REFERENCES garden_tile(user_id, "row", col) ON DELETE CASCADE
 );
+CREATE UNIQUE INDEX creature_placement_slot_unique
+    ON creature_placement (user_id, "row", col)
+    WHERE placement_mode = 'slot';
+
+-- Unity Resources의 모든 정원용 3D 자산을 서버 taxon과 연결하는 배포 카탈로그.
+CREATE TABLE garden_asset_catalog (
+    asset_key          TEXT PRIMARY KEY,
+    taxon_id           TEXT REFERENCES taxon(id) ON DELETE SET NULL,
+    display_name       TEXT NOT NULL,
+    category           TEXT NOT NULL
+                       CHECK (category IN ('tree','plant','insect','bird','animal')),
+    resource_path      TEXT NOT NULL UNIQUE,
+    behaviour_profile TEXT NOT NULL,
+    display_scale      REAL NOT NULL CHECK (display_scale > 0),
+    minimum_altitude   REAL NOT NULL DEFAULT 0,
+    enabled            BOOLEAN NOT NULL DEFAULT TRUE,
+    updated_at         TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX garden_asset_catalog_taxon_idx
+    ON garden_asset_catalog (taxon_id)
+    WHERE taxon_id IS NOT NULL;
 -- 타일-종 호환성(TileCompatibility, 그룹→배치가능 타일)은 정적 config로 확정(제품 결정) —
 -- 사용자가 편집하는 대상이 아니라 seedData.ts의 TILE_COMPATIBILITY 상수. 테이블화하지 않음.
 

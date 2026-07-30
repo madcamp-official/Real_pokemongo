@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/GreenhouseGarden.unity
+    guid: 31049697b00bb0e4495dde12ffd36790
   m_configObjects: {}

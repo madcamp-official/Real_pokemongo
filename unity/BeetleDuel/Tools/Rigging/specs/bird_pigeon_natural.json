@@ -1,0 +1,6 @@
+{
+  "extends": "bird_pigeon.json",
+  "profile": "bird-pigeon-natural-source-wings",
+  "body_excluded_bones": [],
+  "procedural_wings": null
+}

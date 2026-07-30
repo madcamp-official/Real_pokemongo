@@ -20,3 +20,6 @@
 *.suo
 .DS_Store
 Thumbs.db
+
+# Local rigging pipeline output
+Tools/Rigging/Output/

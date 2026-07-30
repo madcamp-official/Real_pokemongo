@@ -1,0 +1,5 @@
+{
+  "extends": "ground_grasshopper_base.json",
+  "profile": "ground-grasshopper-plus90",
+  "pre_rotation_degrees": [0, 0, 90]
+}

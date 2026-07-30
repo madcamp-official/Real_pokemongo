@@ -1,0 +1,12 @@
+{
+  "extends": "bird_flight_base.json",
+  "profile": "bird-gull",
+  "target_vertices": 50000,
+  "procedural_wings": {
+    "color": [0.72, 0.74, 0.76, 1.0],
+    "feather_color": [0.24, 0.27, 0.29, 1.0],
+    "span_scale": 1.65,
+    "trailing_scale": 1.0,
+    "feather_count": 12
+  }
+}

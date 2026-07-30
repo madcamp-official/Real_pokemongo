@@ -202,7 +202,7 @@ public sealed class StagBeetleRig : MonoBehaviour
         Destroy(meshRenderer);
         Destroy(meshFilter);
 
-        motionReference = transform.parent != null ? transform.parent : transform;
+        motionReference = transform;
         previousReferencePosition = motionReference.position;
         restLocalPosition = transform.localPosition;
         restLocalRotation = transform.localRotation;

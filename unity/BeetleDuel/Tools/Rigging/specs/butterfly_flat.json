@@ -1,0 +1,206 @@
+{
+  "profile": "butterfly",
+  "target_vertices": 120000,
+  "pre_rotation_degrees": [90, 0, 0],
+  "armature_name": "ButterflyRig",
+  "bones": [
+    {
+      "name": "root",
+      "head": [0.50, 0.50, 0.16],
+      "tail": [0.50, 0.50, 0.84],
+      "deform": false
+    },
+    {
+      "name": "thorax",
+      "head": [0.50, 0.50, 0.43],
+      "tail": [0.50, 0.50, 0.64],
+      "parent": "root",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen",
+      "head": [0.50, 0.50, 0.45],
+      "tail": [0.50, 0.50, 0.14],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "head",
+      "head": [0.50, 0.50, 0.62],
+      "tail": [0.50, 0.50, 0.76],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "antenna.L",
+      "head": [0.48, 0.50, 0.71],
+      "tail": [0.34, 0.50, 0.97],
+      "parent": "head",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "antenna.R",
+      "head": [0.52, 0.50, 0.71],
+      "tail": [0.66, 0.50, 0.97],
+      "parent": "head",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.L",
+      "head": [0.47, 0.50, 0.45],
+      "tail": [0.47, 0.50, 0.72],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.L.fore",
+      "head": [0.47, 0.50, 0.60],
+      "tail": [0.06, 0.50, 0.87],
+      "parent": "wingPivot.L",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.L.hind",
+      "head": [0.47, 0.50, 0.47],
+      "tail": [0.11, 0.50, 0.22],
+      "parent": "wingPivot.L",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.R",
+      "head": [0.53, 0.50, 0.45],
+      "tail": [0.53, 0.50, 0.72],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.R.fore",
+      "head": [0.53, 0.50, 0.60],
+      "tail": [0.94, 0.50, 0.87],
+      "parent": "wingPivot.R",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.R.hind",
+      "head": [0.53, 0.50, 0.47],
+      "tail": [0.89, 0.50, 0.22],
+      "parent": "wingPivot.R",
+      "roll_reference": [0, 1, 0]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Butterfly_Idle",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 3, 0],
+            "wingPivot.R": [0, -3, 0]
+          }
+        },
+        {
+          "frame": 24,
+          "rotations": {
+            "wingPivot.L": [0, 7, 0],
+            "wingPivot.R": [0, -7, 0],
+            "antenna.L": [0, 0, -2],
+            "antenna.R": [0, 0, 2]
+          }
+        },
+        {
+          "frame": 48,
+          "rotations": {
+            "wingPivot.L": [0, 3, 0],
+            "wingPivot.R": [0, -3, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Butterfly_Flap",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 4, 0],
+            "wingPivot.R": [0, -4, 0]
+          }
+        },
+        {
+          "frame": 6,
+          "locations": {
+            "root": [0, 0, -0.008]
+          },
+          "rotations": {
+            "wingPivot.L": [0, 68, 0],
+            "wingPivot.R": [0, -68, 0],
+            "thorax": [2, 0, 0]
+          }
+        },
+        {
+          "frame": 11,
+          "rotations": {
+            "wingPivot.L": [0, 15, 0],
+            "wingPivot.R": [0, -15, 0]
+          }
+        },
+        {
+          "frame": 16,
+          "locations": {
+            "root": [0, 0, 0.006]
+          },
+          "rotations": {
+            "wingPivot.L": [0, -18, 0],
+            "wingPivot.R": [0, 18, 0],
+            "thorax": [-1, 0, 0]
+          }
+        },
+        {
+          "frame": 21,
+          "rotations": {
+            "wingPivot.L": [0, 10, 0],
+            "wingPivot.R": [0, -10, 0]
+          }
+        },
+        {
+          "frame": 26,
+          "rotations": {
+            "wingPivot.L": [0, 4, 0],
+            "wingPivot.R": [0, -4, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Butterfly_Glide",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 7, 0],
+            "wingPivot.R": [0, -7, 0]
+          }
+        },
+        {
+          "frame": 36,
+          "rotations": {
+            "wingPivot.L": [0, 12, 0],
+            "wingPivot.R": [0, -12, 0],
+            "antenna.L": [0, 0, -2],
+            "antenna.R": [0, 0, 2]
+          }
+        },
+        {
+          "frame": 72,
+          "rotations": {
+            "wingPivot.L": [0, 7, 0],
+            "wingPivot.R": [0, -7, 0]
+          }
+        }
+      ]
+    }
+  ]
+}

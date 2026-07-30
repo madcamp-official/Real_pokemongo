@@ -1,0 +1,5 @@
+{
+  "extends": "ground_compact_base.json",
+  "profile": "ground-compact-180",
+  "pre_rotation_degrees": [0, 0, 180]
+}
