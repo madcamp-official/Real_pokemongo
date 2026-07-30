@@ -1,7 +1,8 @@
 import type { CollectionRepository, TaxonRepository } from "../repositories/ports.js";
 import { SafetyFilter } from "../safety/SafetyFilter.js";
 import type { Taxon, TaxonId, UserId } from "../domain/types.js";
-import { SemanticSearch, type SearchResult } from "./SemanticSearch.js";
+import { topicParticleFor } from "./koreanParticles.js";
+import { detectIntendedField, SemanticSearch, type SearchResult } from "./SemanticSearch.js";
 import {
   DEFAULT_PROFESSOR_THRESHOLDS,
   type ProfessorAskInput,
@@ -26,6 +27,33 @@ const FIXED_OBSERVATION_ANSWER =
   "생물은 손대지 말고 눈으로 관찰해요. 벌이나 낯선 생물은 거리를 두고, 위험해 보이면 가까운 어른에게 알려 주세요.";
 const UNKNOWN_ANSWER =
   "아직 그 질문에 딱 맞는 내용을 찾지 못했어요. 생김새, 사는 곳, 활동 시간처럼 한 가지를 짧게 물어봐 주세요.";
+
+// 종 이름도 필드 패턴도 없는 질문("박사님 안녕!")은 전부 UNKNOWN_ANSWER로 뭉뚱그려져,
+// 친근한 도감 박사가 인사에도 "모르겠다"고 답하는 것처럼 보였다(2026-07-30 사용자 지적).
+// 이 검사는 질문 자체에 아무 근거가 없을 때(hasQuestionAnchor === false)만 참고하므로,
+// "안녕하세요, 까치는 어디 살아요?"처럼 인사말 뒤에 진짜 질문이 붙으면 종 이름이 이미
+// 근거가 되어 이 분기까지 오지 않고 정상적으로 검색해 답한다 — 인사말이 실제 질문을 가리지 않는다.
+// 더 구체적인(정체성 > 감사 > 작별) 패턴을 먼저 확인해, "안녕히 계세요"가 "안녕"에 걸려
+// 작별 인사가 아니라 일반 인사로 오분류되지 않도록 순서를 정했다.
+const IDENTITY_PATTERN = /(너는\s*누구|넌\s*누구|누구세요|누구야|이름이\s*뭐|박사님은\s*누구|자기\s*소개)/u;
+const THANKS_PATTERN = /(고마워|고맙습니다|고맙다|감사)/u;
+const FAREWELL_PATTERN = /(잘\s*가|또\s*봐|다음에\s*봐|바이|안녕히\s*계세요|안녕히\s*가세요)/u;
+const GREETING_PATTERN = /(안녕|반가워|반갑습니다|하이|헬로|\bhello\b|\bhi\b)/iu;
+
+const SMALL_TALK_RESPONSES: ReadonlyArray<readonly [RegExp, string]> = [
+  [
+    IDENTITY_PATTERN,
+    "저는 이 도감의 박사예요! 우리 동네에서 만날 수 있는 곤충, 새, 식물 이야기를 들려줄게요. 궁금한 생물 이름을 말해주거나 '어디서 살아?'처럼 물어봐 주세요.",
+  ],
+  [THANKS_PATTERN, "천만에요! 또 궁금한 게 생기면 언제든 물어봐요."],
+  [FAREWELL_PATTERN, "다음에 또 만나요! 밖에 나가면 어떤 친구를 만날지 기대돼요."],
+  [GREETING_PATTERN, "안녕하세요! 궁금한 생물이 있으면 이름을 말해주거나, '어디서 살아?'처럼 물어봐 주세요."],
+];
+
+function detectSmallTalk(question: string): string | null {
+  const match = SMALL_TALK_RESPONSES.find(([pattern]) => pattern.test(question));
+  return match?.[1] ?? null;
+}
 
 const REASON_BY_FIELD: Record<string, string> = {
   habitat: "사는 곳이 관련 있어요",
@@ -106,6 +134,33 @@ export class ProfessorService {
     const searchSpeciesId =
       (namedTaxon?.id as string | undefined) ??
       (input.contextSpeciesId as string | undefined);
+
+    // 절대 유사도 점수는 이 임베딩 모델에서 신뢰할 수 없다 — 짧은 한국어 문장끼리는
+    // 전혀 관련 없는 질문·문장 쌍도 0.7~0.87까지 나올 수 있어("오늘 저녁 뭐 먹지"가
+    // "서양민들레는 주로 낮에 움직여요"와 0.869로 매칭된 사례), 점수만으로는 "진짜
+    // 관련 있는 질문"과 "우연히 비슷하게 들리는 무관한 질문"을 가르지 못한다.
+    // 대신 질문 자체에 최소한의 근거(종 이름이 나왔거나, 문맥 종이 주어졌거나,
+    // 크기/서식지/활동시간 같은 알려진 필드 패턴에 걸리는지)가 있는지를 먼저 본다.
+    // 근거가 전혀 없으면 점수가 아무리 높아도 검색조차 하지 않고 모른다고 답한다.
+    const hasQuestionAnchor =
+      !!namedTaxon || !!input.contextSpeciesId || detectIntendedField(question) !== null;
+    if (!hasQuestionAnchor) {
+      const smallTalk = detectSmallTalk(question);
+      if (smallTalk) {
+        return {
+          confidence: "high",
+          answer: smallTalk,
+          matched_species: null,
+          safety_warning: null,
+          related: [],
+          similarity_score: null,
+          restricted: false,
+          response_source: "small_talk",
+        };
+      }
+      return unknownResponse(null);
+    }
+
     const results = await this.deps.search.search(question, searchSpeciesId, 8);
     const best = results[0];
     if (!best || best.score < this.thresholds.low) {
@@ -124,7 +179,7 @@ export class ProfessorService {
     // (앱은 이 값을 보고 종 카드 링크 대신 미등록 안내를 보여준다 — ProfessorScreen.tsx).
     return {
       confidence: confidenceForScore(best.score, this.thresholds),
-      answer: best.record.sentence,
+      answer: best.record.answer,
       matched_species: {
         species_id: taxon.id as string,
         name: taxon.korName || taxon.sciName,
@@ -214,18 +269,6 @@ function questionMentionsTaxon(question: string, taxon: Taxon): boolean {
     const comparableName = normalizeForTaxonMatch(name);
     return comparableName.length >= 2 && comparableQuestion.includes(comparableName);
   });
-}
-
-const HANGUL_SYLLABLE_START = 0xac00;
-const HANGUL_SYLLABLE_END = 0xd7a3;
-const HANGUL_JONGSEONG_COUNT = 28;
-
-/** 이름의 마지막 글자 받침 유무로 "은"/"는" 중 맞는 조사를 고른다(받침 있으면 "은"). */
-function topicParticleFor(name: string): string {
-  const lastCode = name.trim().charCodeAt(name.trim().length - 1);
-  if (lastCode < HANGUL_SYLLABLE_START || lastCode > HANGUL_SYLLABLE_END) return "는";
-  const hasBatchim = (lastCode - HANGUL_SYLLABLE_START) % HANGUL_JONGSEONG_COUNT !== 0;
-  return hasBatchim ? "은" : "는";
 }
 
 function normalizeForTaxonMatch(value: string): string {

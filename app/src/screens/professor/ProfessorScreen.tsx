@@ -49,6 +49,7 @@ export default function ProfessorScreen({ navigation, route }: Props) {
   const canSubmit = question.trim().length >= 2 && !askMutation.isPending;
   const statusLabel = useMemo(() => {
     if (!answer || answer.confidence === 'unknown') return null;
+    if (answer.response_source === 'small_talk') return null;
     if (answer.response_source === 'fixed_safety') return '안전 원칙';
     if (answer.confidence === 'high') return '도감에서 찾은 답';
     return '가장 가까운 도감 내용';

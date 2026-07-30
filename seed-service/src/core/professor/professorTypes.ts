@@ -14,7 +14,10 @@ export type ProfessorFieldType =
 
 export interface KnowledgeChunk {
   chunk_id: string;
+  /** 의미 검색(임베딩)에만 쓰는 압축된 라벨형 문장 — 사용자에게 그대로 보여주지 않는다. */
   sentence: string;
+  /** 사용자에게 실제로 보여주는 자연어 답변. sentence와 같은 사실을 담지만 대화체다. */
+  answer: string;
   species_id: string;
   species_name: string;
   field_type: ProfessorFieldType;
@@ -65,7 +68,7 @@ export interface ProfessorAskResponse {
   related: ProfessorRelatedSpecies[];
   similarity_score: number | null;
   restricted: boolean;
-  response_source: "indexed_sentence" | "fixed_safety" | "unknown";
+  response_source: "indexed_sentence" | "fixed_safety" | "small_talk" | "unknown";
 }
 
 export interface ProfessorSuggestion {

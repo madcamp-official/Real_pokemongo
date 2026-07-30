@@ -224,7 +224,7 @@ export interface ProfessorAskResponse {
   related: ProfessorRelatedSpecies[];
   similarity_score: number | null;
   restricted: boolean;
-  response_source: 'indexed_sentence' | 'fixed_safety' | 'unknown';
+  response_source: 'indexed_sentence' | 'fixed_safety' | 'small_talk' | 'unknown';
 }
 export interface ProfessorSuggestion {
   id: string;
