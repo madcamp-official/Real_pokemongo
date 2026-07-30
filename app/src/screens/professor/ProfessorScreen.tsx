@@ -91,7 +91,7 @@ export default function ProfessorScreen({ navigation, route }: Props) {
         </Pressable>
         <View>
           <Text style={styles.eyebrow}>생생탐험대</Text>
-          <Text style={styles.title}>도감 박사</Text>
+          <Text style={styles.title}>아울 박사</Text>
         </View>
         <View style={styles.headerSpacer} />
       </View>
@@ -225,7 +225,7 @@ export default function ProfessorScreen({ navigation, route }: Props) {
             blurOnSubmit
             onSubmitEditing={() => submit()}
             editable={!askMutation.isPending}
-            accessibilityLabel="도감 박사에게 할 질문"
+            accessibilityLabel="아울 박사에게 할 질문"
           />
           <Pressable
             accessibilityRole="button"

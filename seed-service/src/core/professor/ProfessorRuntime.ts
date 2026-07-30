@@ -56,8 +56,8 @@ export async function buildProfessorService(input: {
     } catch (error) {
       unavailableReason =
         error instanceof Error
-          ? `도감 박사 인덱스를 준비하지 못했어요: ${error.message}`
-          : "도감 박사 인덱스를 준비하지 못했어요.";
+          ? `아울 박사 인덱스를 준비하지 못했어요: ${error.message}`
+          : "아울 박사 인덱스를 준비하지 못했어요.";
       console.error(`[professor] ${unavailableReason}`);
     }
   } else if (input.config.nodeEnv !== "production") {

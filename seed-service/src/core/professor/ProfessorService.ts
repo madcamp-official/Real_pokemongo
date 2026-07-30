@@ -77,7 +77,7 @@ export class ProfessorInputError extends Error {
 
 export class ProfessorUnavailableError extends Error {
   constructor(
-    message = "도감 박사가 잠시 생각을 정리하고 있어요. 잠시 후 다시 시도해 주세요.",
+    message = "아울 박사가 잠시 생각을 정리하고 있어요. 잠시 후 다시 시도해 주세요.",
   ) {
     super(message);
     this.name = "ProfessorUnavailableError";

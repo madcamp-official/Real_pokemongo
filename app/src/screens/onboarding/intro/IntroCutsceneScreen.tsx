@@ -87,7 +87,7 @@ export default function IntroCutsceneScreen({ navigation }: Props) {
         <IntroDialogueBox
           key={beatIndex}
           text={text}
-          speakerLabel={beat.speaker === 'professor' ? '박사' : undefined}
+          speakerLabel={beat.speaker === 'professor' ? '아울 박사' : undefined}
           onAdvance={advance}
           onSkip={finish}
           showSkip

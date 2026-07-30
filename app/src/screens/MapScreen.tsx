@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,7 @@ import { fetchMapPins, fetchExploredRegions } from '@/api/map';
 import { fetchDex } from '@/api/dex';
 import { KakaoMapView, type KakaoMapViewHandle } from '@/components/map/KakaoMapView';
 import { RadialMenu } from '@/components/nav/RadialMenu';
+import { ProfessorEntryPoint } from '@/components/professor/ProfessorEntryPoint';
 import { PinDetailSheet } from '@/components/map/PinDetailSheet';
 import {
   requestLocationAndGet,
@@ -284,28 +285,10 @@ export default function MapScreen() {
       </View>
 
       {/* 앱 첫 화면에서도 새 기능을 바로 찾을 수 있는 상시 진입점. */}
-      <Pressable
+      <ProfessorEntryPoint
         onPress={openProfessor}
-        accessibilityRole="button"
-        accessibilityLabel="도감 박사에게 질문하기"
-        style={({ pressed }) => [
-          styles.professorShortcut,
-          { bottom: insets.bottom + 112 },
-          pressed && styles.professorShortcutPressed,
-        ]}
-      >
-        <View style={styles.professorShortcutAvatar}>
-          <Image
-            source={require('../../assets/professor/dex-professor-avatar.png')}
-            style={styles.professorShortcutImage}
-            resizeMode="contain"
-          />
-        </View>
-        <View>
-          <Text style={styles.professorShortcutEyebrow}>궁금한 게 있나요?</Text>
-          <Text style={styles.professorShortcutTitle}>도감 박사</Text>
-        </View>
-      </Pressable>
+        style={[styles.professorShortcut, { bottom: insets.bottom + 112 }]}
+      />
 
       <RadialMenu />
 
@@ -423,32 +406,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 18,
     zIndex: 19,
-    minHeight: 58,
-    borderRadius: 29,
-    paddingLeft: 5,
-    paddingRight: 15,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    borderWidth: 2,
-    borderColor: '#D7E6CE',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: '#30452D',
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 6,
   },
-  professorShortcutPressed: { opacity: 0.82, transform: [{ scale: 0.97 }] },
-  professorShortcutAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#E8F2DF',
-  },
-  professorShortcutImage: { width: 48, height: 48 },
-  professorShortcutEyebrow: { color: '#819084', fontSize: 9, fontWeight: '800' },
-  professorShortcutTitle: { color: '#31563F', fontSize: 14, fontWeight: '900', marginTop: 1 },
-
 });
