@@ -1,8 +1,88 @@
 {
   "schema_version": "professor-knowledge-v1",
   "content_version": "seed-content-v1",
-  "content_hash": "deba0d0f6a8f2f32e4efbaf3d246553ae2551660d7263575c1230a3c6af08e46",
+  "content_hash": "1c2b582ff90f7b02260bbab23b9523e2c66b76b9edaa937576f72f73d61fb25e",
   "records": [
+    {
+      "chunk_id": "taxon-trypoxylus-dichotomus:habitat:1",
+      "sentence": "장수풍뎅이 관찰 장소: 산, 공원.",
+      "answer": "장수풍뎅이는 주로 산, 공원에서 지내요. 그 근처를 잘 살펴보면 만날 수 있을 거예요!",
+      "species_id": "taxon-trypoxylus-dichotomus",
+      "species_name": "장수풍뎅이",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trypoxylus-dichotomus:activity:1",
+      "sentence": "장수풍뎅이 활동 시간: 주로 밤.",
+      "answer": "장수풍뎅이는 주로 밤에 움직여요.",
+      "species_id": "taxon-trypoxylus-dichotomus",
+      "species_name": "장수풍뎅이",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trypoxylus-dichotomus:size:1",
+      "sentence": "장수풍뎅이 크기: 몸길이 3~8cm 정도예요.",
+      "answer": "장수풍뎅이는 몸길이 3~8cm 정도예요.",
+      "species_id": "taxon-trypoxylus-dichotomus",
+      "species_name": "장수풍뎅이",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-trypoxylus-dichotomus:season:1",
+      "sentence": "장수풍뎅이 관찰 계절: 여름.",
+      "answer": "장수풍뎅이는 여름에 많이 보여요.",
+      "species_id": "taxon-trypoxylus-dichotomus",
+      "species_name": "장수풍뎅이",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lucanus-maculifemoratus:habitat:1",
+      "sentence": "사슴벌레 관찰 장소: 산, 공원.",
+      "answer": "사슴벌레는 주로 산, 공원에서 지내요. 그 근처를 잘 살펴보면 만날 수 있을 거예요!",
+      "species_id": "taxon-lucanus-maculifemoratus",
+      "species_name": "사슴벌레",
+      "field_type": "habitat",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lucanus-maculifemoratus:activity:1",
+      "sentence": "사슴벌레 활동 시간: 주로 밤.",
+      "answer": "사슴벌레는 주로 밤에 움직여요.",
+      "species_id": "taxon-lucanus-maculifemoratus",
+      "species_name": "사슴벌레",
+      "field_type": "activity",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lucanus-maculifemoratus:size:1",
+      "sentence": "사슴벌레 크기: 몸길이 3~7cm 정도예요.",
+      "answer": "사슴벌레는 몸길이 3~7cm 정도예요.",
+      "species_id": "taxon-lucanus-maculifemoratus",
+      "species_name": "사슴벌레",
+      "field_type": "size",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
+    {
+      "chunk_id": "taxon-lucanus-maculifemoratus:season:1",
+      "sentence": "사슴벌레 관찰 계절: 여름.",
+      "answer": "사슴벌레는 여름에 많이 보여요.",
+      "species_id": "taxon-lucanus-maculifemoratus",
+      "species_name": "사슴벌레",
+      "field_type": "season",
+      "is_safety": false,
+      "content_version": "seed-content-v1"
+    },
     {
       "chunk_id": "taxon-polygonia-c-aureum:habitat:1",
       "sentence": "네발나비 관찰 장소: 공원, 들판.",

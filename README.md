@@ -4,9 +4,23 @@
 
 | 이름 | GitHub | 역할 |
 |---|---|---|
-| 주성민 | icoflroinity | 동정 모델 및 백엔드 |
-| 허서준 | gjtjwns06 | 프론트엔드, 디자인 및 3D 모델링 |
+| 주성민 | [icoflroinity](https://github.com/icoflroinity) | AI 동정 모델 및 백엔드 |
+| 허서준 | [gjtjwns06](https://github.com/gjtjwns06) | 모바일 프론트엔드, UI/UX 및 Unity 3D 홈가든 |
 
+
+---
+
+## 현재 구성
+
+생생탐험대는 하나의 계정과 API를 공유하는 세 개의 실행 구성으로 나뉩니다.
+
+| 구성 | 역할 | 현재 실행 형태 |
+|---|---|---|
+| 모바일 앱 | 탐험 지도, 사진·소리 동정, 도감, 아울 박사, 퀘스트·배지 | React Native + Expo(Android/iOS) |
+| API 서버 | 인증, 관찰·도감·개체·Garden 동기화, 안전 정책 | Fastify + PostgreSQL |
+| PC Garden | 수집한 개체를 온실에 배치하고 관찰 | Unity Windows 독립 실행 프로그램 |
+
+모바일의 기존 2D 홈가든은 제거했습니다. 모바일에서 수집을 확정하면 서버에 실제 `creature`가 생성되고, PC Garden이 `/garden/bootstrap`을 주기적으로 동기화해 같은 계정의 새 친구를 바로 보관함에 표시합니다.
 
 ---
 
@@ -16,7 +30,7 @@
 
 **목적**: 아이가 직접 밖에 나가 생물을 관찰·촬영·녹음하면 AI가 종을 동정해 도감에 기록해준다. 확률형(가챠) 보상 없이 "실제 관찰"만으로 퀘스트·배지·경험치를 얻는 구조라, 자연을 관찰하고 배우는 행위 자체가 놀이이자 보상이 되도록 설계했다. 위험한 생물은 안전 경고를 먼저 보여주고, 식용 가능 여부처럼 잘못 알려주면 위험한 판단은 애초에 시도하지 않는다.
 
-**핵심 기능**: 사진을 찍으면 BioCLIP 기반으로, 소리를 녹음하면 BirdNET 기반으로 종을 동정한다. 동정된 종은 실제 GPS 좌표와 함께 지도에 핀으로 남고 도감(Dex)에 해금된다. 종을 처음 해금하면 그 종의 "개체(친구)"가 생겨 홈가든에 배치하고 상호작용하며 유대감을 쌓을 수 있고, 관찰 이력을 기반으로 한 퀘스트·배지로 보상을 받는다. "아울 박사"에게 종에 대해 물어보면 미리 검수해둔 지식 문장을 의미 기반 검색으로 찾아 답해준다.
+**핵심 기능**: 사진을 찍으면 BioCLIP 기반으로, 소리를 녹음하면 BirdNET 기반으로 종을 동정한다. 동정된 종은 실제 GPS 좌표와 함께 지도에 핀으로 남고 도감(Dex)에 해금된다. 확정 관찰마다 독립적인 "개체(친구)"가 생겨 PC용 3D 온실 Garden에 원하는 수만큼 배치할 수 있고, 관찰 이력을 기반으로 한 퀘스트·배지 보상을 받는다. "아울 박사"에게 종에 대해 물어보면 미리 검수한 지식 문장을 다국어 sentence-transformer 임베딩으로 검색해 답한다.
 
 **예상 사용자**: 초등학생 등 아동, 그리고 아이와 함께 야외 활동을 하는 보호자.
 
@@ -40,20 +54,21 @@
 - [x] 계정 설정 — 위치·사진 수집 동의 on/off, 데이터 복원, 계정 삭제(전체 데이터 삭제)
 - [x] 사진 기반 종 동정 — 버스트 촬영 → 보정 → BioCLIP 동정 → 후보 확인 → 도감 확정 (`/sightings/upload`, `/identify`, `/identify/confirm`)
 - [x] 카메라 프리뷰 탭 시 위험 여부 잠정 안내 (`POST /vision/preview-scan`, 무상태·미인증 공개 엔드포인트)
-- [x] 소리 기반 조류 동정 — 녹음 → 품질 검사(노이즈/무음/클리핑) → BirdNET 기반 모델 동정 → 확정, 참조 음원과 유사도 채점 (`/audio/*`)
+- [x] 소리 기반 조류 동정 — 녹음 → 품질 검사(노이즈/무음/클리핑) → BirdNET 기반 모델 동정 → 후보 확정·참조 음원 재생 (`/audio/*`)
 - [x] 도감(Dex) — 종 목록·완성도·상세 카드·관찰 사진 갤러리 (`/dex`, `/dex/completion`, `/species/:id/card`, `/species/:id/photos`)
 - [x] 지도 — 카카오맵 기반, 내 관찰 핀·탐험 지역·현재 위치 표시 (`/map/pins`, `/map/explored-regions`)
-- [x] 아울 박사 챗봇 — 의미 기반 검색 답변, 안전 질문 고정 답변, 추천 질문 (`/professor/*`)
+- [x] 아울 박사 챗봇 — 검수 지식 693문장 의미 검색, 안전 질문 고정 답변, 추천 질문 (`/professor/*`)
 - [x] 퀘스트 — 활성 퀘스트 진행률 확인 및 보상 수령 (`/quests`, `/quests/:id/claim`)
 - [x] 배지 — 조건 충족 시 해금, XP 보상 수령 (`/badges`, `/badges/claim`)
-- [x] 홈가든 — 개체(친구) 배치, 이름짓기, 상호작용으로 유대감 상승 (`/creatures/*`, `/garden/*`)
+- [x] PC 3D 홈가든 — 후면을 개방한 온실, 62개 3D 자산 카탈로그, 카드 드래그·고스트 프리뷰·카메라 줌, 이름 검색/추적
+- [x] Garden 동기화 — 같은 종 여러 개체 보유, 식물·나무 슬롯 배치, 동물·곤충·새 자유 배치 및 서버 저장 (`/garden/bootstrap`, `/garden/layout`)
 - [x] 위험 생물 안전 경고, 버섯 등 식용 여부 판단 금지(정책상 항상 고정 안전 문구)
 
 ### 구현되지 않음 / 해당 없음
 
 - [ ] 팀/워크스페이스 협업, 실시간 동기화(WebSocket) — 계정 하나가 혼자 쓰는 구조라 애초에 필요하지 않았고, 관련 의존성이나 라우트도 코드에 없다
 - [ ] 생성형 LLM 기반 자유 대화 — "아울 박사"는 미리 만들어둔 문장 인덱스를 검색해서 답할 뿐, LLM을 호출하지 않는다
-- [ ] 실제 공개 배포(도메인/CI-CD/컨테이너화) — 아래 [배포 결과물](#배포-결과물) 참고
+- [ ] 실제 공개 배포(도메인/CI-CD/컨테이너화) — Android 앱과 Windows Garden 빌드는 가능하지만 공개 URL·스토어 배포는 아직 준비 중
 
 ---
 
@@ -75,7 +90,6 @@ RootStack (headerShown: false, 일부만 헤더 표시)
  │    ├─ Camera         (사진 촬영/탐험 모드)
  │    ├─ Sound          (소리 찾기)
  │    ├─ Dex            (도감 그리드)
- │    ├─ Garden         (홈가든, 가로모드 고정)
  │    ├─ Rewards        (퀘스트·배지·XP)
  │    └─ Settings
  ├─ SpeciesCard          (species Id) — presentation: card
@@ -83,6 +97,8 @@ RootStack (headerShown: false, 일부만 헤더 표시)
  ├─ PhotoViewer          (speciesId, initialIndex) — presentation: fullScreenModal
  └─ Professor            (contextSpeciesId?) — presentation: card
 ```
+
+PC Garden은 모바일 내비게이션에 포함되지 않는 별도 Unity 프로그램입니다. 모바일과 같은 계정으로 로그인하면 수집 목록과 배치 상태를 공유합니다.
 
 ### 화면별 주요 동작
 
@@ -95,13 +111,13 @@ RootStack (headerShown: false, 일부만 헤더 표시)
 | Signup | 이메일/비밀번호/비밀번호 확인/닉네임(최대 12자)/아바타(이모지 6종) | 제출 시 계정 정보+동의값 한 번에 서버 전송 |
 | Map | 카카오맵, 발견 핀, 주간 요약 칩, 그룹 필터, RadialMenu | 핀 탭→상세 시트, 재중심/줌토글, "아울 박사" 바로가기 |
 | Camera | 실시간 카메라 프리뷰, 셔터, 갤러리 버튼 | 탭=미리보기 위험 스캔, 짧게 누름=1장 촬영, 길게 누름=연속 촬영, 핀치 줌 |
-| Sound | 녹음 파형/타이머, 결과 후보 리스트 | 녹음 시작/정지(최대 15초), 후보 선택, 확정/유사도 채점/참조음원 듣기 |
+| Sound | 녹음 파형/타이머, 결과 후보 리스트 | 녹음 시작/정지(최대 15초), 후보 선택, 도감 확정, 참조음원 듣기 |
 | IdentifyResult | 로딩→결과(신규 발견/위험 경고/후보 선택) | 도감에 추가, 후보 선택, 다시 찍기 |
 | Dex | 3열 그리드, 완성도 헤더, 그룹 필터 칩 | 필터 선택, 카드 탭→SpeciesCard, "아울 박사" 진입점 |
 | SpeciesCard | 대표 이미지, 안전 배지, 정보 타일, 재미있는 사실, 비슷한 종, 사진 갤러리 | 아울 박사에게 묻기, 정원에 초대, 사진 탭→PhotoViewer |
 | PhotoViewer | 가로 스와이프 전체화면 갤러리 | 스와이프, 뒤로가기 |
 | Professor(아울 박사) | 채팅형 Q&A, 추천 질문 칩 | 질문 입력/전송, 답변 내 관련 종 카드 이동 |
-| Garden | 2D 가로형 정원 씬, 개체/장식 트레이 | 드래그로 개체·장식 배치, 개체 탭→상태 시트(유대감), 핀치/팬 |
+| PC Garden | Unity 3D 온실, 종 사진 카드, 배치 슬롯·고스트 프리뷰 | 카드 드래그 배치/회수, 개체 검색·줌인·추적, 마우스 회전·WASD 이동 |
 | Rewards | XP바, 퀘스트 목록, 배지 그리드 | 완료 퀘스트/배지 수령(레벨업 시 축하 연출) |
 | Settings | 알림/위치/사진/소리 수집 토글, 계정 관리 | 데이터 복원, 로그아웃, 계정 삭제(게스트는 "게스트 체험 종료") |
 
@@ -140,12 +156,13 @@ RootStack (headerShown: false, 일부만 헤더 표시)
 - `badge_definition` / `earned_badge` — 배지 정의(rule은 JSONB 결정론적 규칙)와 사용자별 획득 이력(해금과 수령 시점 분리).
 
 **홈가든**
-- `creature` — 종 해금 시 자동 생성되는 개체(동반자). `UNIQUE(user_id, taxon_id)`로 종당 1마리만 허용. bond(유대감), last_interaction_at.
-- `garden_tile` / `creature_placement` — 정원 타일 배치판과 개체 배치(1개체=1자리, 유효 타일에만 배치 가능하도록 FK로 강제).
+- `creature` — 확정 관찰마다 생성되는 독립 개체. 같은 종도 여러 `creature.id`를 가질 수 있고, `origin_observation_id` 유니크 인덱스로 같은 관찰의 중복 생성을 막는다.
+- `garden_asset_catalog` — 서버 종과 Unity Resources의 3D 모델·행동 프로필·표시 배율을 연결한다.
+- `garden_tile` / `creature_placement` — 식물·나무는 9×6 슬롯에, 동물·곤충·새는 온실의 3D 월드 좌표에 자유 배치한다. 한 개체는 한 위치에만 놓을 수 있다.
 
 **관계 원칙**: `app_user`에 매달린 대부분의 테이블(observation, collection_entry, creature, quest_progress, earned_badge, garden_tile, audio_sighting 등)은 `ON DELETE CASCADE`로 계정 삭제 시 전체 데이터가 함께 삭제되도록 스키마 수준에서 보증합니다. 반대로 `taxon`(마스터 데이터)을 참조하는 FK는 `ON DELETE RESTRICT`로 실수로 지워지지 않게 막습니다.
 
-마이그레이션은 `seed-service/db/migrations/000N_*.sql` 순서로 적용되며(전용 러너 `src/db/migrate.ts`, ORM 없음), 소리 기능이 5~8단계에 걸쳐 점진적으로 스키마를 확장한 이력이 파일명에 그대로 남아 있습니다(0002 오디오 세션 신설 → 0003 관찰-오디오 연결 → 0004 원자적 확정 클레임 → 0005 참조음원 길이 필드 → 0006 오디오 관찰 좌표, 지도 핀 누락 버그 수정).
+마이그레이션은 `seed-service/db/migrations/000N_*.sql` 순서로 적용됩니다(전용 러너 `src/db/migrate.ts`, ORM 없음). 현재 0011까지 있으며, 0006부터 3D 카탈로그·동일 종 다중 개체를 지원하고 0008은 식물 슬롯 확장, 0009는 PC Garden 자유 좌표, 0010은 기존 배치 보정, 0011은 소리 관찰 GPS 저장을 추가합니다.
 
 ---
 
@@ -227,6 +244,7 @@ RootStack (headerShown: false, 일부만 헤더 표시)
 | GET | `/creatures/:creatureId/status` | 개체 상태(유대감 등) | 예 |
 | POST | `/creatures/:creatureId/interact` | 개체와 상호작용 | 예 |
 | GET | `/garden/layout` | 정원 배치 조회 | 예 |
+| GET | `/garden/bootstrap` | PC Garden용 3D 자산·보유 개체·배치 일괄 조회 | 예 |
 | PUT | `/garden/layout` | 정원 배치 저장 | 예 |
 | GET | `/garden/tile-compatibility` | 타일-종 호환성(정적) | 아니오 |
 
@@ -247,25 +265,26 @@ RootStack (headerShown: false, 일부만 헤더 표시)
 |---|---|
 | 백엔드 | Fastify 5(Node.js/TypeScript), `pg`(node-postgres, ORM 없음), 커스텀 SQL 마이그레이션 러너 |
 | 인증 | JWT(`@fastify/jwt`), 비밀번호 해시는 Node 내장 `crypto.scrypt` |
-| 이미지 동정 | BioCLIP(자체 GPU 서버 하이브리드 추론), Plant.id / Pl@ntNet(상업 API, 폴백) |
+| 이미지 동정 | BioCLIP 자체 GPU 서버 하이브리드 추론. Plant.id / Pl@ntNet 어댑터는 골격만 있고 실제 호출은 미구현 |
 | 소리 동정 | BirdNET 기반 모델("CAMP-3" 자체 GPU 서버) |
-| 아울 박사(챗봇) | 사전 구축 지식 문장 + sentence-transformers 임베딩 기반 의미 검색(생성형 LLM 아님). 임베딩은 별도 Python(FastAPI+uvicorn) 워커, 미연결 시 로컬 해시 임베딩으로 폴백 |
+| 아울 박사(챗봇) | 검수 지식 693문장 + `paraphrase-multilingual-MiniLM-L12-v2` 의미 검색(생성형 LLM 아님), 별도 Python FastAPI 임베딩 워커 |
 | 지도 | Kakao Maps JS SDK(서버가 서빙하는 WebView 페이지 + RN↔WebView postMessage 브릿지) |
-| 프론트엔드 | React Native(Expo), TypeScript, React Navigation(Native Stack + Bottom Tabs), `@tanstack/react-query` |
+| 모바일 | React Native(Expo), TypeScript, React Navigation, `@tanstack/react-query`, SecureStore |
+| PC Garden | Unity 6/URP, C#, Windows Standalone, GLB 기반 3D 자산 |
 | 실시간 | 없음(WebSocket 미사용) |
 | 큐/캐시 | 없음(Redis 등 미사용, 인메모리 상태만 사용) |
-| 테스트 | Node.js 내장 테스트 러너(`node:test`) — 백엔드 450개 테스트(440 통과, 10개는 실DB 필요한 통합 테스트라 로컬 DB 미설정 시 자동 스킵). 프론트엔드 자동화 테스트는 없음 |
-| 배포 | (아래 [배포 결과물](#배포-결과물) 참고 — 컨테이너화·CI/CD 없음) |
+| 테스트 | Node.js 내장 테스트 러너(`node:test`) — 455개 중 445개 통과, 실DB 통합 테스트 10개 스킵. 모바일·서버 TypeScript 검사 및 Unity 스크립트 검증 |
+| 배포 | 모바일 APK/AAB + Windows Garden 실행 파일 + 공용 API로 분리 배포 예정. 컨테이너화·CI/CD는 아직 없음 |
 
 ---
 
 ## 배포 결과물
 
-**서비스 URL**: (아직 없음)
+**서비스 URL**: 아직 공개 배포 전
 
-Dockerfile, docker-compose, CI/CD 파이프라인, 리버스 프록시, 도메인 설정 중 어느 것도 아직 갖춰져 있지 않습니다. DB(PostgreSQL)·BioCLIP·소리 동정 모델은 전부 사설 GPU 서버에 떠 있는데 `127.0.0.1`에만 바인딩돼 있어서, 개발자가 SSH로 로컬 포트포워딩 터널을 직접 열어야만 접근할 수 있습니다.
+현재 개발 환경에서는 PostgreSQL·BioCLIP·BirdNET·아울 박사 임베딩 워커가 CAMP-3 사설 서버에 있고, Windows 개발 PC가 SSH 로컬 포트포워딩으로 연결합니다. 모바일은 Expo 개발 서버를 통해 실행하며 PC Garden은 Unity Windows 빌드로 실행합니다. 운영 배포 시에는 VM의 HTTPS API 하나를 모바일과 Garden이 함께 사용하고, 모델 서버는 사설망에 유지하는 구성을 권장합니다.
 
-### 로컬 실행 방법 (현재 가능한 유일한 실행 방식)
+### 로컬 실행 방법
 
 **백엔드 (`seed-service/`)**
 ```bash
@@ -277,13 +296,16 @@ cp .env.example .env
 #   ssh -L 5433:127.0.0.1:5432 <user>@<gpu-server-host>   # PostgreSQL
 #   ssh -L 8931:127.0.0.1:8931 <user>@<gpu-server-host>   # BioCLIP
 #   ssh -L 8932:127.0.0.1:8932 <user>@<gpu-server-host>   # 소리 동정 모델
+#   ssh -L 8941:127.0.0.1:8941 <user>@<gpu-server-host>   # 아울 박사 임베딩
 npm run db:migrate   # DATABASE_URL 설정 시
-npm test              # 450개 테스트
+npm run professor:knowledge
+npm run professor:index:http  # 콘텐츠 변경 시 693문장 인덱스 재생성
+npm test
 npm run serve         # http://127.0.0.1:8080 (기본값)
 ```
 값을 채우지 않으면(빈 `.env`) DB는 in-memory, 동정은 Mock으로 자동 대체되어 외부 키 없이도 기동됩니다.
 
-**아울 박사 임베딩 워커 (선택, 정확도 개선용 — `seed-service/embedding-worker/`)**
+**아울 박사 임베딩 워커 (`seed-service/embedding-worker/`)**
 ```bash
 cd seed-service/embedding-worker
 python -m venv .venv
@@ -293,12 +315,23 @@ uvicorn professor_worker.api:app --host 127.0.0.1 --port 8941
 # 이후 .env에 PROFESSOR_EMBEDDING_ENDPOINT=http://127.0.0.1:8941 설정
 ```
 
+엔드포인트를 설정한 상태에서 워커나 콘텐츠 해시가 맞지 않으면 API는 오래된 인덱스로 답하지 않고 아울 박사 지식 검색을 비활성화합니다. 워커 연결 후 API를 다시 시작해야 합니다.
+
 **프론트엔드 (`app/`)**
 ```bash
 cd app
 npm install
 npx expo start
 ```
+
+**PC 3D Garden (`unity/BeetleDuel/`)**
+```powershell
+# Unity Editor에서 Assets/Scenes/GreenhouseGarden.unity를 열어 Play하거나,
+# Windows 빌드가 생성돼 있다면 아래 실행 파일을 시작합니다.
+.\unity\BeetleDuel\Builds\Windows\NatureGoGarden\NatureGoGarden.exe
+```
+
+Garden 시작 화면에서 API URL과 모바일 앱에서 사용하는 같은 계정의 이메일·비밀번호로 로그인할 수 있습니다. 환경 변수 `NATURE_GO_API_URL`, `NATURE_GO_AUTH_TOKEN`으로도 연결할 수 있으며, 로그인 토큰은 다음 실행을 위해 로컬에 보존됩니다.
 
 ---
 
