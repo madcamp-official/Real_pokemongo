@@ -268,7 +268,7 @@ public sealed class PCGardenController : MonoBehaviour
         Camera camera = orbitCamera != null
             ? orbitCamera.targetCamera
             : Camera.main;
-        ConfigureCharcoalGradientBackground(camera);
+        ConfigureSkyBlueBackground(camera);
 
         RenderSettings.fog = false;
         RenderSettings.ambientMode =
@@ -279,7 +279,7 @@ public sealed class PCGardenController : MonoBehaviour
             new Color(0.5f, 0.49f, 0.46f);
         RenderSettings.ambientGroundColor =
             new Color(0.3f, 0.29f, 0.27f);
-        RenderSettings.ambientIntensity = 1.1f;
+        RenderSettings.ambientIntensity = 1.25f;
         RenderSettings.defaultReflectionMode =
             UnityEngine.Rendering.DefaultReflectionMode.Custom;
         RenderSettings.customReflection = null;
@@ -316,7 +316,7 @@ public sealed class PCGardenController : MonoBehaviour
         DynamicGI.UpdateEnvironment();
     }
 
-    private void ConfigureCharcoalGradientBackground(Camera mainCamera)
+    private void ConfigureSkyBlueBackground(Camera mainCamera)
     {
         RenderSettings.skybox = null;
         if (mainCamera == null)
@@ -324,16 +324,16 @@ public sealed class PCGardenController : MonoBehaviour
 
         mainCamera.clearFlags = CameraClearFlags.Depth;
         mainCamera.backgroundColor =
-            new Color32(0x1A, 0x1E, 0x24, 0xFF);
+            new Color32(0x87, 0xCE, 0xEB, 0xFF);
         mainCamera.farClipPlane = 500f;
 
         GameObject backgroundObject =
-            new GameObject("차콜 세로 그라데이션 배경 카메라");
+            new GameObject("하늘색 단색 배경 카메라");
         backgroundObject.transform.SetParent(environmentRoot, false);
         Camera backgroundCamera = backgroundObject.AddComponent<Camera>();
         backgroundCamera.clearFlags = CameraClearFlags.SolidColor;
         backgroundCamera.backgroundColor =
-            new Color32(0x1A, 0x1E, 0x24, 0xFF);
+            new Color32(0x87, 0xCE, 0xEB, 0xFF);
         backgroundCamera.cullingMask = 0;
         backgroundCamera.depth = mainCamera.depth - 10f;
         backgroundCamera.rect = mainCamera.rect;
@@ -350,21 +350,21 @@ public sealed class PCGardenController : MonoBehaviour
             "중앙 돔 내부 조명",
             new Vector3(0f, 48f, 17f),
             new Vector3(0f, HabitatFloorY, 17f),
-            2.4f,
+            3.4f,
             82f,
             112f);
         CreateInteriorSpotLight(
             "왼쪽 돔 내부 조명",
             new Vector3(-29f, 27f, 10f),
             new Vector3(-29f, HabitatFloorY, 10f),
-            1.65f,
+            2.45f,
             48f,
             105f);
         CreateInteriorSpotLight(
             "오른쪽 돔 내부 조명",
             new Vector3(29f, 27f, 10f),
             new Vector3(29f, HabitatFloorY, 10f),
-            1.65f,
+            2.45f,
             48f,
             105f);
     }

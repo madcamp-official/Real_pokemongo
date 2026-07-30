@@ -630,7 +630,7 @@ test("POST /audio/identify/confirm: 후보 스냅샷에 없는 종을 확정하�
   assert.equal(res.json().error, "invalid_species_id");
 });
 
-test("POST /audio/identify/confirm: 정상 확정은 200과 계약 형태(observation_id/species_id/dex_updated/reward)를 돌려주고, 관찰 1건과 보상을 만든다", async () => {
+test("POST /audio/identify/confirm: 정상 확정은 관찰·도감·Garden 개체를 함께 만든다", async () => {
   const { server, app, cfg } = await testServer();
   const { token, userId } = await signup(server);
   const { audioSightingId, speciesId } = await uploadIdentifiedSighting(server, cfg, token);
@@ -654,6 +654,23 @@ test("POST /audio/identify/confirm: 정상 확정은 200과 계약 형태(observ
   assert.equal(observations[0]!.modality, "audio");
   assert.equal(observations[0]!.taxonId, speciesId);
   assert.deepEqual(observations[0]!.media, []);
+
+  const creatures = await app.repos.creatures.listByUser(userId as never);
+  assert.equal(creatures.length, 1, "소리로 기록한 종도 PC Garden 보관함에 1마리 생겨야 함");
+  assert.equal(creatures[0]!.taxonId, speciesId);
+  assert.equal(creatures[0]!.originObservationId, observations[0]!.id);
+
+  const garden = await server.inject({
+    method: "GET",
+    url: "/garden/bootstrap",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(garden.statusCode, 200);
+  assert.ok(
+    garden.json().creatures.some((creature: { creatureId: string }) =>
+      creature.creatureId === creatures[0]!.id),
+    "소리 확정 직후 /garden/bootstrap에 새 개체가 노출돼야 함",
+  );
 });
 
 test("POST /audio/identify/confirm: 같은 confirmation_id로 3번 반복해도 관찰과 보상은 정확히 1번만 생긴다(멱등)", async () => {

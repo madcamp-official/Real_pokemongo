@@ -162,6 +162,8 @@ export default function CameraScreen() {
       promptGuestUpgrade();
       return;
     }
+    // 터치 스캔 결과가 촬영 로더 아래에 남거나, 늦은 응답이 다시 나타나지 않게 한다.
+    clear();
     startCapture();
   };
 

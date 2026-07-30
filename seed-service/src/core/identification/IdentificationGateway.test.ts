@@ -205,4 +205,5 @@ test("모든 프로바이더가 예외를 던지면 안전하게 unknown으로 �
   const out = await gateway.identify({ images: IMG, groupHint: "plant" });
   assert.equal(out.tier, "unknown");
   assert.equal(out.top, null);
+  assert.equal(out.unknownReason, "PROVIDER_UNAVAILABLE");
 });

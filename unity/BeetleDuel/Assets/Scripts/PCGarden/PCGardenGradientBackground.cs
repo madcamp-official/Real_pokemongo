@@ -3,8 +3,8 @@ using UnityEngine;
 [RequireComponent(typeof(Camera))]
 public sealed class PCGardenGradientBackground : MonoBehaviour
 {
-    public Color topColor = new Color32(0x2A, 0x30, 0x38, 0xFF);
-    public Color bottomColor = new Color32(0x1A, 0x1E, 0x24, 0xFF);
+    public Color topColor = new Color32(0x87, 0xCE, 0xEB, 0xFF);
+    public Color bottomColor = new Color32(0x87, 0xCE, 0xEB, 0xFF);
 
     private Material gradientMaterial;
 
@@ -19,7 +19,7 @@ public sealed class PCGardenGradientBackground : MonoBehaviour
         }
         gradientMaterial = new Material(template)
         {
-            name = "PC 홈가든 차콜 세로 그라데이션",
+            name = "PC 홈가든 하늘색 단색 배경",
             hideFlags = HideFlags.DontSave,
         };
     }

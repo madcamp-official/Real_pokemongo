@@ -110,7 +110,20 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
     const data = identifyQuery.data;
     const top = data.candidates[0];
 
-    if (!top) {
+    if (
+      !top &&
+      (data.unknown_reason === 'PROVIDER_UNAVAILABLE' || data.unknown_reason === 'NO_PROVIDER')
+    ) {
+      content = (
+        <Status
+          emoji="📡"
+          title="인식 서버에 연결하지 못했어요"
+          desc="사진은 그대로 보관했어요. 잠시 뒤 다시 확인해 주세요."
+          actionLabel="다시 확인"
+          onAction={() => void identifyQuery.refetch()}
+        />
+      );
+    } else if (!top) {
       content = (
         <Status
           emoji="🔍"

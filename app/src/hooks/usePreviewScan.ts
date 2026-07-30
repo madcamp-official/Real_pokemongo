@@ -50,9 +50,14 @@ export function usePreviewScan(cameraRef: RefObject<CameraView | null>) {
   const [point, setPoint] = useState<ScanPoint | null>(null);
   const [result, setResult] = useState<PreviewScanResponse | null>(null);
   const ttlTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const scanGeneration = useRef(0);
 
   const clear = useCallback(() => {
+    // 진행 중인 요청의 응답이 촬영 로더 위에 뒤늦게 다시 나타나지 않게 무효화한다.
+    scanGeneration.current += 1;
     if (ttlTimer.current) clearTimeout(ttlTimer.current);
+    ttlTimer.current = null;
+    setScanning(false);
     setPoint(null);
     setResult(null);
   }, []);
@@ -61,6 +66,7 @@ export function usePreviewScan(cameraRef: RefObject<CameraView | null>) {
     async (screenX: number, screenY: number, layoutW: number, layoutH: number) => {
       if (scanning || !cameraRef.current || layoutW <= 0 || layoutH <= 0) return;
       if (ttlTimer.current) clearTimeout(ttlTimer.current);
+      const generation = ++scanGeneration.current;
 
       const normX = Math.min(Math.max(screenX / layoutW, 0), 1);
       const normY = Math.min(Math.max(screenY / layoutH, 0), 1);
@@ -101,18 +107,22 @@ export function usePreviewScan(cameraRef: RefObject<CameraView | null>) {
         const out = await rendered.saveAsync({ format: SaveFormat.JPEG, base64: true });
 
         const res = await previewScan({ x: normX, y: normY, image: out.base64 ?? '' });
+        if (generation !== scanGeneration.current) return;
         setResult(res);
         if (res.is_dangerous) Vibration.vibrate(200);
 
         ttlTimer.current = setTimeout(() => {
+          if (generation !== scanGeneration.current) return;
           setPoint(null);
           setResult(null);
         }, RESULT_TTL_MS);
       } catch {
-        setPoint(null);
-        setResult(null);
+        if (generation === scanGeneration.current) {
+          setPoint(null);
+          setResult(null);
+        }
       } finally {
-        setScanning(false);
+        if (generation === scanGeneration.current) setScanning(false);
       }
     },
     [scanning, cameraRef]

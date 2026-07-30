@@ -57,9 +57,14 @@ export function PreviewScanOverlay({
 
   const scale = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.7, 1.5] });
   const opacity = pulse.interpolate({ inputRange: [0, 1], outputRange: [0.75, 0] });
+  const isUnknown = result !== null && (
+    result.confidence <= 0 || result.species_guess.trim() === '?'
+  );
 
   const ringColor = !result
     ? '#fff'
+    : isUnknown
+      ? '#F4C95D'
     : result.is_dangerous
       ? colors.dangerText
       : colors.primary;
@@ -109,17 +114,30 @@ export function PreviewScanOverlay({
           style={[styles.bubbleWrap, { left: bubbleLeft, bottom: bubbleBottom }]}
         >
           <Pressable onPress={onDismiss} style={styles.bubble} accessibilityRole="button">
-            <Text style={styles.bubbleName}>{result.species_guess}</Text>
-            <View
-              style={[styles.tag, result.is_dangerous ? styles.tagDanger : styles.tagSafe]}
-            >
-              <Text
-                style={[styles.tagText, result.is_dangerous ? styles.tagTextDanger : styles.tagTextSafe]}
+            <Text style={styles.bubbleName}>
+              {isUnknown ? '아직 잘 모르겠어요' : result.species_guess}
+            </Text>
+            {isUnknown ? (
+              <View style={[styles.tag, styles.tagUnknown]}>
+                <Text style={[styles.tagText, styles.tagTextUnknown]}>
+                  다른 각도에서 다시 눌러보세요
+                </Text>
+              </View>
+            ) : (
+              <View
+                style={[styles.tag, result.is_dangerous ? styles.tagDanger : styles.tagSafe]}
               >
-                {result.is_dangerous ? '⚠️ 조심해요' : '✓ 안전해요'}
-              </Text>
-            </View>
-            {result.is_dangerous && (
+                <Text
+                  style={[
+                    styles.tagText,
+                    result.is_dangerous ? styles.tagTextDanger : styles.tagTextSafe,
+                  ]}
+                >
+                  {result.is_dangerous ? '⚠️ 조심해요' : '✓ 안전해요'}
+                </Text>
+              </View>
+            )}
+            {!isUnknown && result.is_dangerous && (
               <Text style={styles.dangerNote}>가까이 가지 말고 멀리서 관찰해요</Text>
             )}
           </Pressable>
@@ -159,9 +177,11 @@ const styles = StyleSheet.create({
   tag: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 14 },
   tagSafe: { backgroundColor: colors.safeBg },
   tagDanger: { backgroundColor: colors.dangerBg },
+  tagUnknown: { backgroundColor: '#FFF4CF' },
   tagText: { fontSize: 13, fontWeight: '800' },
   tagTextSafe: { color: colors.safeText },
   tagTextDanger: { color: colors.dangerText },
+  tagTextUnknown: { color: '#765A00' },
   dangerNote: { fontSize: 12, fontWeight: '700', color: colors.dangerText, textAlign: 'center' },
 
   // 말풍선 아래 꼬리(삼각형) — 색은 말풍선 배경과 맞춘다.

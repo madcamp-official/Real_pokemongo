@@ -9,6 +9,7 @@ import {
   creatureToApiCreature,
   buildDexCompletion,
   outcomeToIdentifyResponse,
+  buildPreviewScanResponse,
   buildSignupResponse,
   buildRestoreBundle,
   badgeDefToApiBadge,
@@ -193,10 +194,17 @@ test("outcomeToIdentifyResponse: unknown -> 빈 후보", () => {
     safety: null,
     source: "none",
     childMessage: "모르겠어요",
+    unknownReason: "PROVIDER_UNAVAILABLE",
   };
   const res = outcomeToIdentifyResponse(outcome);
   assert.deepEqual(res.candidates, []);
   assert.equal(res.needs_user_confirmation, false);
+  assert.equal(res.unknown_reason, "PROVIDER_UNAVAILABLE");
+  assert.deepEqual(buildPreviewScanResponse(outcome), {
+    species_guess: "아직 잘 모르겠어요",
+    is_dangerous: false,
+    confidence: 0,
+  });
 });
 
 test("buildSignupResponse: User + email을 UserProfile로 합성", () => {

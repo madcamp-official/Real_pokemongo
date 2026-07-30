@@ -57,6 +57,40 @@ import type {
 type Pool = pg.Pool;
 type Queryable = Pool | pg.PoolClient;
 
+const TRANSIENT_POSTGRES_CODES = new Set([
+  "ECONNREFUSED",
+  "ECONNRESET",
+  "EPIPE",
+  "ETIMEDOUT",
+  "57P01",
+  "57P02",
+  "57P03",
+]);
+
+function isTransientPostgresError(error: unknown): boolean {
+  if (!(error instanceof Error)) return false;
+  const code = (error as NodeJS.ErrnoException).code;
+  return (
+    (typeof code === "string" && TRANSIENT_POSTGRES_CODES.has(code)) ||
+    /connection terminated unexpectedly|connection is closed/i.test(error.message)
+  );
+}
+
+async function queryWithReconnectRetry(
+  pool: Pool,
+  text: string,
+  values: unknown[],
+): Promise<pg.QueryResult<any>> {
+  try {
+    return await pool.query(text, values);
+  } catch (error) {
+    if (!isTransientPostgresError(error)) throw error;
+    // SSH 포트포워딩이 방금 재연결된 경우, pg-pool이 끊어진 소켓을 폐기할 시간을 준다.
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    return pool.query(text, values);
+  }
+}
+
 // ---------------------------------------------------------------------------
 // User
 // ---------------------------------------------------------------------------
@@ -79,7 +113,11 @@ export class PgUserRepo implements UserRepository {
   }
 
   async get(id: UserId) {
-    const r = await this.pool.query(`SELECT * FROM app_user WHERE id = $1`, [id]);
+    const r = await queryWithReconnectRetry(
+      this.pool,
+      `SELECT * FROM app_user WHERE id = $1`,
+      [id],
+    );
     return r.rows[0] ? rowToUser(r.rows[0]) : null;
   }
 
@@ -117,7 +155,11 @@ export class PgCredentialRepo implements CredentialRepository {
   }
 
   async findByEmail(email: string) {
-    const r = await this.pool.query(`SELECT * FROM credential WHERE lower(email) = lower($1)`, [email]);
+    const r = await queryWithReconnectRetry(
+      this.pool,
+      `SELECT * FROM credential WHERE lower(email) = lower($1)`,
+      [email],
+    );
     return r.rows[0] ? rowToCredential(r.rows[0]) : null;
   }
 

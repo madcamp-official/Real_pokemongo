@@ -23,7 +23,7 @@ public static class PCGardenSceneBuilder
         Camera camera = cameraObject.AddComponent<Camera>();
         cameraObject.tag = "MainCamera";
         camera.clearFlags = CameraClearFlags.SolidColor;
-        camera.backgroundColor = new Color(0.105f, 0.115f, 0.125f);
+        camera.backgroundColor = new Color32(0x87, 0xCE, 0xEB, 0xFF);
         camera.fieldOfView = 50f;
         camera.nearClipPlane = 0.05f;
         camera.farClipPlane = 300f;

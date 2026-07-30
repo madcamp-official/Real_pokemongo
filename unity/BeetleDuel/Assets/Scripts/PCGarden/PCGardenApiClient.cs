@@ -23,6 +23,12 @@ public sealed class PCGardenApiClient : MonoBehaviour
             PlayerPrefs.GetString("nature-go-auth-token", string.Empty));
         if (!string.IsNullOrWhiteSpace(ApiBaseUrl))
             ApiBaseUrl = ApiBaseUrl.TrimEnd('/');
+        if (!string.IsNullOrWhiteSpace(AuthToken))
+        {
+            // 모바일 계정 토큰을 넣어 실행한 첫 회에도 다음 PC 실행을 위해 연결을 보존한다.
+            PlayerPrefs.SetString("nature-go-auth-token", AuthToken);
+            PlayerPrefs.Save();
+        }
     }
 
     public void Configure(string apiBaseUrl, string authToken)
@@ -30,6 +36,10 @@ public sealed class PCGardenApiClient : MonoBehaviour
         ApiBaseUrl = (apiBaseUrl ?? string.Empty).Trim().TrimEnd('/');
         AuthToken = (authToken ?? string.Empty).Trim();
         PlayerPrefs.SetString("nature-go-api-url", ApiBaseUrl);
+        // PC 전용 홈가든은 모바일 앱과 별도 프로세스이므로 로그인 토큰을 보존하지 않으면
+        // 재실행할 때마다 로컬 미리보기로 돌아가 새로 수집한 개체가 보이지 않는다.
+        // 만료/무효 토큰은 아래 ClearAuthToken에서 즉시 제거하고 다시 로그인을 요구한다.
+        PlayerPrefs.SetString("nature-go-auth-token", AuthToken);
         PlayerPrefs.Save();
     }
 
@@ -81,7 +91,15 @@ public sealed class PCGardenApiClient : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
             onSuccess?.Invoke(request.downloadHandler.text);
         else
-            onFailure?.Invoke(request.error);
+        {
+            if (request.responseCode == 401)
+            {
+                ClearAuthToken();
+                onFailure?.Invoke("로그인이 만료되었습니다. 모바일 앱과 같은 계정으로 다시 로그인해 주세요.");
+            }
+            else
+                onFailure?.Invoke(request.error);
+        }
     }
 
     public IEnumerator SaveLayout(
@@ -103,7 +121,22 @@ public sealed class PCGardenApiClient : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
             onSuccess?.Invoke();
         else
-            onFailure?.Invoke(request.error);
+        {
+            if (request.responseCode == 401)
+            {
+                ClearAuthToken();
+                onFailure?.Invoke("로그인이 만료되었습니다. 다시 로그인해 주세요.");
+            }
+            else
+                onFailure?.Invoke(request.error);
+        }
+    }
+
+    private void ClearAuthToken()
+    {
+        AuthToken = string.Empty;
+        PlayerPrefs.DeleteKey("nature-go-auth-token");
+        PlayerPrefs.Save();
     }
 
     private static string BuildLayoutJson(GardenBootstrapData data)

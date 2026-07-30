@@ -61,6 +61,8 @@ export interface IdentificationOutcome {
   source: string; // 어떤 프로바이더가 냈는지 (Observation.source)
   /** 아이용 한 줄 메시지(연출 문구). */
   childMessage: string;
+  /** unknown일 때 재촬영 문제인지 서버 문제인지 UI가 구분할 수 있게 한다. */
+  unknownReason?: "NO_PROVIDER" | "PROVIDER_UNAVAILABLE" | "LOW_CONFIDENCE";
 }
 
 export class IdentificationGateway {
@@ -81,6 +83,7 @@ export class IdentificationGateway {
       return this.unknownOutcome(
         "no-provider",
         "지금은 동정할 수 없어요. 잠시 뒤 다시 시도해요.",
+        "NO_PROVIDER",
       );
     }
 
@@ -103,7 +106,11 @@ export class IdentificationGateway {
     }
     if (!raw) {
       // 모든 프로바이더 실패/타임아웃 → 좌절 없는 마무리(§7 마지막 행)
-      return this.unknownOutcome(lastProviderName, "다음에 또 찾아보자! 😊");
+      return this.unknownOutcome(
+        lastProviderName,
+        "인식 서버에 잠시 연결하지 못했어요.",
+        "PROVIDER_UNAVAILABLE",
+      );
     }
 
     const resolved = await this.resolveCandidates(raw.candidates);
@@ -185,6 +192,7 @@ export class IdentificationGateway {
     return this.unknownOutcome(
       raw.source,
       "음~ 아직 잘 모르겠어요. 다른 각도로 한 번 더 찍어볼까요? 📸",
+      "LOW_CONFIDENCE",
     );
   }
 
@@ -227,7 +235,11 @@ export class IdentificationGateway {
     return `${top.displayName}예요! ${pct}% 확신해요 ✨`;
   }
 
-  private unknownOutcome(source: string, message: string): IdentificationOutcome {
+  private unknownOutcome(
+    source: string,
+    message: string,
+    reason: NonNullable<IdentificationOutcome["unknownReason"]>,
+  ): IdentificationOutcome {
     return {
       tier: "unknown",
       top: null,
@@ -235,6 +247,7 @@ export class IdentificationGateway {
       safety: null,
       source,
       childMessage: message,
+      unknownReason: reason,
     };
   }
 }

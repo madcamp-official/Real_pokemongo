@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import axios from 'axios';
 import {
   ActivityIndicator,
   Alert,
@@ -43,8 +44,14 @@ export default function LoginScreen({ navigation }: Props) {
       const res = await login({ email, password });
       setSession(res.access_token, res.user);
       navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
-    } catch {
-      Alert.alert('로그인 실패', '이메일 또는 비밀번호를 확인해 주세요.');
+    } catch (error) {
+      const status = axios.isAxiosError(error) ? error.response?.status : undefined;
+      Alert.alert(
+        '로그인 실패',
+        status === undefined || status >= 500
+          ? '서버에 잠시 연결하지 못했어요. 잠시 후 다시 시도해 주세요.'
+          : '이메일 또는 비밀번호를 확인해 주세요.'
+      );
       hasSubmitted.current = false;
       setSubmitting(false);
     }

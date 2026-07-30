@@ -57,6 +57,7 @@ export interface IdentifyResponse {
   candidates: IdentifyCandidate[];
   is_dangerous: boolean;
   needs_user_confirmation: boolean;
+  unknown_reason?: 'NO_PROVIDER' | 'PROVIDER_UNAVAILABLE' | 'LOW_CONFIDENCE';
 }
 
 // ─── Audio MVP: 소리 기반 동정 · 유사도 ──────────────────

@@ -217,6 +217,7 @@ export interface ApiIdentifyResponse {
   candidates: ApiIdentifyCandidate[];
   is_dangerous: boolean;
   needs_user_confirmation: boolean;
+  unknown_reason?: IdentificationOutcome["unknownReason"];
 }
 
 /**
@@ -235,6 +236,9 @@ export function outcomeToIdentifyResponse(
     candidates,
     is_dangerous: outcome.safety !== null,
     needs_user_confirmation: outcome.tier === "medium",
+    ...(outcome.tier === "unknown" && outcome.unknownReason
+      ? { unknown_reason: outcome.unknownReason }
+      : {}),
   };
 }
 
@@ -254,7 +258,7 @@ export function buildPreviewScanResponse(
   outcome: IdentificationOutcome,
 ): ApiPreviewScanResponse {
   if (!outcome.top) {
-    return { species_guess: "?", is_dangerous: false, confidence: 0 };
+    return { species_guess: "아직 잘 모르겠어요", is_dangerous: false, confidence: 0 };
   }
   return {
     species_guess: outcome.top.displayName,

@@ -19,7 +19,6 @@ import {
   deleteAudioSighting,
   identifyAudioSighting,
   getSpeciesSounds,
-  scoreAudioSimilarity,
   uploadAudioSighting,
   type UploadAudioSightingParams,
 } from '@/api/audio';
@@ -34,7 +33,6 @@ import type {
   AudioIdentifyCandidate,
   AudioIdentifyResponse,
   AudioQualityFeedbackCode,
-  AudioSimilarityResponse,
   AudioSightingUploadResponse,
 } from '@/types/api';
 import type { RootTabParamList } from '@/navigation/types';
@@ -46,7 +44,6 @@ type Workflow =
   | 'uploading'
   | 'identifying'
   | 'result'
-  | 'scoring'
   | 'confirming'
   | 'confirmed'
   | 'quality_rejected'
@@ -63,13 +60,6 @@ const qualityMessage: Record<AudioQualityFeedbackCode, string> = {
   MULTIPLE_OVERLAP: '여러 소리가 겹쳐 있어요. 한 소리가 잘 들릴 때 다시 녹음해 주세요.',
   UNSUPPORTED_SOUND: '아직 지원하지 않는 소리예요.',
   NO_TARGET_ACTIVITY: '비교할 생물 소리 구간을 찾지 못했어요.',
-};
-
-const similarityGrade: Record<AudioSimilarityResponse['grade'], string> = {
-  low_similarity: '낮은 유사도',
-  somewhat_similar: '조금 비슷해요',
-  very_similar: '많이 비슷해요',
-  strong_match: '매우 비슷해요',
 };
 
 function createId(prefix: string): string {
@@ -114,7 +104,6 @@ export default function SoundScreen() {
   const [identifyResult, setIdentifyResult] = useState<AudioIdentifyResponse | null>(null);
   const [selectedCandidate, setSelectedCandidate] = useState<AudioIdentifyCandidate | null>(null);
   const [qualityFailures, setQualityFailures] = useState<AudioQualityFeedbackCode[]>([]);
-  const [similarity, setSimilarity] = useState<AudioSimilarityResponse | null>(null);
   const [failureMessage, setFailureMessage] = useState<string | null>(null);
   /** 업로드 실패 시 같은 client_recording_id로 다시 보낼 수 있는 최소 정보. */
   const [pendingUpload, setPendingUpload] = useState<UploadAudioSightingParams | null>(null);
@@ -129,8 +118,6 @@ export default function SoundScreen() {
         return '안전하게 보내는 중…';
       case 'identifying':
         return '어떤 친구인지 찾는 중…';
-      case 'scoring':
-        return '참조 소리와 비교하는 중…';
       case 'confirming':
         return '도감에 기록하는 중…';
       default:
@@ -149,14 +136,23 @@ export default function SoundScreen() {
     setIdentifyResult(null);
     setSelectedCandidate(null);
     setQualityFailures([]);
-    setSimilarity(null);
     setFailureMessage(null);
     setPendingUpload(null);
     confirmationId.current = null;
     setWorkflow('ready');
   }, [audioSightingId, recordingUri]);
 
+  const identifyUploadedSighting = useCallback(async (sightingId: string) => {
+    setFailureMessage(null);
+    setWorkflow('identifying');
+    const result = await identifyAudioSighting(sightingId);
+    setIdentifyResult(result);
+    setSelectedCandidate(result.candidates[0] ?? null);
+    setWorkflow('result');
+  }, []);
+
   const uploadAndIdentify = useCallback(async (uploadInput: UploadAudioSightingParams) => {
+    setFailureMessage(null);
     setWorkflow('uploading');
     const upload: AudioSightingUploadResponse = await uploadAudioSighting(uploadInput);
     setAudioSightingId(upload.audio_sighting_id);
@@ -176,12 +172,8 @@ export default function SoundScreen() {
       return;
     }
 
-    setWorkflow('identifying');
-    const result = await identifyAudioSighting(upload.audio_sighting_id);
-    setIdentifyResult(result);
-    setSelectedCandidate(result.candidates[0] ?? null);
-    setWorkflow('result');
-  }, []);
+    await identifyUploadedSighting(upload.audio_sighting_id);
+  }, [identifyUploadedSighting]);
 
   const finishAndAnalyze = useCallback(async () => {
     if (finishingRef.current) return;
@@ -229,7 +221,6 @@ export default function SoundScreen() {
   const beginRecording = useCallback(async () => {
     setQualityFailures([]);
     setFailureMessage(null);
-    setSimilarity(null);
     const started = await startRecording().catch(() => false);
     if (!started) {
       setFailureMessage('마이크 권한이 필요해요. 설정에서 마이크를 허용한 뒤 다시 시도해 주세요.');
@@ -276,43 +267,38 @@ export default function SoundScreen() {
     }
   };
 
-  const scoreSelected = async () => {
-    if (!audioSightingId || !selectedCandidate?.species_id) return;
-    setWorkflow('scoring');
+  const retryLast = useCallback(async () => {
+    // 연타로 같은 업로드/동정 요청이 중복 실행되는 것을 막되, 이전 실패가 끝난 뒤의
+    // 재시도는 반드시 허용한다.
+    if (finishingRef.current) return;
+    finishingRef.current = true;
+    setFailureMessage(null);
     try {
-      const result = await scoreAudioSimilarity(audioSightingId, selectedCandidate.species_id);
-      setSimilarity(result);
-      setWorkflow('result');
+      if (pendingUpload) {
+        await uploadAndIdentify(pendingUpload);
+        return;
+      }
+      if (audioSightingId && !identifyResult) {
+        // 업로드된 서버 WAV를 그대로 다시 분석한다. 녹음을 다시 하거나 파일을 재업로드하지
+        // 않으므로 모델 연결이 복구된 직후 버튼 한 번으로 결과 화면까지 진행할 수 있다.
+        await identifyUploadedSighting(audioSightingId);
+        return;
+      }
+      await clearSession(true);
     } catch (error) {
       setFailureMessage(errorMessage(error));
       setWorkflow('error');
+    } finally {
+      finishingRef.current = false;
     }
-  };
-
-  const retryLast = () => {
-    if (pendingUpload) {
-      void uploadAndIdentify(pendingUpload).catch((error) => {
-        setFailureMessage(errorMessage(error));
-        setWorkflow('error');
-      });
-      return;
-    }
-    if (audioSightingId && !identifyResult) {
-      setWorkflow('identifying');
-      void identifyAudioSighting(audioSightingId)
-        .then((result) => {
-          setIdentifyResult(result);
-          setSelectedCandidate(result.candidates[0] ?? null);
-          setWorkflow('result');
-        })
-        .catch((error) => {
-          setFailureMessage(errorMessage(error));
-          setWorkflow('error');
-        });
-      return;
-    }
-    void clearSession(true);
-  };
+  }, [
+    audioSightingId,
+    clearSession,
+    identifyResult,
+    identifyUploadedSighting,
+    pendingUpload,
+    uploadAndIdentify,
+  ]);
 
   const leave = () => {
     if (recorderState.isRecording) {
@@ -378,7 +364,7 @@ export default function SoundScreen() {
             title="소리를 처리하지 못했어요"
             description={failureMessage ?? '잠시 후 다시 시도해 주세요.'}
             actionLabel={pendingUpload || (audioSightingId && !identifyResult) ? '다시 시도' : '다시 녹음'}
-            onAction={retryLast}
+            onAction={() => void retryLast()}
           />
         )}
 
@@ -386,10 +372,8 @@ export default function SoundScreen() {
           <ResultPanel
             result={identifyResult}
             selected={selectedCandidate}
-            similarity={similarity}
             onSelect={setSelectedCandidate}
             onConfirm={() => void confirmSelected()}
-            onScore={() => void scoreSelected()}
             onRetry={() => void clearSession(true)}
           />
         )}
@@ -398,7 +382,7 @@ export default function SoundScreen() {
           <MessagePanel
             emoji="🌿"
             title={`${selectedCandidate.common_name_ko}을(를) 기록했어요!`}
-            description="소리로 만난 친구가 도감에 추가되었어요."
+            description="소리로 만난 친구가 도감과 PC Garden 보관함에 추가되었어요."
             actionLabel="탐험 지도로 돌아가기"
             onAction={leave}
           />
@@ -467,18 +451,14 @@ function RecordingPanel({
 function ResultPanel({
   result,
   selected,
-  similarity,
   onSelect,
   onConfirm,
-  onScore,
   onRetry,
 }: {
   result: AudioIdentifyResponse;
   selected: AudioIdentifyCandidate | null;
-  similarity: AudioSimilarityResponse | null;
   onSelect: (candidate: AudioIdentifyCandidate) => void;
   onConfirm: () => void;
-  onScore: () => void;
   onRetry: () => void;
 }) {
   if (result.unknown || result.candidates.length === 0) {
@@ -528,21 +508,13 @@ function ResultPanel({
 
       {selected?.is_dangerous && <Text style={styles.danger}>⚠️ 가까이 가지 말고 안전한 거리를 유지해요.</Text>}
 
-      {similarity && (
-        <View style={styles.similarityCard}>
-          <Text style={styles.similarityTitle}>{selected?.common_name_ko} 소리와 {similarity.score}점 비슷해요</Text>
-          <Text style={styles.similarityDesc}>{similarityGrade[similarity.grade]} · 이 점수는 종일 확률이 아니라 참조 소리와의 유사도예요.</Text>
-        </View>
-      )}
-
       <View style={styles.actions}>
         {selected && !selected.supported && (
           <Text style={styles.unsupportedNote}>
-            이 종은 아직 저희 도감에 없어요. 곧 추가될 예정이에요! 지금은 기록·소리 비교를 할 수 없어요.
+            이 종은 아직 저희 도감에 없어요. 곧 추가될 예정이에요! 지금은 기록할 수 없어요.
           </Text>
         )}
         <PrimaryButton label="이 종으로 기록하기" onPress={onConfirm} disabled={!selected?.supported} />
-        <SecondaryButton label="소리 비교하기" onPress={onScore} disabled={!selected?.supported} />
         {selected?.supported && selected.species_id && <ReferenceSoundButton speciesId={selected.species_id} />}
         <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>다시 녹음</Text></Pressable>
       </View>
@@ -655,28 +627,6 @@ function PrimaryButton({
   );
 }
 
-function SecondaryButton({
-  label,
-  onPress,
-  disabled = false,
-}: {
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-}) {
-  return (
-    <Pressable
-      onPress={onPress}
-      disabled={disabled}
-      style={[styles.secondaryButton, disabled && styles.buttonDisabled]}
-      accessibilityRole="button"
-      accessibilityState={{ disabled }}
-    >
-      <Text style={styles.secondaryText}>{label}</Text>
-    </Pressable>
-  );
-}
-
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.background },
   header: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 10 },
@@ -697,8 +647,6 @@ const styles = StyleSheet.create({
   tip: { fontSize: 13, lineHeight: 19, color: colors.textSecondary },
   primaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: colors.primary, borderRadius: 24, paddingVertical: 16, paddingHorizontal: 18, marginTop: 6 },
   primaryText: { color: colors.onPrimary, fontSize: 16, fontWeight: '900' },
-  secondaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.primary, borderRadius: 24, paddingVertical: 14, paddingHorizontal: 18 },
-  secondaryText: { color: colors.primary, fontSize: 15, fontWeight: '900' },
   buttonDisabled: { opacity: 0.4 },
   unsupportedNote: { color: colors.textMuted, fontSize: 12, lineHeight: 17, textAlign: 'center' },
   recordingLabel: { color: colors.dangerText, fontSize: 16, fontWeight: '900' },
@@ -718,9 +666,6 @@ const styles = StyleSheet.create({
   segmentText: { color: colors.textMuted, fontSize: 11 },
   confidence: { color: colors.primaryDark, fontSize: 13, fontWeight: '900' },
   danger: { color: colors.dangerText, backgroundColor: colors.dangerBg, padding: 12, borderRadius: 14, fontSize: 13, fontWeight: '700' },
-  similarityCard: { backgroundColor: colors.funFactBg, borderRadius: 16, padding: 14, gap: 5 },
-  similarityTitle: { color: colors.textPrimary, fontSize: 15, fontWeight: '900' },
-  similarityDesc: { color: colors.textSecondary, fontSize: 12, lineHeight: 17 },
   actions: { gap: 10, marginTop: 4 },
   retryButton: { alignItems: 'center', paddingVertical: 10 },
   retryText: { color: colors.textSecondary, fontSize: 14, fontWeight: '800' },
