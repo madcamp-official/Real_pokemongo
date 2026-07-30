@@ -45,6 +45,8 @@ export default function ProfessorScreen({ navigation, route }: Props) {
       askProfessor(input.question, input.contextSpeciesId),
     onSuccess: (result) => setAnswer(result),
   });
+  /** "다시 시도" 재전송용 — 전송 즉시 입력창을 비우므로, 실패 시 다시 보낼 질문은 별도로 기억해 둔다. */
+  const lastAskedRef = useRef<{ question: string; contextSpeciesId?: string } | null>(null);
 
   const canSubmit = question.trim().length >= 2 && !askMutation.isPending;
   const statusLabel = useMemo(() => {
@@ -58,13 +60,21 @@ export default function ProfessorScreen({ navigation, route }: Props) {
   const submit = (nextQuestion = question, suggestionContext?: string) => {
     const normalized = nextQuestion.trim();
     if (normalized.length < 2 || askMutation.isPending) return;
-    setQuestion(normalized);
+    const payload = { question: normalized, contextSpeciesId: suggestionContext ?? contextSpeciesId };
+    lastAskedRef.current = payload;
+    // 답변을 받은 뒤에도 방금 물어본 문장이 입력창에 그대로 남아있던 문제(2026-07-30) —
+    // 전송 시점에 바로 비워서 다음 질문을 바로 이어 칠 수 있게 한다.
+    setQuestion('');
     setAnswer(null);
     askMutation.reset();
-    askMutation.mutate({
-      question: normalized,
-      contextSpeciesId: suggestionContext ?? contextSpeciesId,
-    });
+    askMutation.mutate(payload);
+  };
+
+  const retry = () => {
+    if (!lastAskedRef.current || askMutation.isPending) return;
+    setAnswer(null);
+    askMutation.reset();
+    askMutation.mutate(lastAskedRef.current);
   };
 
   const selectSuggestion = (suggestion: ProfessorSuggestion) => {
@@ -145,7 +155,7 @@ export default function ProfessorScreen({ navigation, route }: Props) {
           <View style={styles.errorCard}>
             <Text style={styles.errorTitle}>지금은 답을 가져오지 못했어요</Text>
             <Text style={styles.errorText}>연결을 확인한 뒤 같은 질문을 다시 보내 주세요.</Text>
-            <Pressable style={styles.retryButton} onPress={() => submit()}>
+            <Pressable style={styles.retryButton} onPress={retry}>
               <Text style={styles.retryText}>다시 시도</Text>
             </Pressable>
           </View>
