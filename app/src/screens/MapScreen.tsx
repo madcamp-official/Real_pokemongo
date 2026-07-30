@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -34,6 +34,7 @@ const HOME_ZONE_RADIUS_M = 300;
  */
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const mapRef = useRef<KakaoMapViewHandle>(null);
   const hasInitiallyCentered = useRef(false);
@@ -279,7 +280,16 @@ export default function MapScreen() {
         locations={[0, 0.44, 1]}
         style={styles.bottomWash}
       />
-      <View pointerEvents="none" style={[styles.nearbySummary, { bottom: insets.bottom + 21 }]}>
+      <View
+        pointerEvents="none"
+        style={[
+          styles.nearbySummary,
+          // RadialMenu의 엠블럼 버튼이 화면 정중앙(지름 72dp)에 항상 떠 있어서,
+          // 텍스트가 길어지면 오른쪽 끝이 그 버튼(zIndex 20) 아래로 들어가 가려진다.
+          // 버튼 왼쪽 가장자리보다 14dp 여유를 두는 폭으로 제한해 겹치지 않게 한다.
+          { bottom: insets.bottom + 21, maxWidth: width / 2 - 76 },
+        ]}
+      >
         <Text style={styles.nearbyEyebrow}>{selectedGroup === '전체' ? locationLabel : `${selectedGroup} 관찰`}</Text>
         <Text style={styles.nearbyTitle}>내 주변 관찰 {visiblePins.length}건</Text>
       </View>
