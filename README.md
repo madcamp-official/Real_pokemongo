@@ -123,7 +123,215 @@ RootStack (headerShown: false, 일부만 헤더 표시)
 
 ### ERD
 
-> (다이어그램 이미지 없음 — 아래 표의 FK 관계로 대신합니다.)
+`db/schema.sql`(신규 설치 스냅샷) + `db/migrations/0002~0010`(오디오·3D 홈가든 증분 변경)을 그대로 반영한 다이어그램입니다. 컬럼은 PK/FK와 이해에 중요한 것만 추렸고(전체 컬럼은 아래 표와 실제 스키마 파일 참고), enum 타입은 생략했습니다.
+
+```mermaid
+erDiagram
+    app_user {
+        uuid id PK
+        subscription_plan plan
+        boolean location_storage_enabled
+        text nickname
+        int level
+        int xp
+    }
+    credential {
+        uuid user_id PK "FK → app_user"
+        text email
+        text password_hash
+    }
+    consent_record {
+        bigint id PK
+        uuid user_id FK
+        boolean privacy
+        boolean location
+        boolean photo
+        timestamptz agreed_at
+    }
+
+    taxon {
+        text id PK
+        text sci_name
+        text kor_name
+        taxon_rank rank
+        text parent_id FK "자기참조(상위분류)"
+        taxon_group group
+        rarity rarity
+    }
+    taxon_season {
+        text taxon_id PK "FK"
+        season season PK
+    }
+    taxon_habitat {
+        text taxon_id PK "FK"
+        habitat habitat PK
+    }
+    taxon_risk_tag {
+        text taxon_id PK "FK"
+        risk_tag risk_tag PK
+    }
+    taxon_alias {
+        text taxon_id PK "FK"
+        text alias PK
+    }
+    species_content {
+        text taxon_id PK "FK"
+        text fun_fact
+        text_array similar_species
+        jsonb quiz
+    }
+
+    observation {
+        uuid id PK
+        uuid user_id FK
+        text taxon_id FK "nullable, ON DELETE RESTRICT"
+        observation_modality modality
+        double precise_lat "동의 무관 항상 저장"
+        double precise_lng
+        text region_code "동의 게이트"
+        real confidence
+    }
+    observation_media {
+        uuid observation_id PK "FK"
+        int ordinal PK
+        media_kind media_kind
+        text retention_class
+        text mime_type
+    }
+    collection_entry {
+        uuid user_id PK "FK"
+        text taxon_id PK "FK"
+        boolean unlocked
+        uuid first_observation_id FK
+        int times_observed
+    }
+
+    quest {
+        text id PK
+        quest_type type
+        int distinct_taxa
+        text reward_badge_id FK
+        int reward_xp
+    }
+    quest_progress {
+        uuid user_id PK "FK"
+        text quest_id PK "FK"
+        timestamptz completed_at
+        timestamptz claimed_at
+    }
+    quest_progress_taxon {
+        uuid user_id PK "FK(복합) → quest_progress"
+        text quest_id PK "FK(복합) → quest_progress"
+        text taxon_id PK "FK → taxon"
+    }
+    badge_definition {
+        text id PK
+        jsonb rule
+        badge_theme theme
+        int xp
+    }
+    earned_badge {
+        uuid user_id PK "FK"
+        text badge_id PK "FK"
+        timestamptz earned_at
+        timestamptz claimed_at
+    }
+
+    creature {
+        uuid id PK
+        uuid user_id FK
+        text taxon_id FK
+        uuid origin_observation_id FK "관찰당 1마리, UNIQUE(partial)"
+        text nickname
+        int bond
+    }
+    garden_tile {
+        uuid user_id PK "FK"
+        int row PK
+        int col PK
+        tile_type type
+    }
+    creature_placement {
+        uuid user_id FK
+        uuid creature_id FK "UNIQUE — 개체당 배치 1곳"
+        text placement_mode "slot | free"
+        int row "slot 모드만"
+        int col "slot 모드만"
+        real world_x "free 모드만"
+        real world_y "free 모드만"
+        real world_z "free 모드만"
+    }
+    garden_asset_catalog {
+        text asset_key PK
+        text taxon_id FK
+        text category
+        text resource_path
+        real display_scale
+    }
+
+    audio_sighting {
+        uuid id PK
+        uuid user_id FK
+        text status "ready/rejected/confirmed"
+        uuid confirmed_observation_id FK
+        text confirmation_id "원자적 확정 클레임"
+        double precise_lat
+        double precise_lng
+        jsonb quality
+    }
+    audio_identification_result {
+        uuid audio_sighting_id PK "FK"
+        jsonb candidates_json
+        text model_provider
+        text model_version
+    }
+    species_sound_reference {
+        text id PK
+        text taxon_id FK
+        text quality_status "pending/approved/rejected"
+        text license
+        int duration_ms
+    }
+
+    app_user ||--|| credential : "인증정보"
+    app_user ||--o{ consent_record : "동의이력"
+    app_user ||--o{ observation : "관찰"
+    app_user ||--o{ collection_entry : "도감진행"
+    app_user ||--o{ quest_progress : "퀘스트진행"
+    app_user ||--o{ earned_badge : "배지획득"
+    app_user ||--o{ creature : "보유개체"
+    app_user ||--o{ garden_tile : "정원타일"
+    app_user ||--o{ creature_placement : "정원배치"
+    app_user ||--o{ audio_sighting : "오디오세션"
+
+    taxon ||--o{ taxon : "상위분류(자기참조)"
+    taxon ||--o{ taxon_season : "출현 계절"
+    taxon ||--o{ taxon_habitat : "서식지"
+    taxon ||--o{ taxon_risk_tag : "위험 태그"
+    taxon ||--o{ taxon_alias : "별명"
+    taxon ||--o| species_content : "종 카드 콘텐츠"
+    taxon ||--o{ observation : "동정결과"
+    taxon ||--o{ collection_entry : "해금상태"
+    taxon ||--o{ creature : "종별개체"
+    taxon ||--o{ garden_asset_catalog : "3D 에셋"
+    taxon ||--o{ species_sound_reference : "참조음원"
+    taxon ||--o{ quest_progress_taxon : "매칭된 종"
+
+    observation ||--o{ observation_media : "미디어(사진/오디오)"
+    observation ||--o| collection_entry : "최초관찰로 참조됨"
+    observation ||--o| creature : "유래(선택, 1:0..1)"
+    observation ||--o| audio_sighting : "오디오로부터 확정(선택)"
+
+    quest ||--o{ quest_progress : "진행"
+    badge_definition ||--o{ quest : "보상으로 지정됨(선택)"
+    quest_progress ||--o{ quest_progress_taxon : "매칭된 종"
+    badge_definition ||--o{ earned_badge : "획득"
+
+    creature ||--o| creature_placement : "배치(선택, UNIQUE)"
+    garden_tile ||--o{ creature_placement : "슬롯 점유(복합FK)"
+
+    audio_sighting ||--o| audio_identification_result : "최신 동정 결과"
+```
 
 ### 테이블 설명
 
