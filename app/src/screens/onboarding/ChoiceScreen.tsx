@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { startGuestSession } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
+import { colors } from '@/theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Choice'>;
 
@@ -77,7 +78,7 @@ export default function ChoiceScreen({ navigation }: Props) {
           disabled={startingGuest}
         >
           {startingGuest ? (
-            <ActivityIndicator color="#5B8C3E" />
+            <ActivityIndicator color={colors.primary} />
           ) : (
             <>
               <Text style={styles.secondaryTitle}>게스트로 둘러보기</Text>
@@ -93,28 +94,28 @@ export default function ChoiceScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F7F9F4', padding: 24, justifyContent: 'center', gap: 40 },
+  root: { flex: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'center', gap: 40 },
   header: { alignItems: 'center' },
-  title: { fontSize: 22, fontWeight: '800', color: '#2E3A24', marginBottom: 10 },
-  desc: { fontSize: 14, color: '#6B7A5E', textAlign: 'center', lineHeight: 20 },
+  title: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, marginBottom: 10 },
+  desc: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 },
   options: { gap: 14 },
   primaryCard: {
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     borderRadius: 20,
     padding: 24,
     alignItems: 'center',
   },
   primaryEmoji: { fontSize: 32, marginBottom: 8 },
-  primaryTitle: { color: '#fff', fontSize: 18, fontWeight: '800', marginBottom: 4 },
+  primaryTitle: { color: colors.onPrimary, fontSize: 18, fontWeight: '800', marginBottom: 4 },
   primaryDesc: { color: 'rgba(255,255,255,0.85)', fontSize: 13 },
   secondaryCard: {
     borderRadius: 20,
     padding: 20,
     alignItems: 'center',
     borderWidth: 1.5,
-    borderColor: '#D7E0CC',
-    backgroundColor: '#fff',
+    borderColor: colors.border,
+    backgroundColor: colors.surface,
   },
-  secondaryTitle: { color: '#2E3A24', fontSize: 15, fontWeight: '700', marginBottom: 4 },
-  secondaryDesc: { color: '#8A9880', fontSize: 12, textAlign: 'center' },
+  secondaryTitle: { color: colors.textPrimary, fontSize: 15, fontWeight: '700', marginBottom: 4 },
+  secondaryDesc: { color: colors.textSecondary, fontSize: 12, textAlign: 'center' },
 });

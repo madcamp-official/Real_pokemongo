@@ -8,10 +8,6 @@ import {
   buildMockSignup,
   mockGuestConvert,
   mockRestoreBundle,
-  mockGardenLayout,
-  mockTileCompatibility,
-  buildMockCreatureStatus,
-  interactMockCreature,
   getMockXpProfile,
   getMockBadges,
   claimMockBadge,
@@ -36,11 +32,6 @@ import {
 function speciesIdFromUrl(url: string): string {
   const m = url.match(/\/species\/([^/]+)\/card/);
   return m ? m[1] : 'sp_ladybug';
-}
-
-function creatureIdFromUrl(url: string): string {
-  const m = url.match(/\/creatures\/([^/]+)\//);
-  return m ? m[1] : 'cr_1';
 }
 
 function questIdFromUrl(url: string): string {
@@ -124,21 +115,6 @@ const routes: Array<[string, RegExp, Handler]> = [
   ['POST', /\/session\/guest\/convert$/, () => mockGuestConvert],
   ['GET', /\/account\/restore-bundle$/, () => mockRestoreBundle],
   ['DELETE', /\/account$/, () => ({})],
-  // F16 홈 가든
-  ['GET', /\/garden\/layout$/, () => mockGardenLayout],
-  ['PUT', /\/garden\/layout$/, () => ({})],
-  ['GET', /\/garden\/tile-compatibility$/, () => mockTileCompatibility],
-  ['POST', /\/creatures\/[^/]+\/name$/, () => ({})],
-  [
-    'GET',
-    /\/creatures\/[^/]+\/status$/,
-    (config) => buildMockCreatureStatus(creatureIdFromUrl(config.url ?? ''), null),
-  ],
-  [
-    'POST',
-    /\/creatures\/[^/]+\/interact$/,
-    (config) => interactMockCreature(creatureIdFromUrl(config.url ?? '')),
-  ],
   // F8 배지 · 레벨 보상
   ['GET', /\/profile\/xp$/, () => getMockXpProfile()],
   ['GET', /\/badges$/, () => getMockBadges()],

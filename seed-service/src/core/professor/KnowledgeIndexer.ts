@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import type { SpeciesContent } from "../../child/content/ContentCardService.js";
 import type { Taxon } from "../domain/types.js";
 import { SafetyFilter } from "../safety/SafetyFilter.js";
+import { objectParticleFor, topicParticleFor, withParticleFor } from "./koreanParticles.js";
 import type {
   KnowledgeChunk,
   KnowledgeDocument,
@@ -41,9 +42,10 @@ function normalizeSentence(value: string): string {
 
 function contentHash(records: KnowledgeChunk[]): string {
   const canonical = records
-    .map(({ chunk_id, sentence, species_id, field_type, is_safety, content_version }) => ({
+    .map(({ chunk_id, sentence, answer, species_id, field_type, is_safety, content_version }) => ({
       chunk_id,
       sentence,
+      answer,
       species_id,
       field_type,
       is_safety,
@@ -55,10 +57,18 @@ function contentHash(records: KnowledgeChunk[]): string {
 
 interface ChunkDraft {
   fieldType: ProfessorFieldType;
+  /** 의미 검색 전용 압축 문장(라벨: 값 형태). 화면에는 절대 노출하지 않는다. */
   sentence: string;
+  /** 화면에 보여줄 자연어 답변. */
+  answer: string;
   isSafety?: boolean;
 }
 
+/**
+ * "종명 관찰 장소: 우리 동네, 공원" 같은 라벨 문장은 검색엔 잘 맞지만 아이에게
+ * 그대로 읽어주면 대화가 아니라 데이터베이스 조회처럼 느껴진다. 필드마다 별도
+ * 답변 문장을 조립해, 검색 정확도(sentence)와 실제 말투(answer)를 분리한다.
+ */
 function draftsForTaxon(
   taxon: Taxon,
   content: SpeciesContent | null,
@@ -66,34 +76,57 @@ function draftsForTaxon(
   confusableScientificNames: (scientificName: string) => readonly string[],
 ): ChunkDraft[] {
   const name = taxon.korName || taxon.sciName;
+  const topic = topicParticleFor(name);
   const drafts: ChunkDraft[] = [];
 
   if (taxon.habitatTags.length > 0) {
     const habitats = taxon.habitatTags.map((tag) => HABITAT_KO[tag] ?? tag).join(", ");
-    drafts.push({ fieldType: "habitat", sentence: `${name} 관찰 장소: ${habitats}` });
+    drafts.push({
+      fieldType: "habitat",
+      sentence: `${name} 관찰 장소: ${habitats}`,
+      answer: `${name}${topic} 주로 ${habitats}에서 지내요. 그 근처를 잘 살펴보면 만날 수 있을 거예요!`,
+    });
   }
   if (taxon.activeTime) {
+    const timeText = ACTIVE_TIME_KO[taxon.activeTime];
     drafts.push({
       fieldType: "activity",
-      sentence: `${name} 활동 시간: 주로 ${ACTIVE_TIME_KO[taxon.activeTime]}`,
+      sentence: `${name} 활동 시간: 주로 ${timeText}`,
+      answer: `${name}${topic} 주로 ${timeText}에 움직여요.`,
     });
   }
   if (taxon.sizeDescription) {
-    drafts.push({ fieldType: "size", sentence: `${name} 크기: ${taxon.sizeDescription}` });
+    // sizeDescription은 "몸길이 45cm 안팎이에요"처럼 이미 완결된 서술절이라
+    // 이름+조사만 앞에 붙이면 그대로 자연스러운 답변 문장이 된다.
+    drafts.push({
+      fieldType: "size",
+      sentence: `${name} 크기: ${taxon.sizeDescription}`,
+      answer: `${name}${topic} ${taxon.sizeDescription}`,
+    });
   }
   if (taxon.seasonTags.length > 0) {
     const seasons = taxon.seasonTags.map((tag) => SEASON_KO[tag] ?? tag).join(", ");
-    drafts.push({ fieldType: "season", sentence: `${name} 관찰 계절: ${seasons}` });
+    drafts.push({
+      fieldType: "season",
+      sentence: `${name} 관찰 계절: ${seasons}`,
+      answer: `${name}${topic} ${seasons}에 많이 보여요.`,
+    });
   }
 
   if (content?.funFact) {
-    drafts.push({ fieldType: "funfact", sentence: content.funFact });
+    // funFact는 이미 사람이 대화체로 쓴 문장이라 그대로 답변으로 쓴다.
+    drafts.push({ fieldType: "funfact", sentence: content.funFact, answer: content.funFact });
   }
   for (const point of content?.observePoints ?? []) {
-    drafts.push({ fieldType: "observation", sentence: `${name} 관찰 포인트: ${point}` });
+    // point는 "~봐요/~세어봐요"처럼 이미 완결된 관찰 지시문이다.
+    drafts.push({
+      fieldType: "observation",
+      sentence: `${name} 관찰 포인트: ${point}`,
+      answer: `${name}${objectParticleFor(name)} 관찰할 때는 ${point}`,
+    });
   }
   for (const fact of content?.knowledgeFacts ?? []) {
-    drafts.push({ fieldType: fact.fieldType, sentence: fact.sentence });
+    drafts.push({ fieldType: fact.fieldType, sentence: fact.sentence, answer: fact.sentence });
   }
 
   const safety = new SafetyFilter().evaluate(taxon);
@@ -101,6 +134,7 @@ function draftsForTaxon(
     drafts.push({
       fieldType: "safety",
       sentence: `${name}: ${safety.message}`,
+      answer: `${name}${topic} ${safety.message}`,
       isSafety: true,
     });
   }
@@ -110,9 +144,11 @@ function draftsForTaxon(
     .filter((candidate): candidate is Taxon => candidate !== undefined)
     .map((candidate) => candidate.korName || candidate.sciName);
   if (similarNames.length > 0) {
+    const namesText = similarNames.join(", ");
     drafts.push({
       fieldType: "similar",
-      sentence: `${name}와 헷갈리기 쉬운 생물: ${similarNames.join(", ")}`,
+      sentence: `${name}와 헷갈리기 쉬운 생물: ${namesText}`,
+      answer: `${name}${topic} ${namesText}${withParticleFor(similarNames[similarNames.length - 1]!)} 헷갈리기 쉬워요. 자세히 비교해서 구별해봐요!`,
     });
   }
 
@@ -139,12 +175,14 @@ export function buildKnowledgeDocument(
 
     for (const draft of drafts) {
       const sentence = normalizeSentence(draft.sentence);
-      if (!sentence) continue;
+      const answer = normalizeSentence(draft.answer);
+      if (!sentence || !answer) continue;
       const index = (indexByField.get(draft.fieldType) ?? 0) + 1;
       indexByField.set(draft.fieldType, index);
       records.push({
         chunk_id: `${taxon.id}:${draft.fieldType}:${index}`,
         sentence,
+        answer,
         species_id: taxon.id as string,
         species_name: taxon.korName || taxon.sciName,
         field_type: draft.fieldType,
@@ -171,6 +209,7 @@ export function assertKnowledgeDocument(
 
   for (const record of document.records) {
     if (!record.sentence.trim()) throw new Error(`빈 지식 문장: ${record.chunk_id}`);
+    if (!record.answer.trim()) throw new Error(`빈 답변 문장: ${record.chunk_id}`);
     if (ids.has(record.chunk_id)) throw new Error(`중복 chunk_id: ${record.chunk_id}`);
     ids.add(record.chunk_id);
     countBySpecies.set(record.species_id, (countBySpecies.get(record.species_id) ?? 0) + 1);

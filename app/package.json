@@ -1,5 +1,5 @@
 {
-  "name": "app",
+  "name": "living-dex",
   "version": "1.0.0",
   "main": "index.ts",
   "dependencies": {
@@ -20,6 +20,7 @@
     "expo-location": "~57.0.6",
     "expo-screen-orientation": "~57.0.1",
     "expo-secure-store": "~57.0.1",
+    "expo-splash-screen": "~57.0.5",
     "expo-status-bar": "~57.0.1",
     "react": "19.2.3",
     "react-native": "0.86.0",

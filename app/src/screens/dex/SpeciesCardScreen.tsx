@@ -11,10 +11,11 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSpeciesCard } from '@/api/species';
 import { InfoTile } from '@/components/species/InfoTile';
+import { ProfessorEntryPoint } from '@/components/professor/ProfessorEntryPoint';
 import { QuizQuestion } from '@/components/species/QuizQuestion';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
+import { GardenCreatureArt } from '@/components/species/GardenCreatureArt';
 import { PhotoGalleryBlock } from '@/components/species/PhotoGalleryBlock';
 import type { RootStackParamList } from '@/navigation/types';
 
@@ -51,11 +52,6 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
   const observePoints = card.observe_points ?? [];
   const quiz = card.quiz ?? [];
   const similarSpecies = card.similar_species ?? [];
-
-  const inviteToGarden = () => {
-    navigation.navigate('Main');
-    // Phase 5(홈 가든)에서 특정 개체를 배치하는 실제 초대 플로우로 확장.
-  };
 
   return (
     <View style={styles.root}>
@@ -127,27 +123,13 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
             </View>
           )}
 
-          <Pressable
-            style={styles.professorCta}
+          <ProfessorEntryPoint
+            variant="card"
+            caption="이 친구의 사는 곳과 특징을 물어보세요"
             onPress={() =>
               navigation.navigate('Professor', { contextSpeciesId: card.species_id })
             }
-          >
-            <View style={styles.professorMark}>
-              <Text style={styles.professorMarkText}>?</Text>
-            </View>
-            <View style={styles.professorCopy}>
-              <Text style={styles.professorCtaTitle}>도감 박사에게 묻기</Text>
-              <Text style={styles.professorCtaCaption}>
-                이 친구의 사는 곳과 특징을 물어보세요
-              </Text>
-            </View>
-            <Text style={styles.professorArrow}>›</Text>
-          </Pressable>
-
-          <Pressable style={styles.cta} onPress={inviteToGarden}>
-            <Text style={styles.ctaText}>우리집 정원에 초대하기</Text>
-          </Pressable>
+          />
 
           {similarSpecies.length > 0 && (
             <View style={styles.similarSection}>
@@ -236,40 +218,6 @@ const styles = StyleSheet.create({
   observeText: { flex: 1, fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
 
   quizSection: { gap: 10 },
-
-  professorCta: {
-    minHeight: 72,
-    borderRadius: 20,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    backgroundColor: '#E9F2E4',
-    borderWidth: 1,
-    borderColor: '#D2E2C9',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  professorMark: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: '#4E795B',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  professorMarkText: { color: '#FFFFFF', fontSize: 21, fontWeight: '900' },
-  professorCopy: { flex: 1 },
-  professorCtaTitle: { color: '#2E5139', fontSize: 15, fontWeight: '900' },
-  professorCtaCaption: { color: '#718176', fontSize: 12, lineHeight: 17, marginTop: 2 },
-  professorArrow: { color: '#4E795B', fontSize: 28, lineHeight: 28 },
-
-  cta: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 18,
-    alignItems: 'center',
-  },
-  ctaText: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
 
   similarSection: { gap: 10 },
   similarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

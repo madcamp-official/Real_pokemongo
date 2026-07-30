@@ -2,7 +2,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   Animated,
   Easing,
-  Image,
   Modal,
   Pressable,
   StyleSheet,
@@ -16,7 +15,8 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NatureBall } from '@/components/nav/NatureBall';
-import { colors } from '@/theme/colors';
+import { ProfessorEntryPoint } from '@/components/professor/ProfessorEntryPoint';
+import { colors, primaryGradient } from '@/theme/colors';
 import type { RootStackParamList, RootTabParamList } from '@/navigation/types';
 
 type Nav = BottomTabNavigationProp<RootTabParamList>;
@@ -31,12 +31,11 @@ const ITEMS: MenuItem[] = [
   { route: 'Dex', label: '도감', icon: '📖' },
   { route: 'Camera', label: '촬영', icon: '📷' },
   { route: 'Sound', label: '소리 찾기', icon: '🎙️' },
-  { route: 'Garden', label: '홈 가든', icon: '🌿' },
   { route: 'Rewards', label: '퀘스트', icon: '🏆' },
 ];
 
-/** 메뉴 배경(연녹색 그라데이션) — 포켓몬고 메인 메뉴 톤. */
-const MENU_BG = ['#D8F0C6', '#EFF9E4', '#E2F5D3'] as const;
+/** 메뉴 배경(연녹색 그라데이션) — colors.ts의 공용 primary 그린 워시 톤. */
+const MENU_BG = primaryGradient;
 
 const EMBLEM_SIZE = 72;
 const CIRCLE = 72;
@@ -167,28 +166,10 @@ export function RadialMenu() {
             </Pressable>
           </View>
 
-          <Pressable
+          <ProfessorEntryPoint
             onPress={openProfessor}
-            accessibilityRole="button"
-            accessibilityLabel="도감 박사"
-            style={({ pressed }) => [
-              styles.professorMenu,
-              { top: insets.top + 14 },
-              pressed && styles.pressed,
-            ]}
-          >
-            <View style={styles.professorMenuAvatar}>
-              <Image
-                source={require('../../../assets/professor/dex-professor-avatar.png')}
-                style={styles.professorMenuImage}
-                resizeMode="contain"
-              />
-            </View>
-            <View>
-              <Text style={styles.professorMenuEyebrow}>생태 질문</Text>
-              <Text style={styles.professorMenuTitle}>도감 박사</Text>
-            </View>
-          </Pressable>
+            style={[styles.professorMenu, { top: insets.top + 14 }]}
+          />
 
           {/* 부채꼴로 펼쳐지는 메뉴 항목 — 엠블럼 위치에서 각자의 호 좌표로 날아간다. */}
           {itemLayouts.map(({ item, left, bottom, dx, up }) => {
@@ -262,27 +243,7 @@ const styles = StyleSheet.create({
   professorMenu: {
     position: 'absolute',
     left: 18,
-    minHeight: 54,
-    paddingLeft: 4,
-    paddingRight: 14,
-    borderRadius: 27,
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    borderWidth: 2,
-    borderColor: 'rgba(122,163,113,0.5)',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
   },
-  professorMenuAvatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    overflow: 'hidden',
-    backgroundColor: '#E7F1DF',
-  },
-  professorMenuImage: { width: 44, height: 44 },
-  professorMenuEyebrow: { color: '#7B927C', fontSize: 9, fontWeight: '800' },
-  professorMenuTitle: { color: '#365A3D', fontSize: 14, fontWeight: '900' },
 
   itemWrap: {
     position: 'absolute',
@@ -290,7 +251,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  itemLabel: { fontSize: 14, fontWeight: '800', color: '#3F6340', textAlign: 'center' },
+  itemLabel: { fontSize: 14, fontWeight: '800', color: colors.primaryDark, textAlign: 'center' },
   itemCircle: {
     width: CIRCLE,
     height: CIRCLE,

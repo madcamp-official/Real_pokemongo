@@ -1,7 +1,7 @@
 import type { EmbeddingClient, EmbeddingResult } from "./professorTypes.js";
 
 export class EmbeddingUnavailableError extends Error {
-  constructor(message = "도감 박사 지식 검색을 잠시 사용할 수 없어요.") {
+  constructor(message = "아울 박사 지식 검색을 잠시 사용할 수 없어요.") {
     super(message);
     this.name = "EmbeddingUnavailableError";
   }

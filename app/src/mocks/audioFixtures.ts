@@ -40,6 +40,7 @@ export const mockAudioIdentify: AudioIdentifyResponse = {
       start_ms: 1100,
       end_ms: 5300,
       is_dangerous: false,
+      supported: true,
     },
   ],
   unknown: false,

@@ -164,6 +164,46 @@ test("GET /map/pins: 좌표 없이 확정한 관찰은 핀에 안 나온다", as
   assert.deepEqual(res.json(), []);
 });
 
+test("GET /map/pins: 좌표 없이 최초 발견한 뒤 좌표와 함께 재관찰하면 핀이 뜬다(2026-07-30)", async () => {
+  // 최초 발견 당시 위치 수집이 꺼져 있었다면(게스트 온보딩이 위치 동의 없이 시작하는
+  // 경우 등) 그 종의 핀이 영구히 안 떴다 — CollectionEngine.applyObservation이
+  // 재관찰 시 firstObservationId를 절대 갱신하지 않았기 때문. 나중에 위치를 켜고
+  // 같은 종을 다시 관찰하면 대표 관찰이 갱신돼 핀이 떠야 한다.
+  const { app, server } = await testServer();
+  const { token } = await signupWithUser(server);
+  await observeDandelionAt(app, token, server); // 1차: 좌표 없이 최초 발견
+  await observeDandelionAt(app, token, server, { lat: 37.6, lng: 127.1 }); // 2차: 좌표와 함께 재관찰
+
+  const res = await server.inject({
+    method: "GET",
+    url: "/map/pins",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const pins = res.json();
+  assert.equal(pins.length, 1);
+  assert.equal(pins[0].species_id, "taxon-dandelion");
+  assert.equal(pins[0].lat, 37.6);
+  assert.equal(pins[0].lng, 127.1);
+});
+
+test("GET /map/pins: 이미 좌표가 있으면 재관찰로 덮어쓰지 않는다(최초 발견 위치를 신뢰)", async () => {
+  const { app, server } = await testServer();
+  const { token } = await signupWithUser(server);
+  await observeDandelionAt(app, token, server, { lat: 37.5, lng: 127.0 }); // 1차: 좌표 있음
+  await observeDandelionAt(app, token, server, { lat: 40.0, lng: 130.0 }); // 2차: 다른 좌표로 재관찰
+
+  const res = await server.inject({
+    method: "GET",
+    url: "/map/pins",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  const pins = res.json();
+  assert.equal(pins.length, 1);
+  assert.equal(pins[0].lat, 37.5, "최초 발견 좌표가 유지돼야 한다");
+  assert.equal(pins[0].lng, 127.0);
+});
+
 test("GET /map/pins: 남의 관찰은 안 보인다", async () => {
   const { app, server } = await testServer();
   const { token: tokenA } = await signupWithUser(server);

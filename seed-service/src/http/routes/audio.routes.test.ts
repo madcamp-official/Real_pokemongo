@@ -14,7 +14,7 @@ import { fileURLToPath } from "node:url";
 import { buildApp, type App } from "../../composition.js";
 import { loadConfig, type AppConfig } from "../../config/index.js";
 import { buildHttpServer } from "../server.js";
-import { makeRealAudio, makeRealSpeech } from "../../core/audio/fixtures.js";
+import { makeRealAudio, makeRealSpeech, makeSilence } from "../../core/audio/fixtures.js";
 import { asAudioSightingId, asTaxonId } from "../../core/domain/ids.js";
 import { signMediaToken } from "../../core/media/mediaToken.js";
 import type { SpeciesSoundReference } from "../../core/audio/reference/referenceTypes.js";
@@ -64,6 +64,8 @@ interface UploadFields {
   duration_ms?: string;
   recorded_at?: string;
   mode?: string;
+  lat?: string;
+  lng?: string;
 }
 
 async function buildAudioMultipart(
@@ -206,22 +208,20 @@ test("POST /audio/sightings/upload: 같은 client_recording_id로 재시도하�
   assert.equal(res1.json().audio_sighting_id, res2.json().audio_sighting_id);
 });
 
-test("POST /audio/sightings/upload: 사람 음성이 우세한 녹음은 422 품질 거부(SPEECH_DETECTED)이고 바이트가 저장되지 않는다", async () => {
-  // ACCEPTANCE.md 시나리오 4: "Speech-dominant audio → Rejection; no model inference or
-  // retained user audio" — 라우트 레벨에서 422/rejected/usable=false까지 실제로 확인하고,
-  // AudioUploadService가 storagePath를 안 만든다는 것도(=바이트 미보관) 간접 확인한다
-  // (repo에서 조회해 storagePath가 없는지 직접 보는 건 이 테스트의 범위 밖이라, 응답 계약만
-  // 확인 — 저장 여부 자체는 AudioUploadService.test.ts가 별도로 확인).
+test("POST /audio/sightings/upload: 사람 음성이 우세한 녹음도 200으로 통과하고 동정 단계로 넘어간다(CR-20260729)", async () => {
+  // ACCEPTANCE.md 시나리오 4(2026-07-29 갱신): 더 이상 업로드 단계에서 차단하지 않는다 —
+  // "노이즈(사람 소리 등)가 섞여도 새소리를 인식해야 한다"는 사용자 결정. 오동정 방지는
+  // /audio/identify 쪽 고확신 안전장치(AudioIdentificationGateway)가 담당한다.
   const { server } = await testServer();
   const { token } = await signup(server);
   const audio = await makeRealSpeech("This recording contains a full human sentence, not a bird call.");
   const res = await upload(server, token, audio, defaultFields({ duration_ms: "4000" }), "rec.wav");
-  assert.equal(res.statusCode, 422);
+  assert.equal(res.statusCode, 200);
   const body = res.json();
-  assert.equal(body.status, "rejected");
-  assert.equal(body.quality.usable, false);
-  assert.ok(body.quality.feedback_codes.includes("SPEECH_DETECTED"), JSON.stringify(body.quality));
-  assert.deepEqual(body.quality.valid_segments, []);
+  assert.equal(body.status, "ready");
+  assert.equal(body.quality.usable, true);
+  assert.ok(!body.quality.feedback_codes.includes("SPEECH_DETECTED"), JSON.stringify(body.quality));
+  assert.ok(body.quality.valid_segments.length > 0);
 });
 
 test("POST /audio/sightings/upload: mode가 ambient가 아니면 400 audio_invalid_format", async () => {
@@ -352,9 +352,11 @@ test("POST /audio/identify: 남의 세션은 존재 여부를 안 드러내고 �
 });
 
 test("POST /audio/identify: 품질 거부(rejected)된 세션은 404 not_found(STATE_MACHINE.md — identify 불허)", async () => {
+  // CR-20260729-noisy-audio-reaches-model 이후로는 사람 음성만으로는 더 이상 거부되지
+  // 않으므로(위 테스트 참고), "정말 거부되는" 무음 오디오로 rejected 상태를 재현한다.
   const { server } = await testServer();
   const { token } = await signup(server);
-  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
+  const speech = await makeSilence(4);
   const uploadRes = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
   assert.equal(uploadRes.statusCode, 422); // 사전조건: 정말 거부됐는지
   const sightingId = uploadRes.json().audio_sighting_id as string;
@@ -414,14 +416,14 @@ test("POST /audio/identify: 정상 동정은 200과 계약 형태(candidates/con
   assert.equal(observations.length, 0, "동정만으로는 관찰을 만들면 안 됨");
 });
 
-test("POST /audio/identify: 지원 종이 하나도 안 나오면 200 unknown=true", async () => {
+test("POST /audio/identify: 모든 후보가 low 임계값(0.35) 미만이면 200 unknown=true", async () => {
   const { server, cfg } = await testServer();
   cfg.audio.model.endpoint = "http://fake-birdnet-test";
   const { token } = await signup(server);
   const sightingId = await uploadReadySighting(server, token);
 
   const fakeFetch = fakeBirdNetResponse([
-    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Not A Real Bird", label: "?", score: 0.99 }] },
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.2 }] },
   ]);
   const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
 
@@ -431,6 +433,26 @@ test("POST /audio/identify: 지원 종이 하나도 안 나오면 200 unknown=tr
   assert.equal(body.unknown_reason, "NO_SUPPORTED_BIRD_MATCH");
   assert.equal(body.needs_user_confirmation, false);
   assert.deepEqual(body.candidates, []);
+});
+
+test("POST /audio/identify: CR-20260729-species-outside-db — taxon DB에 없는 종도 supported=false로 노출된다(unknown=false)", async () => {
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+  const sightingId = await uploadReadySighting(server, token);
+
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Sturnus vulgaris", label: "European Starling", score: 0.9 }] },
+  ]);
+  const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
+
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.unknown, false);
+  assert.equal(body.candidates.length, 1);
+  assert.equal(body.candidates[0].species_id, null);
+  assert.equal(body.candidates[0].supported, false);
+  assert.equal(body.candidates[0].common_name_ko, "European Starling");
 });
 
 test("POST /audio/identify: 모델 서비스 오류는 503 audio_processor_unavailable(doc03 '모델 오류는 5xx')", async () => {
@@ -540,9 +562,11 @@ test("POST /audio/identify/confirm: 남의 세션은 같은 404 not_found", asyn
 });
 
 test("POST /audio/identify/confirm: 품질 거부(rejected)된 세션은 404 not_found", async () => {
+  // CR-20260729-noisy-audio-reaches-model 이후로는 사람 음성만으로는 더 이상 거부되지
+  // 않으므로, "정말 거부되는" 무음 오디오로 rejected 상태를 재현한다.
   const { server } = await testServer();
   const { token } = await signup(server);
-  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
+  const speech = await makeSilence(4);
   const uploadRes = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
   assert.equal(uploadRes.statusCode, 422);
   const sightingId = uploadRes.json().audio_sighting_id as string;
@@ -1079,10 +1103,12 @@ test("계약 fixture: upload-success.json과 실제 업로드 응답의 구조�
 });
 
 test("계약 fixture: upload-quality-rejected.json과 실제 거부 응답의 구조가 일치한다", async () => {
+  // CR-20260729-noisy-audio-reaches-model 이후로는 사람 음성만으로는 더 이상 거부되지
+  // 않으므로, "정말 거부되는" 무음 오디오로 이 계약 형태를 검증한다.
   const { server } = await testServer();
   const { token } = await signup(server);
-  const speech = await makeRealSpeech("This is spoken human language, not a bird call at all.");
-  const res = await upload(server, token, speech, defaultFields({ duration_ms: "4000" }), "rec.wav");
+  const silence = await makeSilence(4);
+  const res = await upload(server, token, silence, defaultFields({ duration_ms: "4000" }), "rec.wav");
   assert.equal(res.statusCode, 422);
   assertContractShape(res.json(), loadFixture("upload-quality-rejected.json"), "upload-quality-rejected");
 });
@@ -1122,12 +1148,14 @@ test("계약 fixture: identify-multiple-candidates.json과 실제 동정 응답�
 });
 
 test("계약 fixture: identify-unknown.json과 실제 미지원 응답의 구조가 일치한다", async () => {
+  // CR-20260729-species-outside-db 이후로는 taxon DB에 없는 종도 후보로 노출되므로(unknown이
+  // 아님), 진짜 unknown을 재현하려면 low 임계값(0.35) 미만 점수를 써야 한다.
   const { server, cfg } = await testServer();
   cfg.audio.model.endpoint = "http://fake-birdnet-test";
   const { token } = await signup(server);
   const sightingId = await uploadReadySighting(server, token);
   const fakeFetch = fakeBirdNetResponse([
-    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Not A Real Bird", label: "?", score: 0.99 }] },
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.2 }] },
   ]);
   const res = await withMockedFetch(fakeFetch, () => callIdentify(server, token, sightingId));
   assert.equal(res.statusCode, 200);
@@ -1145,6 +1173,52 @@ test("계약 fixture: confirm-success.json과 실제 확정 응답의 구조가 
   });
   assert.equal(res.statusCode, 200);
   assertContractShape(res.json(), loadFixture("confirm-success.json"), "confirm-success");
+});
+
+test("2026-07-29 버그 수정: 좌표와 함께 소리로 확정한 종이 /map/pins에 뜬다", async () => {
+  // 이전엔 lat/lng을 파싱만 하고 버려서 소리로 확정한 observation엔 preciseCoord가 전혀
+  // 없었고, /map/pins가 좌표 없는 관찰을 걸러내 지도에서 항상 빠졌다(0006 마이그레이션 +
+  // AudioUploadService/recordIdentification 수정으로 해결).
+  const { server, cfg } = await testServer();
+  cfg.audio.model.endpoint = "http://fake-birdnet-test";
+  const { token } = await signup(server);
+
+  const audio = await makeRealAudio({ seconds: 4, format: "wav" });
+  const uploadRes = await upload(
+    server,
+    token,
+    audio,
+    defaultFields({ duration_ms: "4000", lat: "36.36", lng: "127.38" }),
+    "rec.wav",
+  );
+  assert.equal(uploadRes.statusCode, 200);
+  const audioSightingId = uploadRes.json().audio_sighting_id as string;
+
+  const fakeFetch = fakeBirdNetResponse([
+    { start_s: 0, end_s: 3, candidates: [{ sci_name: "Hypsipetes amaurotis", label: "Brown-eared Bulbul", score: 0.87 }] },
+  ]);
+  const identifyRes = await withMockedFetch(fakeFetch, () => callIdentify(server, token, audioSightingId));
+  assert.equal(identifyRes.statusCode, 200);
+  const speciesId = identifyRes.json().candidates[0].species_id as string;
+
+  const confirmRes = await callConfirm(server, token, {
+    audio_sighting_id: audioSightingId,
+    species_id: speciesId,
+    confirmation_id: randomUUID(),
+  });
+  assert.equal(confirmRes.statusCode, 200);
+
+  const pinsRes = await server.inject({
+    method: "GET",
+    url: "/map/pins",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(pinsRes.statusCode, 200);
+  const pins = pinsRes.json() as Array<{ species_id: string; lat: number; lng: number }>;
+  const pin = pins.find((p) => p.species_id === speciesId);
+  assert.ok(pin, "소리로 확정한 종이 지도 핀에 있어야 함: " + JSON.stringify(pins));
+  assert.ok(Math.abs(pin!.lat - 36.36) < 0.001);
+  assert.ok(Math.abs(pin!.lng - 127.38) < 0.001);
 });
 
 test("계약 fixture: similarity-success.json과 실제 채점 응답의 구조가 일치한다", async () => {

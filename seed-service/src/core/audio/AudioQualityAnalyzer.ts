@@ -20,7 +20,16 @@
  * 초기 보정은 합성음/TTS 중심이었지만, 실제 새소리 검증에서 정상적인 한 마리의 복합 배음도
  * "여러 소리 중첩"으로 오탐하는 문제가 확인됐다(직박구리 XC1016816, 2026-07-29).
  * 따라서 두 스펙트럼 피크만으로 중첩을 단정하지 않고, 낮은 SNR까지 함께 나타날 때만
- * MULTIPLE_OVERLAP을 차단 사유로 쓴다. 최종 종 판별은 BirdNET 후보 확신도가 담당한다.
+ * "노이즈 있음"으로 본다.
+ *
+ * (2026-07-29, 사용자 결정) TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP은 더 이상 usable을
+ * 차단하지 않는다 — "노이즈(사람 소리, 바람 소리 등)가 섞여 있어도 새소리를 인식해야 한다"는
+ * 제품 요구에 따라, 신호가 조금이라도 있으면 일단 BirdNET까지 보내고 판단을 맡긴다. 세 조건은
+ * `noisy` 플래그로 남아 AudioIdentificationGateway의 확신도 안전장치(노이즈 입력엔 고확신
+ * 후보만 인정)를 트리거한다 — 오동정 방지 책임을 "업로드 차단"에서 "동정 임계값 강화"로 옮긴
+ * 것이다. TOO_SHORT/MOSTLY_SILENCE/CLIPPED/UNSUPPORTED_SOUND/NO_TARGET_ACTIVITY는 그대로
+ * 차단한다 — 이건 "노이즈 섞인 신호"가 아니라 "애초에 모델에 보낼 신호 자체가 없거나
+ * 새소리로 볼 근거가 없는" 경우라 완화 대상이 아니다.
  */
 import { extractPcm16Mono } from "./pcmUtils.js";
 import { magnitudeSpectrum, nextPow2 } from "./dsp/fft.js";
@@ -159,6 +168,7 @@ export class AudioQualityAnalyzer {
     if (durationMs < MIN_DURATION_MS) {
       return {
         usable: false,
+        noisy: false,
         durationMs,
         activeDurationMs: 0,
         snrDb: null,
@@ -302,28 +312,30 @@ export class AudioQualityAnalyzer {
     }
 
     // --- 판정 취합(순서는 무관 — 최종 출력 시 계약 순서로 재정렬) ---
+    // (2026-07-29, 사용자 결정) TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP은 더 이상 업로드를
+    // 차단하지 않는다 — "노이즈가 섞여 있어도 새소리를 인식해야 한다"는 요구에 따라, 신호가
+    // 조금이라도 있으면 일단 모델(BirdNET)까지 보내고 판단을 맡긴다. 대신 이 세 조건은
+    // `noisy` 플래그로 남겨 AudioIdentificationGateway가 확신도 안전장치(고확신 후보만 인정)를
+    // 적용하는 신호로 쓴다 — 차단 대신 "더 엄격하게 채점"으로 안전장치를 옮긴 것.
     const hit = new Set<AudioFeedbackCode>();
     if (silenceRatio > MOSTLY_SILENCE_RATIO) hit.add("MOSTLY_SILENCE");
     if (clippingRatio > CLIPPING_RATIO_THRESHOLD) hit.add("CLIPPED");
-    if (snrDb !== null && snrDb < TOO_NOISY_SNR_DB_THRESHOLD) hit.add("TOO_NOISY");
-    if (speechRatio > SPEECH_MODULATION_RATIO_THRESHOLD) hit.add("SPEECH_DETECTED");
-    // 실제 한 마리 새소리도 정상적으로 여러 비배음 피크를 낼 수 있다. 스펙트럼 피크가
-    // 여러 개라는 이유만으로 차단하지 않고, 저SNR 복합 신호일 때만 "겹침" 안내를 낸다.
-    if (
-      overlapFrameRatio > OVERLAP_FRAME_RATIO_THRESHOLD &&
-      snrDb !== null &&
-      snrDb < TOO_NOISY_SNR_DB_THRESHOLD
-    ) {
-      hit.add("MULTIPLE_OVERLAP");
-    }
     if (isStationaryTone) hit.add("UNSUPPORTED_SOUND");
     if (!hit.has("MOSTLY_SILENCE") && validSegments.length === 0) hit.add("NO_TARGET_ACTIVITY");
+
+    const tooNoisy = snrDb !== null && snrDb < TOO_NOISY_SNR_DB_THRESHOLD;
+    const speechDetected = speechRatio > SPEECH_MODULATION_RATIO_THRESHOLD;
+    // 실제 한 마리 새소리도 정상적으로 여러 비배음 피크를 낼 수 있다. 스펙트럼 피크가
+    // 여러 개라는 이유만으로는 안 보고, 저SNR 복합 신호일 때만 "겹침"으로 본다.
+    const multipleOverlap = overlapFrameRatio > OVERLAP_FRAME_RATIO_THRESHOLD && tooNoisy;
+    const noisy = tooNoisy || speechDetected || multipleOverlap;
 
     const feedbackCodes = FEEDBACK_CODE_ORDER.filter((c) => hit.has(c));
     const usable = feedbackCodes.length === 0;
 
     return {
       usable,
+      noisy,
       durationMs,
       activeDurationMs,
       snrDb: snrDb === null ? null : Math.round(snrDb * 10) / 10,

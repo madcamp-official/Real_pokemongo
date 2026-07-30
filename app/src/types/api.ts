@@ -96,7 +96,8 @@ export interface AudioSightingUploadResponse {
 }
 
 export interface AudioIdentifyCandidate {
-  species_id: ID;
+  /** CR-20260729-species-outside-db: supported=false면 null(도감 DB 밖 종 — 모델 원시 라벨만 있음). */
+  species_id: ID | null;
   common_name_ko: string;
   scientific_name: string;
   confidence: number;
@@ -104,6 +105,8 @@ export interface AudioIdentifyCandidate {
   start_ms: number;
   end_ms: number;
   is_dangerous: boolean;
+  /** false면 도감에 없는 종 — "기록하기"/"소리 비교하기"를 비활성화해야 한다. */
+  supported: boolean;
 }
 
 export interface AudioIdentifyResponse {
@@ -221,7 +224,7 @@ export interface ProfessorAskResponse {
   related: ProfessorRelatedSpecies[];
   similarity_score: number | null;
   restricted: boolean;
-  response_source: 'indexed_sentence' | 'fixed_safety' | 'unknown';
+  response_source: 'indexed_sentence' | 'fixed_safety' | 'small_talk' | 'unknown';
 }
 export interface ProfessorSuggestion {
   id: string;
@@ -239,40 +242,6 @@ export interface SpeciesPhoto {
   /** API base URL을 붙여야 하는 상대 경로(`/media/:observationId`). */
   url: string;
   taken_at: string; // ISO8601
-}
-
-// ─── F16. 홈 가든 ───────────────────────────────────────
-export type TileType = '잔디' | '물웅덩이' | '흙' | '돌' | '꽃밭';
-
-export interface GardenTile {
-  row: number;
-  col: number;
-  type: TileType;
-}
-export interface Placement {
-  creature_id: ID;
-  species_id: ID;
-  row: number;
-  col: number;
-}
-export interface GardenLayout {
-  tiles: GardenTile[];
-  placements: Placement[];
-}
-/** 분류 그룹(서식지 기반) → 배치 가능한 타일 종류. F6 서식지 데이터와 공유. */
-export type TileCompatibility = Record<TaxonGroup, TileType[]>;
-
-export interface CreatureStatus {
-  creature_id: ID;
-  nickname: string | null;
-  /** 함께한 일수 (기준 데이터는 서버 제공, 최종 표시는 클라이언트 계산 가능) */
-  days_together: number;
-  bond: number;
-  bond_max: number;
-  /** 오늘의 상태 문구 (시간/계절 반영) */
-  status_message: string;
-  /** 마지막 상호작용 후 오래 지나 재회로 판정됐는지 (F9) */
-  is_reunion: boolean;
 }
 
 // ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
@@ -296,17 +265,6 @@ export interface Badge {
   icon: string;
   unlocked: boolean;
   claimed: boolean;
-}
-
-// ─── F9. 친밀도(Bond) 상호작용 ────────────────────────────
-export interface InteractResponse {
-  bond: number;
-  bond_max: number;
-  /** 이번 상호작용으로 Bond 구간이 올라갔는지(모션 풀·장식 해금 트리거) */
-  bond_leveled_up: boolean;
-  reaction_message: string;
-  /** 마지막 상호작용 후 오래 지나 재회로 판정됐는지 */
-  is_reunion: boolean;
 }
 
 // ─── F10. 퀘스트 ──────────────────────────────────────────

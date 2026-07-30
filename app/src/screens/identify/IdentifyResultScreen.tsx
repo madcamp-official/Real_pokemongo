@@ -17,7 +17,7 @@ import { queryClient } from '@/api/queryClient';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { colors, discoveryGradient, alertGradient } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { CreatureArt } from '@/components/species/CreatureArt';
+import { GardenCreatureArt } from '@/components/species/GardenCreatureArt';
 import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'IdentifyResult'>;
@@ -33,7 +33,8 @@ type Tone = 'discovery' | 'alert';
  * 신뢰도에 따라 "새로운 친구를 발견했어요!" 축하 연출 또는 "어떤 모습에 가까운가요?"
  * 후보 선택. 위험 생물이면 종 카드(안전 수칙 최상단)를 우선 노출한다.
  *
- * 작명은 이 화면에서 하지 않는다 — 홈 가든(F16)의 개체 상태 시트가 담당한다.
+ * 개체 작명(F16 `/creatures/:id/name`)은 이 모바일 앱에는 UI가 없다 — 3D 홈 가든
+ * 클라이언트가 같은 백엔드 엔드포인트를 통해 별도로 담당한다.
  */
 export default function IdentifyResultScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();
@@ -127,7 +128,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
           <Text style={styles.eyebrowDanger}>⚠️ CAREFUL ⚠️</Text>
           <Text style={styles.title}>조심해야 할{'\n'}친구예요</Text>
           <Halo tint={colors.dangerBg}>
-            <CreatureArt speciesId={top.species_id} size={124} />
+            <GardenCreatureArt speciesId={top.species_id} size={124} />
           </Halo>
           <Text style={styles.speciesName}>{nameOf(top.species_id)}일 수 있어요</Text>
           <Text style={styles.subText}>가까이 가기 전에 안전 정보를 먼저 확인해요.</Text>
@@ -153,7 +154,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
                   onPress={() => void confirmAndOpen(c.species_id)}
                 >
                   <View style={[styles.candidateThumb, { backgroundColor: getPastel(v.pastel) }]}>
-                    <CreatureArt speciesId={c.species_id} size={38} />
+                    <GardenCreatureArt speciesId={c.species_id} size={38} />
                   </View>
                   <Text style={styles.candidateName}>{nameOf(c.species_id)}</Text>
                   <Text style={styles.candidatePct}>{Math.round(c.confidence * 100)}%</Text>
@@ -171,7 +172,7 @@ export default function IdentifyResultScreen({ navigation, route }: Props) {
           <Text style={styles.eyebrow}>✦ NEW FRIEND ✦</Text>
           <Text style={styles.title}>새로운 친구를{'\n'}발견했어요!</Text>
           <Halo tint={getPastel(visual.pastel)}>
-            <CreatureArt speciesId={top.species_id} size={124} />
+            <GardenCreatureArt speciesId={top.species_id} size={124} />
           </Halo>
           <Text style={styles.speciesName}>{nameOf(top.species_id)}</Text>
           <View style={styles.confidenceChip}>
@@ -272,7 +273,7 @@ function SecondaryButton({ label, onPress }: { label: string; onPress: () => voi
 function Loading({ title }: { title: string }) {
   return (
     <View style={styles.centerBox}>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={colors.accent} />
       <Text style={styles.subText}>{title}</Text>
     </View>
   );
@@ -325,7 +326,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     fontSize: 13,
     fontWeight: '800',
-    color: colors.primary,
+    color: colors.accent,
     letterSpacing: 2.5,
   },
   eyebrowDanger: {
@@ -378,26 +379,26 @@ const styles = StyleSheet.create({
 
   actions: { width: '100%', gap: 12, marginTop: 14 },
   primaryBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     paddingVertical: 17,
     borderRadius: 26,
     alignItems: 'center',
-    shadowColor: colors.primaryDark,
+    shadowColor: colors.accentDark,
     shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
-  primaryBtnText: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
+  primaryBtnText: { color: colors.onAccent, fontSize: 17, fontWeight: '800' },
   secondaryBtn: {
     paddingVertical: 16,
     borderRadius: 26,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: colors.accent,
     backgroundColor: 'rgba(255,255,255,0.55)',
   },
-  secondaryBtnText: { color: colors.primary, fontSize: 16, fontWeight: '800' },
+  secondaryBtnText: { color: colors.accent, fontSize: 16, fontWeight: '800' },
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
 
   dot: { position: 'absolute' },

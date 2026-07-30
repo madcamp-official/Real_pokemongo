@@ -1,5 +1,5 @@
 import { Image, type ImageSourcePropType } from 'react-native';
-import { GardenCreatureArt, getGardenCreatureImageSource } from '@/components/garden/GardenCreatureArt';
+import { GardenCreatureArt, getGardenCreatureImageSource } from '@/components/species/GardenCreatureArt';
 import { UnknownSpeciesSilhouette } from '@/components/dex/UnknownSpeciesSilhouette';
 import type { TaxonGroup } from '@/types/api';
 

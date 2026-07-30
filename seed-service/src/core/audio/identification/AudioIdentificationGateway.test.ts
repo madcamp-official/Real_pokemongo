@@ -1,7 +1,8 @@
 /**
  * 골든 테스트: 오디오 동정 게이트웨이.
  * 핵심 불변식(doc03 9장 + docs/audio/API_CONTRACT.md §2):
- *  - taxon으로 안 풀리는 종(미지원 모델 종)은 후보에서 제외된다.
+ *  - taxon으로 안 풀리는 종(미지원 모델 종)도 CR-20260729-species-outside-db 이후로는
+ *    후보에서 제외되지 않는다 — 대신 supported=false/speciesId=null로 노출된다.
  *  - low 임계값(0.35) 미만은 후보로도 안 보여준다.
  *  - 최대 3개까지만 보여준다.
  *  - 위험 태그가 있는 taxon이면 그 후보만 is_dangerous=true.
@@ -97,7 +98,7 @@ test("여러 후보: medium/low가 함께 노출된다(사진과 달리 low도 �
   assert.equal(outcome.candidates[1]!.confidenceLevel, "low");
 });
 
-test("미지원 모델 종(taxon으로 안 풀림)은 확정 후보에서 제외된다", async () => {
+test("CR-20260729-species-outside-db: taxon으로 안 풀리는 종도 후보로 나오지만 supported=false/speciesId=null", async () => {
   const taxa = await seededTaxa();
   const provider = makeProvider({
     candidates: [cand("Sturnus vulgaris", 0.9), cand("Hypsipetes amaurotis", 0.5)],
@@ -106,8 +107,16 @@ test("미지원 모델 종(taxon으로 안 풀림)은 확정 후보에서 제외
   const gateway = new AudioIdentificationGateway(provider, taxa);
   const outcome = await gateway.identify(Buffer.from("x"));
 
-  assert.equal(outcome.candidates.length, 1, "지원 안 하는 Sturnus vulgaris는 빠져야 함");
-  assert.equal(outcome.candidates[0]!.scientificName, "Hypsipetes amaurotis");
+  assert.equal(outcome.candidates.length, 2, "둘 다 후보로 나와야 함");
+  const unsupported = outcome.candidates.find((c) => c.scientificName === "Sturnus vulgaris");
+  assert.ok(unsupported, "미지원 종도 후보에 있어야 함");
+  assert.equal(unsupported!.supported, false);
+  assert.equal(unsupported!.speciesId, null);
+
+  const supported = outcome.candidates.find((c) => c.scientificName === "Hypsipetes amaurotis");
+  assert.ok(supported);
+  assert.equal(supported!.supported, true);
+  assert.ok(supported!.speciesId);
 });
 
 test("low 임계값(0.35) 미만은 후보에 안 들어간다", async () => {

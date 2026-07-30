@@ -24,6 +24,7 @@ import {
   type UploadAudioSightingParams,
 } from '@/api/audio';
 import { requestLocationAndGet } from '@/services/location';
+import { maybePromptLocationCollection } from '@/services/locationCollectionPrompt';
 import { deleteRecordedAudio } from '@/services/audioStorage';
 import { MAX_AUDIO_DURATION_MS, MIN_AUDIO_DURATION_MS, useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -204,7 +205,10 @@ export default function SoundScreen() {
       }
 
       setWorkflow('local_checking');
-      const coord = locationCollectionEnabled ? await requestLocationAndGet() : null;
+      // 첫 녹음에 한해 위치 수집 여부를 인라인으로 한 번 물어본다(2026-07-30) —
+      // useCapture.ts의 촬영 흐름과 동일한 이유(게스트 온보딩은 위치 동의를 안 거침).
+      const shouldCollectLocation = locationCollectionEnabled || (await maybePromptLocationCollection());
+      const coord = shouldCollectLocation ? await requestLocationAndGet() : null;
       const uploadInput: UploadAudioSightingParams = {
         uri: recording.uri,
         clientRecordingId: createId('audio'),
@@ -256,7 +260,7 @@ export default function SoundScreen() {
   }, [interrupted, workflow]);
 
   const confirmSelected = async () => {
-    if (!audioSightingId || !selectedCandidate) return;
+    if (!audioSightingId || !selectedCandidate?.species_id) return;
     if (!confirmationId.current) confirmationId.current = createId('confirmation');
     setWorkflow('confirming');
     try {
@@ -273,7 +277,7 @@ export default function SoundScreen() {
   };
 
   const scoreSelected = async () => {
-    if (!audioSightingId || !selectedCandidate) return;
+    if (!audioSightingId || !selectedCandidate?.species_id) return;
     setWorkflow('scoring');
     try {
       const result = await scoreAudioSimilarity(audioSightingId, selectedCandidate.species_id);
@@ -396,7 +400,7 @@ export default function SoundScreen() {
             title={`${selectedCandidate.common_name_ko}을(를) 기록했어요!`}
             description="소리로 만난 친구가 도감에 추가되었어요."
             actionLabel="탐험 지도로 돌아가기"
-            onAction={() => navigation.navigate('Map')}
+            onAction={leave}
           />
         )}
       </ScrollView>
@@ -496,10 +500,11 @@ function ResultPanel({
       <Text style={styles.description}>가장 비슷한 후보를 골라 확인해 주세요.</Text>
       <View style={styles.candidates}>
         {result.candidates.map((candidate) => {
-          const active = selected?.species_id === candidate.species_id;
+          const key = candidateKey(candidate);
+          const active = selected !== null && candidateKey(selected) === key;
           return (
             <Pressable
-              key={candidate.species_id}
+              key={key}
               onPress={() => onSelect(candidate)}
               style={[styles.candidate, active && styles.candidateActive]}
               accessibilityRole="button"
@@ -511,6 +516,9 @@ function ResultPanel({
                 <Text style={styles.candidateName}>{candidate.common_name_ko}</Text>
                 <Text style={styles.scientificName}>{candidate.scientific_name}</Text>
                 <Text style={styles.segmentText}>{formatTime(candidate.start_ms)}부터 들렸어요</Text>
+                {!candidate.supported && (
+                  <Text style={styles.unsupportedNote}>아직 도감에 없는 종이에요 · 기록은 안 돼요</Text>
+                )}
               </View>
               <Text style={styles.confidence}>{candidate.confidence_level === 'high' ? '높음' : candidate.confidence_level === 'medium' ? '보통' : '낮음'}</Text>
             </Pressable>
@@ -528,13 +536,23 @@ function ResultPanel({
       )}
 
       <View style={styles.actions}>
-        <PrimaryButton label="이 종으로 기록하기" onPress={onConfirm} />
-        <SecondaryButton label="소리 비교하기" onPress={onScore} />
-        {selected && <ReferenceSoundButton speciesId={selected.species_id} />}
+        {selected && !selected.supported && (
+          <Text style={styles.unsupportedNote}>
+            이 종은 아직 저희 도감에 없어요. 곧 추가될 예정이에요! 지금은 기록·소리 비교를 할 수 없어요.
+          </Text>
+        )}
+        <PrimaryButton label="이 종으로 기록하기" onPress={onConfirm} disabled={!selected?.supported} />
+        <SecondaryButton label="소리 비교하기" onPress={onScore} disabled={!selected?.supported} />
+        {selected?.supported && selected.species_id && <ReferenceSoundButton speciesId={selected.species_id} />}
         <Pressable onPress={onRetry} style={styles.retryButton}><Text style={styles.retryText}>다시 녹음</Text></Pressable>
       </View>
     </View>
   );
+}
+
+/** species_id가 없는(도감 미지원) 후보끼리도 구분되는 안정적인 키. */
+function candidateKey(candidate: AudioIdentifyCandidate): string {
+  return candidate.species_id ?? `unsupported:${candidate.scientific_name}`;
 }
 
 /** 참조 음원만 재생한다. 사용자 녹음은 앱에서 재생·영구 보관하지 않는다. */
@@ -615,12 +633,48 @@ function LoadingOverlay({ visible, label }: { visible: boolean; label: string })
   );
 }
 
-function PrimaryButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return <Pressable onPress={onPress} style={styles.primaryButton} accessibilityRole="button"><Text style={styles.primaryText}>{label}</Text></Pressable>;
+function PrimaryButton({
+  label,
+  onPress,
+  disabled = false,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={[styles.primaryButton, disabled && styles.buttonDisabled]}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+    >
+      <Text style={styles.primaryText}>{label}</Text>
+    </Pressable>
+  );
 }
 
-function SecondaryButton({ label, onPress }: { label: string; onPress: () => void }) {
-  return <Pressable onPress={onPress} style={styles.secondaryButton} accessibilityRole="button"><Text style={styles.secondaryText}>{label}</Text></Pressable>;
+function SecondaryButton({
+  label,
+  onPress,
+  disabled = false,
+}: {
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      disabled={disabled}
+      style={[styles.secondaryButton, disabled && styles.buttonDisabled]}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
+    >
+      <Text style={styles.secondaryText}>{label}</Text>
+    </Pressable>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -645,6 +699,8 @@ const styles = StyleSheet.create({
   primaryText: { color: colors.onPrimary, fontSize: 16, fontWeight: '900' },
   secondaryButton: { alignSelf: 'stretch', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 2, borderColor: colors.primary, borderRadius: 24, paddingVertical: 14, paddingHorizontal: 18 },
   secondaryText: { color: colors.primary, fontSize: 15, fontWeight: '900' },
+  buttonDisabled: { opacity: 0.4 },
+  unsupportedNote: { color: colors.textMuted, fontSize: 12, lineHeight: 17, textAlign: 'center' },
   recordingLabel: { color: colors.dangerText, fontSize: 16, fontWeight: '900' },
   timer: { fontSize: 42, fontWeight: '900', color: colors.textPrimary, fontVariant: ['tabular-nums'] },
   meterTrack: { alignSelf: 'stretch', height: 14, overflow: 'hidden', borderRadius: 7, backgroundColor: colors.progressTrack },
@@ -654,7 +710,7 @@ const styles = StyleSheet.create({
   stopHint: { color: colors.textSecondary, fontSize: 13, fontWeight: '700' },
   candidates: { gap: 10 },
   candidate: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, padding: 14, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
-  candidateActive: { borderColor: colors.primary, backgroundColor: '#FFF5F0' },
+  candidateActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
   candidateEmoji: { fontSize: 30 },
   candidateText: { flex: 1, gap: 2 },
   candidateName: { color: colors.textPrimary, fontSize: 16, fontWeight: '900' },

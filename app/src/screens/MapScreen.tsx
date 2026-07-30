@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View, useWindowDimensions } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation, useFocusEffect } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
@@ -10,6 +10,7 @@ import { fetchMapPins, fetchExploredRegions } from '@/api/map';
 import { fetchDex } from '@/api/dex';
 import { KakaoMapView, type KakaoMapViewHandle } from '@/components/map/KakaoMapView';
 import { RadialMenu } from '@/components/nav/RadialMenu';
+import { ProfessorEntryPoint } from '@/components/professor/ProfessorEntryPoint';
 import { PinDetailSheet } from '@/components/map/PinDetailSheet';
 import {
   requestLocationAndGet,
@@ -33,6 +34,7 @@ const HOME_ZONE_RADIUS_M = 300;
  */
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
   const navigation = useNavigation<BottomTabNavigationProp<RootTabParamList>>();
   const mapRef = useRef<KakaoMapViewHandle>(null);
   const hasInitiallyCentered = useRef(false);
@@ -278,38 +280,25 @@ export default function MapScreen() {
         locations={[0, 0.44, 1]}
         style={styles.bottomWash}
       />
-      <View pointerEvents="none" style={[styles.nearbySummary, { bottom: insets.bottom + 21 }]}>
-        <View style={styles.scaleRow}>
-          <View style={styles.scaleLine} />
-          <Text style={styles.scaleText}>100m</Text>
-        </View>
+      <View
+        pointerEvents="none"
+        style={[
+          styles.nearbySummary,
+          // RadialMenu의 엠블럼 버튼이 화면 정중앙(지름 72dp)에 항상 떠 있어서,
+          // 텍스트가 길어지면 오른쪽 끝이 그 버튼(zIndex 20) 아래로 들어가 가려진다.
+          // 버튼 왼쪽 가장자리보다 14dp 여유를 두는 폭으로 제한해 겹치지 않게 한다.
+          { bottom: insets.bottom + 21, maxWidth: width / 2 - 76 },
+        ]}
+      >
         <Text style={styles.nearbyEyebrow}>{selectedGroup === '전체' ? locationLabel : `${selectedGroup} 관찰`}</Text>
         <Text style={styles.nearbyTitle}>내 주변 관찰 {visiblePins.length}건</Text>
       </View>
 
       {/* 앱 첫 화면에서도 새 기능을 바로 찾을 수 있는 상시 진입점. */}
-      <Pressable
+      <ProfessorEntryPoint
         onPress={openProfessor}
-        accessibilityRole="button"
-        accessibilityLabel="도감 박사에게 질문하기"
-        style={({ pressed }) => [
-          styles.professorShortcut,
-          { bottom: insets.bottom + 112 },
-          pressed && styles.professorShortcutPressed,
-        ]}
-      >
-        <View style={styles.professorShortcutAvatar}>
-          <Image
-            source={require('../../assets/professor/dex-professor-avatar.png')}
-            style={styles.professorShortcutImage}
-            resizeMode="contain"
-          />
-        </View>
-        <View>
-          <Text style={styles.professorShortcutEyebrow}>궁금한 게 있나요?</Text>
-          <Text style={styles.professorShortcutTitle}>도감 박사</Text>
-        </View>
-      </Pressable>
+        style={[styles.professorShortcut, { bottom: insets.bottom + 112 }]}
+      />
 
       <RadialMenu />
 
@@ -328,7 +317,7 @@ export default function MapScreen() {
 const INK = '#201E1D';
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#E4EBDA' },
+  root: { flex: 1, backgroundColor: colors.background },
 
   topWash: { position: 'absolute', top: 0, left: 0, right: 0 },
   topLeft: { position: 'absolute', left: 26, alignItems: 'flex-start', gap: 9 },
@@ -347,7 +336,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   chipText: { fontSize: 15, fontWeight: '700', color: '#4B5248' },
-  chipAccent: { color: '#E7553D', fontWeight: '900' },
+  chipAccent: { color: colors.accent, fontWeight: '900' },
   emptyHint: {
     fontSize: 11,
     fontWeight: '700',
@@ -420,9 +409,6 @@ const styles = StyleSheet.create({
 
   bottomWash: { position: 'absolute', left: 0, right: 0, bottom: 0, height: 220 },
   nearbySummary: { position: 'absolute', left: 26, gap: 5 },
-  scaleRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginBottom: 8 },
-  scaleLine: { width: 66, height: 2, backgroundColor: '#252523' },
-  scaleText: { fontSize: 12, fontWeight: '800', color: '#555652' },
   nearbyEyebrow: { fontSize: 12, fontWeight: '800', letterSpacing: 0.2, color: '#667062' },
   nearbyTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.35, color: INK },
 
@@ -430,32 +416,5 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 18,
     zIndex: 19,
-    minHeight: 58,
-    borderRadius: 29,
-    paddingLeft: 5,
-    paddingRight: 15,
-    backgroundColor: 'rgba(255,255,255,0.96)',
-    borderWidth: 2,
-    borderColor: '#D7E6CE',
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-    shadowColor: '#30452D',
-    shadowOpacity: 0.18,
-    shadowRadius: 10,
-    shadowOffset: { width: 0, height: 5 },
-    elevation: 6,
   },
-  professorShortcutPressed: { opacity: 0.82, transform: [{ scale: 0.97 }] },
-  professorShortcutAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    overflow: 'hidden',
-    backgroundColor: '#E8F2DF',
-  },
-  professorShortcutImage: { width: 48, height: 48 },
-  professorShortcutEyebrow: { color: '#819084', fontSize: 9, fontWeight: '800' },
-  professorShortcutTitle: { color: '#31563F', fontSize: 14, fontWeight: '900', marginTop: 1 },
-
 });

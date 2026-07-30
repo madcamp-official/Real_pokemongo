@@ -20,7 +20,11 @@ import type { ConfidenceTier } from "../../identification/confidencePolicy.js";
 export type AudioConfidenceLevel = Exclude<ConfidenceTier, "unknown">;
 
 export interface AudioIdentificationCandidate {
-  speciesId: TaxonId;
+  /** CR-20260729-species-outside-db: BirdNET이 우리 taxon DB(18종)에 없는 종을 맞히면
+   * speciesId는 null이고 supported=false다 — 실제 taxon 레코드(안전 정보 포함)가 없어
+   * 도감 등록(confirm)·유사도 채점을 할 수 없기 때문. commonNameKo는 이 경우 모델의
+   * 영문 라벨을 그대로 쓴다(한국어 이름을 지어내지 않는다). */
+  speciesId: TaxonId | null;
   commonNameKo: string;
   scientificName: string;
   confidence: number;
@@ -29,6 +33,9 @@ export interface AudioIdentificationCandidate {
   startMs: number;
   endMs: number;
   isDangerous: boolean;
+  /** false면 taxon DB에 없는 종 — 클라이언트는 "이 종으로 기록하기"/"소리 비교하기"를
+   * 비활성화해야 한다(서버도 confirm/similarity 양쪽에서 독립적으로 다시 막는다). */
+  supported: boolean;
 }
 
 export type AudioUnknownReason = "NO_SUPPORTED_BIRD_MATCH";

@@ -9,7 +9,8 @@
       "confidence_level": "high",
       "start_ms": 1100,
       "end_ms": 5300,
-      "is_dangerous": false
+      "is_dangerous": false,
+      "supported": true
     }
   ],
   "unknown": false,

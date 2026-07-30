@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import type { RootStackParamList } from '@/navigation/types';
+import { colors } from '@/theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Tutorial'>;
 
@@ -87,31 +88,31 @@ export default function TutorialScreen({ navigation }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F7F9F4', paddingTop: 60 },
+  root: { flex: 1, backgroundColor: colors.background, paddingTop: 60 },
   skip: { position: 'absolute', top: 56, right: 20, zIndex: 1 },
-  skipText: { color: '#8A9880', fontSize: 14, fontWeight: '600' },
+  skipText: { color: colors.textSecondary, fontSize: 14, fontWeight: '600' },
   content: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32 },
   emoji: { fontSize: 64, marginBottom: 20 },
-  title: { fontSize: 22, fontWeight: '800', color: '#2E3A24', marginBottom: 12, textAlign: 'center' },
-  desc: { fontSize: 15, color: '#6B7A5E', textAlign: 'center', lineHeight: 22 },
+  title: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, marginBottom: 12, textAlign: 'center' },
+  desc: { fontSize: 15, color: colors.textSecondary, textAlign: 'center', lineHeight: 22 },
   demoBox: { marginTop: 28, width: '100%', alignItems: 'center' },
   demoPermButton: {
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingHorizontal: 20,
     paddingVertical: 12,
     borderRadius: 20,
   },
-  demoPermText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  demoPermText: { color: colors.onPrimary, fontSize: 14, fontWeight: '700' },
   demoCamera: { width: 220, height: 220, borderRadius: 20, overflow: 'hidden' },
   footer: { padding: 24, gap: 20 },
   dots: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#D7E0CC' },
-  dotActive: { backgroundColor: '#5B8C3E', width: 20 },
+  dot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.border },
+  dotActive: { backgroundColor: colors.primary, width: 20 },
   nextButton: {
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 24,
     alignItems: 'center',
   },
-  nextText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  nextText: { color: colors.onPrimary, fontSize: 16, fontWeight: '800' },
 });

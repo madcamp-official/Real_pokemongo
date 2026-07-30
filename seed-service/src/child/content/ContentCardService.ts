@@ -24,7 +24,7 @@ export interface SpeciesContent {
   knowledgeFacts?: Array<{
     fieldType: Extract<
       ProfessorFieldType,
-      "diet" | "sound" | "season" | "observation"
+      "diet" | "sound" | "season" | "observation" | "similar"
     >;
     sentence: string;
   }>;

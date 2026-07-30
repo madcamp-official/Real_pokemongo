@@ -37,6 +37,7 @@ export async function loadKnowledgeVectorDocument(
       !expected ||
       seen.has(record.chunk_id) ||
       record.sentence !== expected.sentence ||
+      record.answer !== expected.answer ||
       record.species_id !== expected.species_id ||
       record.field_type !== expected.field_type ||
       record.is_safety !== expected.is_safety ||

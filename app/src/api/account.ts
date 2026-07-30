@@ -8,7 +8,11 @@ export interface PrivacySettings {
   photo: boolean;
 }
 
-/** 기기 변경/재설치 후 도감·홈가든 배치 등 계정 데이터를 서버에서 복원한다. */
+/**
+ * 기기 변경/재설치 후 계정 데이터를 서버에서 복원한다.
+ * 응답의 `garden_layout_present`는 서버(3D 홈가든 등 다른 클라이언트)가 정원 배치를
+ * 갖고 있는지 여부일 뿐, 이 모바일 앱은 홈가든 UI가 없어 값을 읽지 않는다.
+ */
 export async function fetchRestoreBundle(): Promise<RestoreBundleResponse> {
   const { data } = await apiClient.get<RestoreBundleResponse>('/account/restore-bundle');
   return data;

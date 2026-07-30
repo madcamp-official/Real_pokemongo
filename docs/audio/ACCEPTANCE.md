@@ -20,7 +20,7 @@
 | 1 | 8-second bird recording | Upload succeeds and candidates are displayed |
 | 2 | 2-second recording | App stops before upload and asks for 3 seconds or more |
 | 3 | Mostly silent audio | Quality rejection; no observation or reward |
-| 4 | Speech-dominant audio | Rejection; no model inference or retained user audio |
+| 4 | Speech-dominant audio | Upload succeeds (not rejected); model inference proceeds, but only `high`-confidence candidates are accepted (CR-20260729-noisy-audio-reaches-model) |
 | 5 | Candidate result without confirmation | No dex, map, quest, or reward mutation |
 | 6 | Valid confirmation | One `audio` observation and one reward result |
 | 7 | Confirmation repeated three times | Exactly one observation and one reward |

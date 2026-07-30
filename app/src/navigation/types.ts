@@ -7,7 +7,6 @@ export type RootTabParamList = {
   Camera: undefined; // F2 촬영
   Sound: undefined; // Audio MVP 소리 찾기
   Dex: undefined; // F5 도감
-  Garden: undefined; // F16 홈 가든
   Map: undefined; // F11 지도 & 탐험 기록
   Rewards: undefined; // F8/F10 보상함(배지·퀘스트)
   Settings: undefined; // F18 설정
@@ -23,6 +22,8 @@ export type RootStackParamList = {
   Login: undefined;
   Consent: { mode: AuthFlowMode };
   Signup: { mode: AuthFlowMode; consent: ConsentPayload };
+  /** 신규 가입 직후 1회 재생되는 "아울 박사" 인트로 컷씬. */
+  Intro: undefined;
   // ── 메인 앱 ──────────────────────────────────────────
   Main: undefined;
   // ── 상세 (F4/F6) ─────────────────────────────────────

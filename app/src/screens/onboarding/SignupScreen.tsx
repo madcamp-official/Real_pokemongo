@@ -13,6 +13,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { signup, convertGuestSession } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
+import { colors } from '@/theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Signup'>;
 
@@ -66,7 +67,12 @@ export default function SignupScreen({ navigation, route }: Props) {
       }
 
       completeOnboarding();
-      navigation.reset({ index: 0, routes: [{ name: 'Main' }] });
+      // 게스트 전환은 이미 탐험을 경험한 사용자라 인트로 없이 바로 메인으로 보낸다.
+      // 신규 가입만 "아울 박사" 인트로 컷씬을 한 번 거친다.
+      navigation.reset({
+        index: 0,
+        routes: [{ name: mode === 'convert' ? 'Main' : 'Intro' }],
+      });
     } catch {
       Alert.alert('계정 생성 실패', '잠시 후 다시 시도해 주세요.');
     } finally {
@@ -87,7 +93,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         <TextInput
           style={styles.input}
           placeholder="이메일"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           autoCapitalize="none"
           keyboardType="email-address"
           value={email}
@@ -96,7 +102,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         <TextInput
           style={styles.input}
           placeholder="비밀번호 (8자 이상)"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -104,7 +110,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         <TextInput
           style={styles.input}
           placeholder="비밀번호 확인"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={passwordConfirm}
           onChangeText={setPasswordConfirm}
@@ -112,7 +118,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         <TextInput
           style={styles.input}
           placeholder="닉네임"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           value={nickname}
           onChangeText={setNickname}
           maxLength={12}
@@ -138,7 +144,7 @@ export default function SignupScreen({ navigation, route }: Props) {
         disabled={!isValid || submitting}
       >
         {submitting ? (
-          <ActivityIndicator color="#fff" />
+          <ActivityIndicator color={colors.onPrimary} />
         ) : (
           <Text style={styles.submitText}>
             {mode === 'convert' ? '완료하고 기록 이어가기' : '탐험 시작하기'}
@@ -150,41 +156,41 @@ export default function SignupScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flexGrow: 1, backgroundColor: '#F7F9F4', padding: 24, justifyContent: 'center', gap: 16 },
-  title: { fontSize: 22, fontWeight: '800', color: '#2E3A24' },
-  desc: { fontSize: 14, color: '#6B7A5E', lineHeight: 20, marginBottom: 4 },
+  root: { flexGrow: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'center', gap: 16 },
+  title: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
+  desc: { fontSize: 14, color: colors.textSecondary, lineHeight: 20, marginBottom: 4 },
   form: { gap: 12 },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: '#E4EFD8',
-    color: '#2E3A24',
+    borderColor: colors.primaryLight,
+    color: colors.textPrimary,
   },
-  sectionLabel: { fontSize: 13, fontWeight: '700', color: '#6B7A5E', marginTop: 4 },
+  sectionLabel: { fontSize: 13, fontWeight: '700', color: colors.textSecondary, marginTop: 4 },
   avatarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
   avatarChip: {
     width: 52,
     height: 52,
     borderRadius: 26,
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderWidth: 2,
-    borderColor: '#E4EFD8',
+    borderColor: colors.primaryLight,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarChipActive: { borderColor: '#5B8C3E', backgroundColor: '#E4EFD8' },
+  avatarChipActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
   avatarEmoji: { fontSize: 24 },
   submitButton: {
     marginTop: 12,
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 24,
     alignItems: 'center',
   },
   disabled: { opacity: 0.5 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  submitText: { color: colors.onPrimary, fontSize: 16, fontWeight: '800' },
 });

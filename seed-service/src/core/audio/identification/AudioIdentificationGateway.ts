@@ -36,28 +36,65 @@ export class AudioIdentificationGateway {
   /**
    * wavBytes를 분석해 판정 결과를 낸다. 프로바이더 미설정/네트워크 실패/5xx는 그대로 throw한다
    * (위 파일 주석 참고 — 호출부가 503으로 매핑).
+   *
+   * `noisy`(CR-20260729-noisy-audio-reaches-model): 업로드 단계 품질 게이트가 더 이상
+   * TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP를 차단하지 않는 대신, 그 신호를 여기로 넘겨
+   * 오동정 안전장치로 쓴다 — 노이즈가 섞인 입력이면 `high` 확신도 후보만 인정하고
+   * medium/low는 버린다(깨끗한 입력보다 더 엄격한 잣대). 이렇게 해야 "모델한테는 기회를
+   * 주되, 애매한 확신도로 잘못된 종을 단정하지는 않는다"는 절충이 성립한다.
+   *
+   * `supported`(CR-20260729-species-outside-db): taxon DB(18종)에 없는 종도 이제 후보로
+   * 노출한다(모델이 실제로 뭐라고 답하는지 숨기지 않는다) — 대신 speciesId=null,
+   * supported=false로 표시해 도감 등록(confirm)·유사도 채점은 못 하게 막는다. taxon이 있는
+   * 경우와 없는 경우 둘 다 같은 확신도/노이즈 규칙을 적용한다.
    */
-  async identify(wavBytes: Buffer): Promise<AudioIdentificationOutcome> {
+  async identify(wavBytes: Buffer, opts: { noisy?: boolean } = {}): Promise<AudioIdentificationOutcome> {
     const raw = await this.provider.analyze(wavBytes);
+    console.error(
+      "[audio identify] raw candidates=",
+      JSON.stringify(raw.candidates.map((c) => ({ sciName: c.sciName, label: c.label, score: c.score }))),
+    );
 
     const resolved: AudioIdentificationCandidate[] = [];
     for (const c of raw.candidates) {
       const taxon = await this.taxa.findBySciName(c.sciName);
-      if (!taxon) continue; // "미지원 모델 종은 확정 후보에서 제외"
 
       const tier = classifyConfidence(c.score, this.thresholds);
-      if (tier === "unknown") continue; // low 임계값(0.35) 미만은 후보로도 안 보여줌
+      if (tier === "unknown") {
+        continue; // low 임계값(0.35) 미만은 후보로도 안 보여줌
+      }
+      if (opts.noisy && tier !== "high") {
+        continue; // 노이즈 섞인 입력은 high(0.85 이상)만 인정 — 오동정 안전장치
+      }
 
-      resolved.push({
-        speciesId: taxon.id,
-        commonNameKo: taxon.korName,
-        scientificName: taxon.sciName,
-        confidence: c.score,
-        confidenceLevel: tier,
-        startMs: c.startMs,
-        endMs: c.endMs,
-        isDangerous: this.safety.evaluate(taxon) !== null,
-      });
+      resolved.push(
+        taxon
+          ? {
+              speciesId: taxon.id,
+              commonNameKo: taxon.korName,
+              scientificName: taxon.sciName,
+              confidence: c.score,
+              confidenceLevel: tier,
+              startMs: c.startMs,
+              endMs: c.endMs,
+              isDangerous: this.safety.evaluate(taxon) !== null,
+              supported: true,
+            }
+          : {
+              speciesId: null,
+              commonNameKo: c.label,
+              scientificName: c.sciName,
+              confidence: c.score,
+              confidenceLevel: tier,
+              startMs: c.startMs,
+              endMs: c.endMs,
+              // 안전 정보가 없는 미지원 종을 함부로 "안전"으로 단정하지 않는다 — 위험 여부
+              // 미상은 UI가 별도로 "아직 확인되지 않음"으로 안내해야 한다(taxon 있는 종만
+              // SafetyFilter로 실제 판정).
+              isDangerous: false,
+              supported: false,
+            },
+      );
     }
 
     // 프로바이더가 이미 score 내림차순으로 줬지만, taxon 필터링으로 순서가 흔들릴 일은 없어도

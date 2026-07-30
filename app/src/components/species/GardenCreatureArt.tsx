@@ -3,24 +3,21 @@ import { CreatureArt } from '@/components/species/CreatureArt';
 import {
   GardenIllustratedArt,
   hasGardenIllustratedArt,
-} from '@/components/garden/GardenIllustratedArt';
-import { WingedInsectFlutterArt } from '@/components/garden/WingedInsectFlutterArt';
+} from '@/components/species/GardenIllustratedArt';
 
 interface Props {
   speciesId: string;
   size?: number;
-  /** 홈가든 월드의 살아 있는 스프라이트에서만 날개 애니메이션을 허용한다. */
-  animateWinged?: boolean;
 }
 
 /**
- * 홈 가든 전용 회화풍 스프라이트.
+ * 종별 대표 일러스트(PNG) 제공자.
  *
- * 정원 배경과 같은 고슈·수채화 질감으로 제작된 검수 에셋만 여기서 노출한다.
- * 도감 등 다른 화면의 식별용 벡터 아트와 분리해, 홈 가든의 미술 톤을 독립적으로
- * 조정할 수 있게 한다.
+ * 원래는 홈 가든 전용 회화풍 스프라이트였지만, 2D 홈 가든 제거 이후에도 도감·동정
+ * 결과·지도 핀·인트로 등 앱 전반의 "종 대표 이미지"로 계속 쓰인다. 검수된 PNG가 없는
+ * 종은 `species/CreatureArt`의 최소 벡터 세트로 폴백한다.
  */
-export function GardenCreatureArt({ speciesId, size = 72, animateWinged = false }: Props) {
+export function GardenCreatureArt({ speciesId, size = 72 }: Props) {
   const normalizedSpeciesId = normalizeId(speciesId);
   if (hasGardenIllustratedArt(speciesId)) {
     return <GardenIllustratedArt speciesId={speciesId} size={size} />;
@@ -29,10 +26,6 @@ export function GardenCreatureArt({ speciesId, size = 72, animateWinged = false 
   const source = GARDEN_ART[normalizedSpeciesId];
   if (!source) {
     return <CreatureArt speciesId={speciesId} size={size} />;
-  }
-
-  if (animateWinged && WINGED_INSECT_SPECIES.has(normalizedSpeciesId)) {
-    return <WingedInsectFlutterArt source={source} size={size} />;
   }
 
   return (
@@ -45,70 +38,18 @@ export function GardenCreatureArt({ speciesId, size = 72, animateWinged = false 
   );
 }
 
-/** 홈 가든에 배치 가능한 검수 완료 종인지 확인한다. */
-export function hasGardenCreatureArt(speciesId: string): boolean {
-  return hasGardenIllustratedArt(speciesId) || normalizeId(speciesId) in GARDEN_ART;
-}
-
 /**
  * 도감처럼 정적인 종별 PNG가 필요한 화면에서 사용하는 원본 에셋 조회 함수.
- * 홈가든의 벡터 우선·날갯짓 규칙을 거치지 않으므로 assets/species에 저장한 그림을
- * 그대로 표시하거나, tintColor를 적용해 종별 실루엣을 만들 수 있다.
+ * assets/species에 저장한 그림을 그대로 표시하거나, tintColor를 적용해 종별
+ * 실루엣을 만들 수 있다.
  */
 export function getGardenCreatureImageSource(speciesId: string): ImageSourcePropType | undefined {
   return GARDEN_ART[normalizeId(speciesId)];
 }
 
-/** 넓은 비행 이동과 날갯짓을 적용할 수 있는 곤충인지 확인한다. */
-export function hasWingedInsectArt(speciesId: string): boolean {
-  return WINGED_INSECT_SPECIES.has(normalizeId(speciesId));
-}
-
 function normalizeId(speciesId: string): string {
   return speciesId.replace(/^(taxon-|sp_)/, '').replace(/_/g, '-');
 }
-
-const WINGED_INSECT_SPECIES = new Set([
-  // 초기 호환 종
-  'ladybug',
-  'cabbage-white',
-  'honeybee',
-  'butterfly',
-  'bee',
-  // garden-v4
-  'eurema-mandarina',
-  'oedaleus-infernalis',
-  'ephemera-orientalis',
-  'vespa-mandarinia',
-  // garden-v5
-  'polygonia-c-aureum',
-  'bothrogonia-ferruginea',
-  'baetis-fuscatus',
-  'orthetrum-albistylum',
-  'propylea-japonica',
-  'papilio-xuthus',
-  'episyrphus-balteatus',
-  'pieris-melete',
-  'epeorus-pellucidus',
-  'ischnura-asiatica',
-  'ecdyonurus-levis',
-  'ecdyonurus-kibunensis',
-  'neptis-sappho',
-  'riptortus-pedestris',
-  'celastrina-argiolus',
-  'elkalyce-argiades',
-  'cheumatopsyche-brevilineata',
-  'sphaerophoria-scripta',
-  'pachygrontha-antennata',
-  'cletus-schmidti',
-  'acrida-cinerea',
-  'atractomorpha-lata',
-  'carbula-putoni',
-  // garden-v6(칠성무당벌레만 학명 기반 taxon ID라 이 키로 직접 도달함 — 나머지 세 종은
-  // honeybee/cabbage-white/ladybug 키가 이미 커버하므로 별도 등록 불필요, GARDEN_ART의
-  // 같은 절 주석 참고)
-  'coccinella-septempunctata',
-]);
 
 const DANDELION = require('../../../assets/species/garden-v1/dandelion.png') as ImageSourcePropType;
 const DAYFLOWER = require('../../../assets/species/garden-v1/dayflower.png') as ImageSourcePropType;
@@ -313,8 +254,8 @@ const GARDEN_ART: Record<string, ImageSourcePropType> = {
   dandelion: DANDELION,
   dayflower: DAYFLOWER,
 
-  // 곤충 — 홈가든은 대표 네 종에 GardenIllustratedArt를 우선하지만, 도감은 이
-  // PNG 레지스트리를 직접 사용해 사용자가 만든 종별 원본과 실루엣을 표시한다.
+  // 곤충 — 대표 네 종은 이 컴포넌트에서 GardenIllustratedArt(벡터)를 우선하지만,
+  // 도감 그리드(DexSpeciesArt)는 이 PNG 레지스트리를 직접 조회해 원본과 실루엣을 표시한다.
   'cabbage-white': PIERIS_RAPAE,
   honeybee: APIS_MELLIFERA,
   ladybug: HARMONIA_AXYRIDIS,

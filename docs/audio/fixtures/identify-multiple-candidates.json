@@ -9,7 +9,8 @@
       "confidence_level": "medium",
       "start_ms": 900,
       "end_ms": 4200,
-      "is_dangerous": false
+      "is_dangerous": false,
+      "supported": true
     },
     {
       "species_id": "taxon-pica-serica",
@@ -19,7 +20,8 @@
       "confidence_level": "low",
       "start_ms": 1200,
       "end_ms": 3900,
-      "is_dangerous": false
+      "is_dangerous": false,
+      "supported": true
     }
   ],
   "unknown": false,

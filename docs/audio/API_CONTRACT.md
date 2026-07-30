@@ -88,10 +88,19 @@ Success (`200`): see `fixtures/identify-high-confidence.json`, `fixtures/identif
 
 Rules:
 
-- Return at most three candidates from the server's supported bird list.
+- Return at most three candidates. Candidates are no longer restricted to the server's taxon DB
+  (CR-20260729-species-outside-db) — the model's raw output is surfaced even when the species
+  isn't in our dex yet.
+- Each candidate has `supported: boolean`. When `false`, `species_id` is `null` and
+  `common_name_ko` is the model's raw label (not a taxon record) — this candidate cannot be
+  confirmed to the dex or scored for similarity (`400 unsupported_species` / `400 invalid_species_id`
+  if attempted).
 - `confidence` is calibrated to `0..1`; `confidence_level` is `high`, `medium`, or `low`.
-- `unknown: true` means no supported bird is safe to propose. It is not a server failure.
+- `unknown: true` means no candidate cleared the low-confidence threshold at all (not the same as
+  "species unsupported" — an unsupported species can still appear with `unknown: false`).
 - Missing, expired, deleted, or another user's sighting returns the same `404 not_found` response.
+- If the sighting's quality was `noisy` (CR-20260729-noisy-audio-reaches-model), only `high`-confidence
+  candidates are returned regardless of species support.
 
 ## 3. Confirm a returned candidate
 
@@ -113,6 +122,8 @@ Rules:
 - The same `confirmation_id` must return the original success response without creating another observation or reward.
 - A sighting may be confirmed only once.
 - `409 already_confirmed` is used only when a different confirmation request tries to confirm an already confirmed sighting.
+- `400 unsupported_species`: the chosen candidate has `supported: false` (species outside the taxon
+  DB) — there is no taxon record to attach an observation to (CR-20260729-species-outside-db).
 
 ## 4. Score similarity to a selected species
 

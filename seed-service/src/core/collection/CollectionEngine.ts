@@ -16,6 +16,7 @@ import type {
 } from "../domain/types.js";
 import type {
   CollectionRepository,
+  ObservationRepository,
   TaxonRepository,
 } from "../repositories/ports.js";
 
@@ -34,6 +35,7 @@ export class CollectionEngine {
   constructor(
     private readonly collection: CollectionRepository,
     private readonly taxa: TaxonRepository,
+    private readonly observations: ObservationRepository,
   ) {}
 
   /**
@@ -44,9 +46,16 @@ export class CollectionEngine {
     const existing = await this.collection.get(obs.userId, obs.taxonId);
 
     if (existing && existing.unlocked) {
+      // firstObservationId는 "최초 발견 시각"(firstObservedAt)과 별개로 지도 핀
+      // 좌표의 출처로도 쓰인다(map.routes.ts GET /map/pins). 최초 발견 당시 위치 수집이
+      // 꺼져 있어 좌표가 없었다면, 그 상태로 영구히 고정돼 핀이 절대 못 떴다
+      // (2026-07-30 버그 리포트). 대표 관찰에 좌표가 없고 이번 재관찰엔 좌표가 있으면
+      // 대표 관찰을 이번 것으로 옮겨 핀이 뜨게 한다 — 이미 좌표가 있으면 덮어쓰지 않는다.
+      const shouldAdoptAsMapPinSource = await this.shouldAdoptAsMapPinSource(existing, obs);
       const updated: CollectionEntry = {
         ...existing,
         timesObserved: existing.timesObserved + 1,
+        ...(shouldAdoptAsMapPinSource ? { firstObservationId: obs.id } : {}),
       };
       await this.collection.save(updated);
       return { entry: updated, newlyUnlocked: false };
@@ -62,6 +71,16 @@ export class CollectionEngine {
     };
     await this.collection.save(entry);
     return { entry, newlyUnlocked: true };
+  }
+
+  private async shouldAdoptAsMapPinSource(
+    existing: CollectionEntry,
+    obs: Observation,
+  ): Promise<boolean> {
+    if (!obs.preciseCoord) return false;
+    if (!existing.firstObservationId) return true;
+    const current = await this.observations.get(existing.firstObservationId);
+    return !current?.preciseCoord;
   }
 
   /** 전체(또는 계절/서식지 축) 진행률. */

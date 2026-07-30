@@ -13,7 +13,7 @@
  */
 import { createHash } from "node:crypto";
 import { newAudioSightingId } from "../domain/ids.js";
-import type { UserId } from "../domain/types.js";
+import type { PreciseCoordinate, UserId } from "../domain/types.js";
 import type { AudioSightingRepository } from "../repositories/ports.js";
 import type { AudioSighting } from "./audioTypes.js";
 import { AudioConverter } from "./AudioConverter.js";
@@ -28,6 +28,8 @@ export interface AudioUploadInput {
    * 결과에서 직접 잰 값이다(doc 03 "duration_ms: 클라이언트 측정, 서버 디코드로 검증"). */
   clientDurationMs: number;
   recordedAt: string;
+  /** 선택 — 있으면 확정(/audio/identify/confirm) 시 observation에 그대로 실려 지도 핀에 쓰인다. */
+  coord?: PreciseCoordinate | null;
 }
 
 export interface AudioUploadServiceOptions {
@@ -62,6 +64,9 @@ export class AudioUploadService {
       wavBytes: converted.wavBytes,
       durationMs: converted.durationMs,
     });
+    // TEMP DEBUG(새소리 오탐 원인 조사 중 — 테스트 통과 전까지 지우지 말 것) --------------
+    console.error("[audio quality DEBUG]", JSON.stringify(quality));
+    // TEMP DEBUG 끝 ------------------------------------------------------------------
 
     const now = new Date();
     const expiresAt = new Date(now.getTime() + this.opts.ttlHours * 60 * 60 * 1000);
@@ -81,6 +86,7 @@ export class AudioUploadService {
       sha256,
       storagePath,
       quality,
+      coord: input.coord ?? null,
       recordedAt: input.recordedAt,
       createdAt: now.toISOString(),
       expiresAt: expiresAt.toISOString(),

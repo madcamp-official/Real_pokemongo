@@ -4,7 +4,7 @@
  * 표현일 뿐이라, 여기 필드를 늘리거나 이름을 바꾸려면 계약 자체를 먼저 바꿔야 한다
  * (CHANGE_REQUESTS.md 경유 — `03_소리기능_서버_GPU_구현계획_팀원.md` 2장 "수정 금지" 목록).
  */
-import type { AudioSightingId, ObservationId, TaxonId, UserId } from "../domain/types.js";
+import type { AudioSightingId, ObservationId, PreciseCoordinate, TaxonId, UserId } from "../domain/types.js";
 
 /** `docs/audio/API_CONTRACT.md` "Quality object"의 blocking feedback_codes. */
 export type AudioFeedbackCode =
@@ -34,6 +34,11 @@ export interface AudioQualityValidSegment {
  */
 export interface AudioQuality {
   usable: boolean;
+  /** CR-20260729-noisy-audio-reaches-model: TOO_NOISY/SPEECH_DETECTED/MULTIPLE_OVERLAP 조건 중
+   * 하나라도 해당하면 true. usable을 더 이상 막지 않는 대신, AudioIdentificationGateway가 이
+   * 플래그를 보고 고확신 후보만 인정하는 안전장치를 켠다. 계약 필드가 아니라 HTTP 응답에는
+   * 절대 노출하지 않는다(내부 신호 전용). */
+  noisy: boolean;
   durationMs: number;
   activeDurationMs: number;
   snrDb: number | null;
@@ -81,6 +86,11 @@ export interface AudioSighting {
    * status가 'rejected'면 저장된 바이트가 없으므로 undefined. */
   storagePath?: string;
   quality: AudioQuality;
+  /** 사용자가 제공한 정밀 좌표(선택) — 사진 파이프라인의 rawCoord와 같은 성격.
+   * `db/migrations/0006_audio_sighting_coord.sql`. 3단계 때는 파싱만 하고 버렸었는데,
+   * 그 탓에 /audio/identify/confirm이 만드는 observation에 좌표가 전혀 안 남아 소리로
+   * 등록한 종이 탐험 지도(/map/pins)에 안 뜨는 문제가 있었다(2026-07-29 수정). */
+  coord?: PreciseCoordinate | null;
   /** 클라이언트가 녹음한 시각(ISO8601) — DATA_CONTRACT.md의 audio_sighting.recorded_at,
    * Required 필드. 3단계 때 라우트가 파싱만 하고 저장은 안 했던 걸 5단계에서 바로잡음. */
   recordedAt: string;

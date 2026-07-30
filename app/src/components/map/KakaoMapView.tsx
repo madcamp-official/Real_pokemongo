@@ -199,12 +199,12 @@ export const KakaoMapView = forwardRef<KakaoMapViewHandle, Props>(function Kakao
 });
 
 const styles = StyleSheet.create({
-  web: { flex: 1, backgroundColor: '#E4EBDA' },
+  web: { flex: 1, backgroundColor: colors.background },
   loading: {
     alignItems: 'center',
     justifyContent: 'center',
     gap: 10,
-    backgroundColor: '#E4EBDA',
+    backgroundColor: colors.background,
   },
   loadingText: { fontSize: 13, fontWeight: '700', color: colors.textSecondary },
 });

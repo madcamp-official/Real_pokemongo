@@ -4,6 +4,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
+import { colors } from '@/theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Consent'>;
 
@@ -115,27 +116,27 @@ export default function ConsentScreen({ navigation, route }: Props) {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#F7F9F4', padding: 24, justifyContent: 'center', gap: 32 },
+  root: { flex: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'center', gap: 32 },
   progress: { flexDirection: 'row', justifyContent: 'center', gap: 8 },
-  progressDot: { width: 32, height: 6, borderRadius: 3, backgroundColor: '#D7E0CC' },
-  progressDotActive: { backgroundColor: '#5B8C3E' },
+  progressDot: { width: 32, height: 6, borderRadius: 3, backgroundColor: colors.border },
+  progressDotActive: { backgroundColor: colors.primary },
   card: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 20,
     padding: 28,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#E4EFD8',
+    borderColor: colors.primaryLight,
   },
   emoji: { fontSize: 44, marginBottom: 14 },
-  title: { fontSize: 18, fontWeight: '800', color: '#2E3A24', marginBottom: 10, textAlign: 'center' },
-  desc: { fontSize: 14, color: '#6B7A5E', textAlign: 'center', lineHeight: 21 },
+  title: { fontSize: 18, fontWeight: '800', color: colors.textPrimary, marginBottom: 10, textAlign: 'center' },
+  desc: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 21 },
   agreeButton: {
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 24,
     alignItems: 'center',
   },
   disabled: { opacity: 0.6 },
-  agreeText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  agreeText: { color: colors.onPrimary, fontSize: 16, fontWeight: '800' },
 });
