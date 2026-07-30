@@ -39,6 +39,7 @@ import {
   PgAudioIdentificationResultRepo,
   PgSpeciesSoundReferenceRepo,
   upsertBadgeDefinitions,
+  upsertGardenAssetCatalog,
 } from "./core/repositories/postgres/PostgresRepositories.js";
 import type {
   UserRepository,
@@ -91,6 +92,7 @@ import {
   SEED_BADGES,
   SEED_CONTENT,
 } from "./seed/seedData.js";
+import { SEED_GARDEN_ASSETS } from "./seed/gardenAssetCatalog.js";
 
 export interface App {
   config: AppConfig;
@@ -208,6 +210,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
 
   // --- 시드 로드 ---
   await repos.taxa.upsertMany(SEED_TAXA);
+  if (dbPool) await upsertGardenAssetCatalog(dbPool, SEED_GARDEN_ASSETS);
   await repos.quests.upsertMany(SEED_QUESTS);
   const content = new ContentCardService();
   for (const c of SEED_CONTENT) content.upsert(c);

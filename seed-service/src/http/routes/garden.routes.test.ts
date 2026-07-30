@@ -80,7 +80,7 @@ test("GET /garden/layout: 인증 없으면 401", async () => {
   assert.equal(res.statusCode, 401);
 });
 
-test("GET /garden/layout: 저장한 적 없으면 기본 6x6 정원을 돌려준다(배치는 없음)", async () => {
+test("GET /garden/layout: 저장한 적 없으면 기본 9x6 정원을 돌려준다(배치는 없음)", async () => {
   const { server } = await testServer();
   const { token } = await signupWithUser(server);
   const res = await server.inject({
@@ -90,8 +90,34 @@ test("GET /garden/layout: 저장한 적 없으면 기본 6x6 정원을 돌려준
   });
   assert.equal(res.statusCode, 200);
   const body = res.json();
-  assert.equal(body.tiles.length, 36);
+  assert.equal(body.tiles.length, 54);
   assert.deepEqual(body.placements, []);
+});
+
+test("GET /garden/bootstrap: 3D 카탈로그와 같은 종의 모든 보유 개체를 내려준다", async () => {
+  const { app, server } = await testServer();
+  const { token } = await signupWithUser(server);
+  await observeDandelion(app, token, server);
+  await observeDandelion(app, token, server);
+
+  const res = await server.inject({
+    method: "GET",
+    url: "/garden/bootstrap",
+    headers: { authorization: `Bearer ${token}` },
+  });
+  assert.equal(res.statusCode, 200);
+  const body = res.json();
+  assert.equal(body.schemaVersion, 2);
+  assert.equal(body.assets.length, 62);
+  assert.equal(typeof body.creatures[0]?.capturedAt, "string");
+  assert.equal(
+    body.creatures.filter((creature: any) => creature.speciesId === "taxon-dandelion").length,
+    2,
+  );
+  assert.equal(
+    body.inventory.find((entry: any) => entry.speciesId === "taxon-dandelion").ownedCount,
+    2,
+  );
 });
 
 test("PUT → GET 왕복: 저장한 배치가 그대로 조회되고 species_id도 채워진다", async () => {
@@ -122,6 +148,7 @@ test("PUT → GET 왕복: 저장한 배치가 그대로 조회되고 species_id�
   assert.equal(body.placements.length, 1);
   assert.equal(body.placements[0].creature_id, creature.id);
   assert.equal(body.placements[0].species_id, "taxon-dandelion");
+  assert.equal(body.placements[0].placement_mode, "slot");
 });
 
 test("PUT /garden/layout: 존재하지 않거나 남의 개체를 배치하면 400", async () => {

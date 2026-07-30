@@ -1,0 +1,12 @@
+{
+  "extends": "bird_flight_base.json",
+  "profile": "bird-egret",
+  "target_vertices": 50000,
+  "procedural_wings": {
+    "color": [0.88, 0.88, 0.84, 1.0],
+    "feather_color": [0.74, 0.75, 0.72, 1.0],
+    "span_scale": 1.34,
+    "trailing_scale": 1.0,
+    "feather_count": 12
+  }
+}

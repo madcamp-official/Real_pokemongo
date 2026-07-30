@@ -219,6 +219,11 @@ export class InMemoryCreatureRepo implements CreatureRepository {
       [...this.m.values()].find((c) => c.userId === userId && c.taxonId === taxonId) ?? null
     );
   }
+  async listByUserAndTaxon(userId: UserId, taxonId: TaxonId) {
+    return [...this.m.values()].filter(
+      (c) => c.userId === userId && c.taxonId === taxonId,
+    );
+  }
   async listByUser(userId: UserId) {
     return [...this.m.values()].filter((c) => c.userId === userId);
   }

@@ -16,8 +16,12 @@ export interface GardenTile {
 }
 
 export interface CreaturePlacement {
-  row: number;
-  col: number;
+  placementMode?: "slot" | "free";
+  row?: number;
+  col?: number;
+  worldX?: number;
+  worldY?: number;
+  worldZ?: number;
   creatureId: CreatureId;
 }
 
@@ -50,7 +54,7 @@ export function tileTypeFromKorean(label: string): TileType | null {
   return KOREAN_TO_TILE_TYPE[label] ?? null;
 }
 
-// 6×6 기본 정원. app/src/mocks/mockData.ts의 TILE_MAP과 동일한 배치(한글→영문 변환값) —
+// PC 홈가든 식물 슬롯을 위해 9×6(54칸)으로 확장한 기본 정원.
 // 사용자가 한 번도 저장한 적 없을 때(GET /garden/layout) 이 값을 그대로 돌려준다(DB엔 안 씀,
 // 실제로 저장은 사용자가 처음 PUT할 때 일어난다).
 const DEFAULT_TILE_ROWS: TileType[][] = [
@@ -60,6 +64,9 @@ const DEFAULT_TILE_ROWS: TileType[][] = [
   ["grass", "soil", "soil", "grass", "grass", "rock"],
   ["flower_bed", "grass", "grass", "grass", "rock", "rock"],
   ["flower_bed", "flower_bed", "grass", "soil", "soil", "grass"],
+  ["grass", "grass", "soil", "grass", "grass", "flower_bed"],
+  ["grass", "grass", "soil", "grass", "grass", "flower_bed"],
+  ["grass", "grass", "soil", "grass", "grass", "flower_bed"],
 ];
 
 export function buildDefaultTiles(): GardenTile[] {

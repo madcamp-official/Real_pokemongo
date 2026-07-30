@@ -180,9 +180,8 @@ export interface CollectionEntry {
 // ---------------------------------------------------------------------------
 
 /**
- * 종 단위 해금(CollectionEntry) 위에 얹히는 "개체 단위 동반자". 종을 처음 해금할 때
- * 자동으로 1마리 생성되고(ObservationFlow.recordIdentification), 종당 최대 1마리로
- * 제한한다(제품 결정 — D단계). 홈가든(F16) 화면이 이 레코드를 배치·표시한다.
+ * 종 단위 해금(CollectionEntry) 위에 얹히는 "개체 단위 동반자".
+ * 확정 관찰마다 한 마리가 생성되며, 홈가든은 각 ID를 독립적으로 배치·표시한다.
  */
 export interface Creature {
   id: CreatureId;

@@ -106,7 +106,7 @@ test("위험 종도 도감에는 수집되되, 안전 안내가 먼저 노출된
   assert.equal(res.identification.childMessage, res.safety!.message);
 });
 
-test("재관찰은 중복 해금·중복 배지를 만들지 않는다(멱등성)", async () => {
+test("재관찰은 해금·배지는 중복하지 않고 정원 개체는 한 마리 더 지급한다", async () => {
   const { app, ctx } = await setup();
   const first = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
   const second = await observeHigh(app, ctx, "Taraxacum officinale", "민들레", "plant");
@@ -123,10 +123,10 @@ test("재관찰은 중복 해금·중복 배지를 만들지 않는다(멱등성
   const fresh = await app.accounts.getUser(ctx.userId);
   assert.equal(fresh!.xp, 12);
 
-  // D단계: 개체도 첫 해금 때만 1마리 생성되고, 재관찰로 추가 생성되지 않는다(종당 최대 1마리).
+  // 같은 종도 확정 관찰 횟수만큼 서로 다른 정원 개체를 보유한다.
   const creatures = await app.repos.creatures.listByUser(ctx.userId);
   const dandelionCreatures = creatures.filter((c) => c.taxonId === "taxon-dandelion");
-  assert.equal(dandelionCreatures.length, 1, "재관찰해도 개체는 여전히 1마리여야 함");
+  assert.equal(dandelionCreatures.length, 2, "두 번 관찰했으므로 두 개체를 보유해야 함");
 });
 
 test("일일 한도 초과 시 외부 동정 API를 호출하지 않고 차단한다(비용 안전)", async () => {

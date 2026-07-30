@@ -91,11 +91,12 @@ export interface BadgeRepository {
   deleteByUser(userId: UserId): Promise<number>;
 }
 
-/** D단계: 개체(Creature). 종당 최대 1마리 — getByUserAndTaxon으로 첫 해금 여부를 판정. */
+/** 수집한 개체. 같은 종도 관찰 횟수만큼 서로 다른 개체 ID를 가질 수 있다. */
 export interface CreatureRepository {
   save(c: Creature): Promise<void>;
   get(id: CreatureId): Promise<Creature | null>;
   getByUserAndTaxon(userId: UserId, taxonId: TaxonId): Promise<Creature | null>;
+  listByUserAndTaxon(userId: UserId, taxonId: TaxonId): Promise<Creature[]>;
   listByUser(userId: UserId): Promise<Creature[]>;
   deleteByUser(userId: UserId): Promise<number>;
 }

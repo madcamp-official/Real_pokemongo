@@ -1,0 +1,8 @@
+{
+  "extends": "bird_flight_base.json",
+  "profile": "bird-crow-flight",
+  "target_vertices": 55000,
+  "pre_rotation_degrees": [0, 0, 0],
+  "body_excluded_bones": [],
+  "procedural_wings": null
+}

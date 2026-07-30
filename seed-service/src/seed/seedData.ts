@@ -13,6 +13,32 @@ import type { SpeciesContent } from "../child/content/ContentCardService.js";
 
 export const SEED_TAXA: Taxon[] = [
   {
+    id: asTaxonId("taxon-trypoxylus-dichotomus"),
+    sciName: "Trypoxylus dichotomus",
+    korName: "장수풍뎅이",
+    rank: "species",
+    group: "insect",
+    seasonTags: ["summer"],
+    habitatTags: ["mountain", "park"],
+    riskTags: [],
+    rarity: "common",
+    sizeDescription: "몸길이 3~8cm 정도예요",
+    activeTime: "night",
+  },
+  {
+    id: asTaxonId("taxon-lucanus-maculifemoratus"),
+    sciName: "Lucanus maculifemoratus",
+    korName: "사슴벌레",
+    rank: "species",
+    group: "insect",
+    seasonTags: ["summer"],
+    habitatTags: ["mountain", "park"],
+    riskTags: [],
+    rarity: "common",
+    sizeDescription: "몸길이 3~7cm 정도예요",
+    activeTime: "night",
+  },
+  {
     id: asTaxonId("taxon-polygonia-c-aureum"),
     sciName: "Polygonia c-aureum",
     korName: "네발나비",

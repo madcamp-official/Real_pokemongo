@@ -1,0 +1,6 @@
+{
+  "extends": "bird_passerine_brown.json",
+  "profile": "bird-passerine-brown-natural-source-wings",
+  "body_excluded_bones": [],
+  "procedural_wings": null
+}

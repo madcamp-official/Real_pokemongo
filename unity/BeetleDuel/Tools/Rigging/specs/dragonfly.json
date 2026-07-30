@@ -1,0 +1,183 @@
+{
+  "profile": "dragonfly",
+  "target_vertices": 120000,
+  "pre_rotation_degrees": [0, -90, -90],
+  "armature_name": "DragonflyRig",
+  "bones": [
+    {
+      "name": "root",
+      "head": [0.50, 0.46, 0.08],
+      "tail": [0.50, 0.46, 0.88],
+      "deform": false
+    },
+    {
+      "name": "thorax",
+      "head": [0.50, 0.50, 0.48],
+      "tail": [0.50, 0.52, 0.66],
+      "parent": "root",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen.base",
+      "head": [0.50, 0.48, 0.52],
+      "tail": [0.50, 0.47, 0.36],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen.mid",
+      "head": [0.50, 0.47, 0.37],
+      "tail": [0.50, 0.46, 0.20],
+      "parent": "abdomen.base",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen.tip",
+      "head": [0.50, 0.46, 0.21],
+      "tail": [0.50, 0.45, 0.05],
+      "parent": "abdomen.mid",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "head",
+      "head": [0.50, 0.52, 0.64],
+      "tail": [0.50, 0.53, 0.78],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.L",
+      "head": [0.47, 0.56, 0.50],
+      "tail": [0.47, 0.56, 0.68],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.L.fore",
+      "head": [0.46, 0.56, 0.60],
+      "tail": [0.05, 0.52, 0.79],
+      "parent": "wingPivot.L",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.L.hind",
+      "head": [0.46, 0.56, 0.51],
+      "tail": [0.05, 0.50, 0.34],
+      "parent": "wingPivot.L",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.R",
+      "head": [0.53, 0.56, 0.50],
+      "tail": [0.53, 0.56, 0.68],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.R.fore",
+      "head": [0.54, 0.56, 0.60],
+      "tail": [0.95, 0.52, 0.79],
+      "parent": "wingPivot.R",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.R.hind",
+      "head": [0.54, 0.56, 0.51],
+      "tail": [0.95, 0.50, 0.34],
+      "parent": "wingPivot.R",
+      "roll_reference": [0, 1, 0]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Dragonfly_Flap",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 16, 0],
+            "wingPivot.R": [0, -16, 0]
+          }
+        },
+        {
+          "frame": 3,
+          "rotations": {
+            "wingPivot.L": [0, -12, 0],
+            "wingPivot.R": [0, 12, 0],
+            "abdomen.mid": [1.5, 0, 0]
+          }
+        },
+        {
+          "frame": 5,
+          "rotations": {
+            "wingPivot.L": [0, 18, 0],
+            "wingPivot.R": [0, -18, 0],
+            "abdomen.mid": [-1, 0, 0]
+          }
+        },
+        {
+          "frame": 7,
+          "rotations": {
+            "wingPivot.L": [0, 16, 0],
+            "wingPivot.R": [0, -16, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dragonfly_Hover",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 8, 0],
+            "wingPivot.R": [0, -8, 0]
+          }
+        },
+        {
+          "frame": 4,
+          "rotations": {
+            "wingPivot.L": [0, -7, 0],
+            "wingPivot.R": [0, 7, 0]
+          }
+        },
+        {
+          "frame": 7,
+          "rotations": {
+            "wingPivot.L": [0, 8, 0],
+            "wingPivot.R": [0, -8, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Dragonfly_Glide",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 3, 0],
+            "wingPivot.R": [0, -3, 0]
+          }
+        },
+        {
+          "frame": 36,
+          "rotations": {
+            "wingPivot.L": [0, 5, 0],
+            "wingPivot.R": [0, -5, 0],
+            "abdomen.tip": [1.5, 0, 0]
+          }
+        },
+        {
+          "frame": 72,
+          "rotations": {
+            "wingPivot.L": [0, 3, 0],
+            "wingPivot.R": [0, -3, 0]
+          }
+        }
+      ]
+    }
+  ]
+}

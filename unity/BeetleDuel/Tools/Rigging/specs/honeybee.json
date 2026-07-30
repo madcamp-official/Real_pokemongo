@@ -1,0 +1,170 @@
+{
+  "profile": "honeybee",
+  "target_vertices": 120000,
+  "pre_rotation_degrees": [0, 0, -90],
+  "armature_name": "HoneybeeRig",
+  "bones": [
+    {
+      "name": "root",
+      "head": [0.50, 0.40, 0.10],
+      "tail": [0.50, 0.58, 0.88],
+      "deform": false
+    },
+    {
+      "name": "thorax",
+      "head": [0.50, 0.52, 0.43],
+      "tail": [0.50, 0.60, 0.62],
+      "parent": "root",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen.base",
+      "head": [0.50, 0.50, 0.45],
+      "tail": [0.50, 0.37, 0.25],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "abdomen.tip",
+      "head": [0.50, 0.37, 0.27],
+      "tail": [0.50, 0.22, 0.08],
+      "parent": "abdomen.base",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "head",
+      "head": [0.50, 0.60, 0.60],
+      "tail": [0.50, 0.69, 0.78],
+      "parent": "thorax",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "antenna.L",
+      "head": [0.46, 0.68, 0.75],
+      "tail": [0.34, 0.78, 0.94],
+      "parent": "head",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "antenna.R",
+      "head": [0.54, 0.68, 0.75],
+      "tail": [0.66, 0.78, 0.94],
+      "parent": "head",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.L",
+      "head": [0.47, 0.65, 0.48],
+      "tail": [0.47, 0.66, 0.68],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.L",
+      "head": [0.46, 0.66, 0.56],
+      "tail": [0.06, 0.72, 0.84],
+      "parent": "wingPivot.L",
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wingPivot.R",
+      "head": [0.53, 0.65, 0.48],
+      "tail": [0.53, 0.66, 0.68],
+      "parent": "thorax",
+      "deform": false,
+      "roll_reference": [0, 1, 0]
+    },
+    {
+      "name": "wing.R",
+      "head": [0.54, 0.66, 0.56],
+      "tail": [0.94, 0.72, 0.84],
+      "parent": "wingPivot.R",
+      "roll_reference": [0, 1, 0]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Honeybee_Flap",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 38, 0],
+            "wingPivot.R": [0, -38, 0]
+          }
+        },
+        {
+          "frame": 3,
+          "rotations": {
+            "wingPivot.L": [0, -32, 0],
+            "wingPivot.R": [0, 32, 0],
+            "thorax": [1, 0, 0]
+          }
+        },
+        {
+          "frame": 5,
+          "rotations": {
+            "wingPivot.L": [0, 38, 0],
+            "wingPivot.R": [0, -38, 0],
+            "thorax": [-1, 0, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Honeybee_Hover",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 24, 0],
+            "wingPivot.R": [0, -24, 0]
+          }
+        },
+        {
+          "frame": 3,
+          "rotations": {
+            "wingPivot.L": [0, -20, 0],
+            "wingPivot.R": [0, 20, 0]
+          }
+        },
+        {
+          "frame": 5,
+          "rotations": {
+            "wingPivot.L": [0, 24, 0],
+            "wingPivot.R": [0, -24, 0]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Honeybee_Glide",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "wingPivot.L": [0, 8, 0],
+            "wingPivot.R": [0, -8, 0]
+          }
+        },
+        {
+          "frame": 30,
+          "rotations": {
+            "wingPivot.L": [0, 12, 0],
+            "wingPivot.R": [0, -12, 0],
+            "antenna.L": [0, 0, -3],
+            "antenna.R": [0, 0, 3]
+          }
+        },
+        {
+          "frame": 60,
+          "rotations": {
+            "wingPivot.L": [0, 8, 0],
+            "wingPivot.R": [0, -8, 0]
+          }
+        }
+      ]
+    }
+  ]
+}

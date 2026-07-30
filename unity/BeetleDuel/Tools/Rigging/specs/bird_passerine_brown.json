@@ -1,0 +1,12 @@
+{
+  "extends": "bird_flight_base.json",
+  "profile": "bird-passerine-brown",
+  "target_vertices": 35000,
+  "procedural_wings": {
+    "color": [0.34, 0.27, 0.18, 1.0],
+    "feather_color": [0.18, 0.13, 0.08, 1.0],
+    "span_scale": 1.0,
+    "trailing_scale": 1.0,
+    "feather_count": 10
+  }
+}

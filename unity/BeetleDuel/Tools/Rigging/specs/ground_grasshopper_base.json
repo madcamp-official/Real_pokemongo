@@ -1,0 +1,175 @@
+{
+  "profile": "ground-grasshopper",
+  "target_vertices": 45000,
+  "max_texture_size": 1024,
+  "binding": "proximity",
+  "armature_name": "GrasshopperGroundRig",
+  "bones": [
+    {
+      "name": "root",
+      "head": [0.50, 0.48, 0.18],
+      "tail": [0.50, 0.48, 0.74],
+      "deform": false
+    },
+    {
+      "name": "thorax",
+      "head": [0.50, 0.24, 0.40],
+      "tail": [0.50, 0.47, 0.42],
+      "parent": "root",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "abdomen",
+      "head": [0.50, 0.44, 0.40],
+      "tail": [0.50, 0.90, 0.35],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "head",
+      "head": [0.50, 0.25, 0.43],
+      "tail": [0.50, 0.05, 0.50],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "antenna.L",
+      "head": [0.44, 0.10, 0.52],
+      "tail": [0.28, 0.00, 0.72],
+      "parent": "head",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "antenna.R",
+      "head": [0.56, 0.10, 0.52],
+      "tail": [0.72, 0.00, 0.72],
+      "parent": "head",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.L.front",
+      "head": [0.43, 0.25, 0.30],
+      "tail": [0.13, 0.11, 0.02],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.R.front",
+      "head": [0.57, 0.25, 0.30],
+      "tail": [0.87, 0.11, 0.02],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.L.mid",
+      "head": [0.42, 0.43, 0.30],
+      "tail": [0.10, 0.48, 0.02],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.R.mid",
+      "head": [0.58, 0.43, 0.30],
+      "tail": [0.90, 0.48, 0.02],
+      "parent": "thorax",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.L.hind.upper",
+      "head": [0.42, 0.58, 0.38],
+      "tail": [0.10, 0.43, 0.76],
+      "parent": "abdomen",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.L.hind.lower",
+      "head": [0.10, 0.43, 0.76],
+      "tail": [0.04, 0.91, 0.02],
+      "parent": "leg.L.hind.upper",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.R.hind.upper",
+      "head": [0.58, 0.58, 0.38],
+      "tail": [0.90, 0.43, 0.76],
+      "parent": "abdomen",
+      "roll_reference": [0, 0, 1]
+    },
+    {
+      "name": "leg.R.hind.lower",
+      "head": [0.90, 0.43, 0.76],
+      "tail": [0.96, 0.91, 0.02],
+      "parent": "leg.R.hind.upper",
+      "roll_reference": [0, 0, 1]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Ground_Walk",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "leg.L.front": [0, 11, 0],
+            "leg.R.front": [0, -11, 0],
+            "leg.L.mid": [0, -9, 0],
+            "leg.R.mid": [0, 9, 0],
+            "leg.L.hind.upper": [0, 0, 5],
+            "leg.R.hind.upper": [0, 0, -5]
+          }
+        },
+        {
+          "frame": 8,
+          "rotations": {
+            "leg.L.front": [0, -11, 0],
+            "leg.R.front": [0, 11, 0],
+            "leg.L.mid": [0, 9, 0],
+            "leg.R.mid": [0, -9, 0],
+            "leg.L.hind.upper": [0, 0, -5],
+            "leg.R.hind.upper": [0, 0, 5],
+            "abdomen": [1.5, 0, 0]
+          }
+        },
+        {
+          "frame": 15,
+          "rotations": {
+            "leg.L.front": [0, 11, 0],
+            "leg.R.front": [0, -11, 0],
+            "leg.L.mid": [0, -9, 0],
+            "leg.R.mid": [0, 9, 0],
+            "leg.L.hind.upper": [0, 0, 5],
+            "leg.R.hind.upper": [0, 0, -5]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ground_Idle",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "antenna.L": [0, 0, -2],
+            "antenna.R": [0, 0, 2]
+          }
+        },
+        {
+          "frame": 36,
+          "rotations": {
+            "antenna.L": [0, 0, 5],
+            "antenna.R": [0, 0, -5],
+            "leg.L.hind.lower": [0, 0, 2],
+            "leg.R.hind.lower": [0, 0, -2]
+          }
+        },
+        {
+          "frame": 72,
+          "rotations": {
+            "antenna.L": [0, 0, -2],
+            "antenna.R": [0, 0, 2]
+          }
+        }
+      ]
+    }
+  ]
+}

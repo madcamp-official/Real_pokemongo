@@ -377,7 +377,7 @@ test("PgSpeciesSoundReferenceRepo: 8단계 — listApproved는 approved만, upse
   }
 });
 
-test("PgCollectionRepo + PgCreatureRepo: 종당 개체 1마리 UNIQUE 제약이 실제로 걸린다", { skip }, async () => {
+test("PgCollectionRepo + PgCreatureRepo: 같은 종의 여러 개체를 저장할 수 있다", { skip }, async () => {
   await withUser(async (userId) => {
     const taxa = new PgTaxonRepo(pool!);
     const collection = new PgCollectionRepo(pool!);
@@ -417,9 +417,11 @@ test("PgCollectionRepo + PgCreatureRepo: 종당 개체 1마리 UNIQUE 제약이 
       await creatures.save(c1);
       assert.equal((await creatures.getByUserAndTaxon(userId, taxonId))?.id, c1.id);
 
-      // 같은 (user, taxon)으로 두 번째 개체를 만들려 하면 UNIQUE 제약 위반으로 거부돼야 한다.
+      // 같은 (user, taxon)이어도 서로 다른 관찰에서 온 개체는 함께 보유할 수 있다.
       const c2: Creature = { ...c1, id: randomUUID() as Creature["id"] };
-      await assert.rejects(() => creatures.save(c2));
+      c2.originObservationId = undefined;
+      await creatures.save(c2);
+      assert.equal((await creatures.listByUserAndTaxon(userId, taxonId)).length, 2);
     } finally {
       // withUser()의 finally(사용자 삭제 CASCADE)보다 먼저 실행되므로, taxon을 참조하는
       // 사용자 데이터를 여기서 직접 먼저 지워야 taxon FK(ON DELETE RESTRICT)에 안 걸린다.

@@ -405,8 +405,12 @@ export interface ApiGardenTile {
 export interface ApiPlacement {
   creature_id: string;
   species_id: string;
-  row: number;
-  col: number;
+  placement_mode: "slot" | "free";
+  row?: number;
+  col?: number;
+  world_x?: number;
+  world_y?: number;
+  world_z?: number;
 }
 export interface ApiGardenLayout {
   tiles: ApiGardenTile[];
@@ -429,8 +433,14 @@ export function gardenLayoutToApi(
       .map((p) => ({
         creature_id: p.creatureId as string,
         species_id: taxonIdByCreatureId.get(p.creatureId as string)!,
-        row: p.row,
-        col: p.col,
+        placement_mode: p.placementMode ?? "slot",
+        ...(p.placementMode === "free"
+          ? {
+              world_x: p.worldX,
+              world_y: p.worldY,
+              world_z: p.worldZ,
+            }
+          : { row: p.row, col: p.col }),
       })),
   };
 }

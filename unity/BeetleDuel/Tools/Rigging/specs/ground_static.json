@@ -1,0 +1,4 @@
+{
+  "extends": "ground_static_base.json",
+  "profile": "ground-static"
+}

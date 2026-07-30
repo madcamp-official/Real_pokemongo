@@ -1,0 +1,64 @@
+{
+  "profile": "ground-static-prop",
+  "target_vertices": 35000,
+  "max_texture_size": 1024,
+  "binding": "proximity",
+  "armature_name": "GroundStaticRig",
+  "bones": [
+    {
+      "name": "root",
+      "head": [0.50, 0.50, 0.15],
+      "tail": [0.50, 0.50, 0.80],
+      "deform": false
+    },
+    {
+      "name": "body",
+      "head": [0.50, 0.28, 0.35],
+      "tail": [0.50, 0.76, 0.48],
+      "parent": "root",
+      "roll_reference": [0, 0, 1]
+    }
+  ],
+  "animations": [
+    {
+      "name": "Ground_Walk",
+      "keyframes": [
+        {
+          "frame": 1,
+          "rotations": {
+            "body": [0, 0, -1]
+          }
+        },
+        {
+          "frame": 10,
+          "rotations": {
+            "body": [0, 0, 1]
+          }
+        },
+        {
+          "frame": 20,
+          "rotations": {
+            "body": [0, 0, -1]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Ground_Idle",
+      "keyframes": [
+        {
+          "frame": 1
+        },
+        {
+          "frame": 60,
+          "rotations": {
+            "body": [0.5, 0, 0]
+          }
+        },
+        {
+          "frame": 120
+        }
+      ]
+    }
+  ]
+}
