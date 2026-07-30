@@ -227,7 +227,7 @@ export async function buildApp(config: AppConfig = loadConfig()): Promise<App> {
 
   // --- 서비스/엔진 ---
   const observations = new ObservationService(repos.observations);
-  const collection = new CollectionEngine(repos.collection, repos.taxa);
+  const collection = new CollectionEngine(repos.collection, repos.taxa, repos.observations);
   const quests = new QuestEngine(repos.quests, repos.taxa);
   const rewards = new RewardEngine(
     SEED_BADGES,

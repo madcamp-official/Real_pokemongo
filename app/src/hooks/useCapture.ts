@@ -2,6 +2,7 @@ import { useCallback, useRef, useState, type RefObject } from 'react';
 import type { CameraView } from 'expo-camera';
 import { persistPhoto } from '@/services/photoStorage';
 import { requestLocationAndGet } from '@/services/location';
+import { maybePromptLocationCollection } from '@/services/locationCollectionPrompt';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { useAuthStore } from '@/store/authStore';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -80,9 +81,12 @@ export function useCapture(cameraRef: RefObject<CameraView | null>) {
     setFrameCount(0);
     if (frames.length === 0) return null;
 
-    // 위치정보 수집이 꺼져 있으면 권한 요청조차 하지 않는다. 실패해도(권한 거부 등)
-    // 무시하고 촬영은 살린다 — 어느 쪽이든 핀만 안 남을 뿐이다.
-    const coord = locationCollectionEnabled
+    // 위치정보 수집이 꺼져 있으면 첫 촬영에 한해 인라인으로 한 번 물어본다(2026-07-30) —
+    // 게스트 온보딩은 위치 동의 화면을 안 거쳐 이 설정이 계속 꺼진 채로 남아있곤 했다.
+    // 이미 물어봤거나 켜져 있으면 즉시 반환되고, 실패해도(권한 거부 등) 무시하고
+    // 촬영은 살린다 — 어느 쪽이든 핀만 안 남을 뿐이다.
+    const shouldCollectLocation = locationCollectionEnabled || (await maybePromptLocationCollection());
+    const coord = shouldCollectLocation
       ? await requestLocationAndGet().catch(() => null)
       : null;
     const uploadId = enqueue({

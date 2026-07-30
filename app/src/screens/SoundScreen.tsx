@@ -24,6 +24,7 @@ import {
   type UploadAudioSightingParams,
 } from '@/api/audio';
 import { requestLocationAndGet } from '@/services/location';
+import { maybePromptLocationCollection } from '@/services/locationCollectionPrompt';
 import { deleteRecordedAudio } from '@/services/audioStorage';
 import { MAX_AUDIO_DURATION_MS, MIN_AUDIO_DURATION_MS, useAudioRecorder } from '@/hooks/useAudioRecorder';
 import { useSettingsStore } from '@/store/settingsStore';
@@ -204,7 +205,10 @@ export default function SoundScreen() {
       }
 
       setWorkflow('local_checking');
-      const coord = locationCollectionEnabled ? await requestLocationAndGet() : null;
+      // 첫 녹음에 한해 위치 수집 여부를 인라인으로 한 번 물어본다(2026-07-30) —
+      // useCapture.ts의 촬영 흐름과 동일한 이유(게스트 온보딩은 위치 동의를 안 거침).
+      const shouldCollectLocation = locationCollectionEnabled || (await maybePromptLocationCollection());
+      const coord = shouldCollectLocation ? await requestLocationAndGet() : null;
       const uploadInput: UploadAudioSightingParams = {
         uri: recording.uri,
         clientRecordingId: createId('audio'),
