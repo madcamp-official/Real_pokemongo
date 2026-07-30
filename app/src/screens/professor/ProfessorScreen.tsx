@@ -90,7 +90,7 @@ export default function ProfessorScreen({ navigation, route }: Props) {
           <Text style={styles.backText}>‹</Text>
         </Pressable>
         <View>
-          <Text style={styles.eyebrow}>NATURE GO</Text>
+          <Text style={styles.eyebrow}>생생탐험대</Text>
           <Text style={styles.title}>도감 박사</Text>
         </View>
         <View style={styles.headerSpacer} />

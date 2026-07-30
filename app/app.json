@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "app",
-    "slug": "app",
+    "name": "생생탐험대",
+    "slug": "living-dex",
     "version": "1.0.0",
     "orientation": "default",
     "icon": "./assets/icon.png",
@@ -16,7 +16,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "backgroundColor": "#FBEEE6",
+        "backgroundColor": "#5B8C3E",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
@@ -64,6 +64,12 @@
         "expo-screen-orientation",
         {
           "initialOrientation": "PORTRAIT_UP"
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "backgroundColor": "#5B8C3E"
         }
       ]
     ]
