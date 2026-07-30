@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
+import { colors } from '@/theme/colors';
 import { INTRO_MISSION_STEPS } from './introScript';
 
 interface Props {
@@ -66,5 +67,5 @@ const styles = StyleSheet.create({
     minWidth: 62,
   },
   chipEmoji: { fontSize: 20 },
-  chipLabel: { marginTop: 2, fontSize: 12, fontWeight: '800', color: '#2E3A24' },
+  chipLabel: { marginTop: 2, fontSize: 12, fontWeight: '800', color: colors.textPrimary },
 });

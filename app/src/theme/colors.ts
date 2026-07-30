@@ -1,7 +1,12 @@
 /**
  * 앱 공용 색상 팔레트.
- * Phase 3 디자인 시안(코랄+크림 톤)을 기준으로 정의한다.
- * 이후 화면들은 이 토큰을 참조하고, 초기(온보딩/카메라) 화면도 점진적으로 이 팔레트로 수렴.
+ *
+ * 2026-07-30 팔레트 통일: 온보딩(초록)·지도(버밀리언/올리브)·방사형 메뉴(딥그린)가
+ * 서로 다른 색상을 써서 화면을 옮길 때마다 "다른 앱 같다"는 문제가 있었다. 자연 탐험
+ * 앱 정체성에 맞춰 온보딩에서 쓰던 초록을 앱 전체의 주 색상(primary)으로 승격하고,
+ * 기존 주 색상이던 코랄은 강조색(accent)으로 역할을 좁혔다 — "새로운 친구를
+ * 발견했어요!" 같은 특별한 순간에만 쓰는 색이다(IdentifyResultScreen 참고).
+ * 이 파일이 유일한 진실 공급원이며, 새 화면은 하드코딩된 hex 대신 이 토큰을 쓴다.
  */
 export const colors = {
   // 배경/표면
@@ -9,11 +14,19 @@ export const colors = {
   surface: '#FFFFFF',
   surfaceMuted: '#F3EAE3',
 
-  // 주요 강조 (코랄)
-  primary: '#F08A6E',
-  primaryDark: '#E3765A',
+  // 주 색상 (숲 초록 — 온보딩에서 쓰던 색을 앱 전체 기본색으로 승격)
+  primary: '#5B8C3E',
+  primaryDark: '#46702E',
+  /** 배지·선택된 칩처럼 옅은 초록 배경이 필요할 때(온보딩 아바타 선택 등과 동일 톤). */
+  primaryLight: '#E4EFD8',
   onPrimary: '#FFFFFF',
-  progressTrack: '#F6DBCF',
+  progressTrack: '#DCEECB',
+
+  // 강조색 (따뜻한 코랄 — 예전엔 주 색상이었지만, 이제 "발견/축하" 같은 특별한
+  // 순간에만 쓰는 액센트로 역할을 좁혔다)
+  accent: '#F08A6E',
+  accentDark: '#E3765A',
+  onAccent: '#FFFFFF',
 
   // 텍스트
   textPrimary: '#3A3330',
@@ -61,6 +74,8 @@ export const cameraTheme = {
 export const discoveryGradient = ['#FFF6E9', '#FCE9E4', '#F7D9E4'] as const;
 /** 위험 생물 판정 시 배경 그라데이션 (크림 → 옅은 레드). */
 export const alertGradient = ['#FFF3EA', '#FBE2DB', '#F6D2CC'] as const;
+/** 옅은 초록 배경 워시(방사형 메뉴 등 primary 톤의 은은한 배경이 필요할 때). */
+export const primaryGradient = ['#D8F0C6', '#EFF9E4', '#E2F5D3'] as const;
 
 /** 종 카드 히어로/썸네일 배경 등 파스텔 톤 모음. */
 export const pastels = {

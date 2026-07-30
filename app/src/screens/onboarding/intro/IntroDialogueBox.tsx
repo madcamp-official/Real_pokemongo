@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/theme/colors';
 
 interface Props {
   text: string;
@@ -109,12 +110,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: -16,
     left: 18,
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     borderRadius: 12,
     paddingHorizontal: 14,
     paddingVertical: 6,
   },
-  speakerText: { color: '#fff', fontSize: 13, fontWeight: '800' },
-  text: { fontSize: 16, color: '#2E3A24', lineHeight: 24, fontWeight: '600' },
-  chevron: { textAlign: 'right', color: '#8A9880', marginTop: 6, fontSize: 12 },
+  speakerText: { color: colors.onPrimary, fontSize: 13, fontWeight: '800' },
+  text: { fontSize: 16, color: colors.textPrimary, lineHeight: 24, fontWeight: '600' },
+  chevron: { textAlign: 'right', color: colors.textSecondary, marginTop: 6, fontSize: 12 },
 });

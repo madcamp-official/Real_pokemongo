@@ -272,7 +272,7 @@ function SecondaryButton({ label, onPress }: { label: string; onPress: () => voi
 function Loading({ title }: { title: string }) {
   return (
     <View style={styles.centerBox}>
-      <ActivityIndicator size="large" color={colors.primary} />
+      <ActivityIndicator size="large" color={colors.accent} />
       <Text style={styles.subText}>{title}</Text>
     </View>
   );
@@ -325,7 +325,7 @@ const styles = StyleSheet.create({
   eyebrow: {
     fontSize: 13,
     fontWeight: '800',
-    color: colors.primary,
+    color: colors.accent,
     letterSpacing: 2.5,
   },
   eyebrowDanger: {
@@ -378,26 +378,26 @@ const styles = StyleSheet.create({
 
   actions: { width: '100%', gap: 12, marginTop: 14 },
   primaryBtn: {
-    backgroundColor: colors.primary,
+    backgroundColor: colors.accent,
     paddingVertical: 17,
     borderRadius: 26,
     alignItems: 'center',
-    shadowColor: colors.primaryDark,
+    shadowColor: colors.accentDark,
     shadowOpacity: 0.3,
     shadowRadius: 12,
     shadowOffset: { width: 0, height: 5 },
     elevation: 4,
   },
-  primaryBtnText: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
+  primaryBtnText: { color: colors.onAccent, fontSize: 17, fontWeight: '800' },
   secondaryBtn: {
     paddingVertical: 16,
     borderRadius: 26,
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: colors.primary,
+    borderColor: colors.accent,
     backgroundColor: 'rgba(255,255,255,0.55)',
   },
-  secondaryBtnText: { color: colors.primary, fontSize: 16, fontWeight: '800' },
+  secondaryBtnText: { color: colors.accent, fontSize: 16, fontWeight: '800' },
   pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
 
   dot: { position: 'absolute' },

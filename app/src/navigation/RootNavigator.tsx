@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import { colors } from '@/theme/colors';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { startGuestSession } from '@/api/auth';
@@ -53,8 +54,8 @@ export function RootNavigator() {
   // 대기 없이 렌더하면 재방문 사용자에게 튜토리얼이 잠깐 다시 보이는 깜빡임이 생긴다.
   if (!hasHydratedStore || !hasHydratedToken) {
     return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: '#F7F9F4' }}>
-        <ActivityIndicator color="#5B8C3E" />
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.primary} />
       </View>
     );
   }

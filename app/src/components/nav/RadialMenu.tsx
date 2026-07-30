@@ -16,7 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { NatureBall } from '@/components/nav/NatureBall';
-import { colors } from '@/theme/colors';
+import { colors, primaryGradient } from '@/theme/colors';
 import type { RootStackParamList, RootTabParamList } from '@/navigation/types';
 
 type Nav = BottomTabNavigationProp<RootTabParamList>;
@@ -35,8 +35,8 @@ const ITEMS: MenuItem[] = [
   { route: 'Rewards', label: '퀘스트', icon: '🏆' },
 ];
 
-/** 메뉴 배경(연녹색 그라데이션) — 포켓몬고 메인 메뉴 톤. */
-const MENU_BG = ['#D8F0C6', '#EFF9E4', '#E2F5D3'] as const;
+/** 메뉴 배경(연녹색 그라데이션) — colors.ts의 공용 primary 그린 워시 톤. */
+const MENU_BG = primaryGradient;
 
 const EMBLEM_SIZE = 72;
 const CIRCLE = 72;
@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: 8,
   },
-  itemLabel: { fontSize: 14, fontWeight: '800', color: '#3F6340', textAlign: 'center' },
+  itemLabel: { fontSize: 14, fontWeight: '800', color: colors.primaryDark, textAlign: 'center' },
   itemCircle: {
     width: CIRCLE,
     height: CIRCLE,

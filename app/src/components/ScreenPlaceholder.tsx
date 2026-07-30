@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { colors } from '@/theme/colors';
 
 interface Props {
   title: string;
@@ -26,19 +27,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 24,
-    backgroundColor: '#F7F9F4',
+    backgroundColor: colors.background,
   },
   badge: {
     fontSize: 12,
     fontWeight: '700',
-    color: '#5B8C3E',
-    backgroundColor: '#E4EFD8',
+    color: colors.primary,
+    backgroundColor: colors.primaryLight,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 12,
     overflow: 'hidden',
     marginBottom: 12,
   },
-  title: { fontSize: 22, fontWeight: '800', color: '#2E3A24', marginBottom: 8 },
-  desc: { fontSize: 14, color: '#6B7A5E', textAlign: 'center', lineHeight: 20 },
+  title: { fontSize: 22, fontWeight: '800', color: colors.textPrimary, marginBottom: 8 },
+  desc: { fontSize: 14, color: colors.textSecondary, textAlign: 'center', lineHeight: 20 },
 });

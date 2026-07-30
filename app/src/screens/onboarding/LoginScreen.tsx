@@ -13,6 +13,7 @@ import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { login } from '@/api/auth';
 import { useAuthStore } from '@/store/authStore';
+import { colors } from '@/theme/colors';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Login'>;
 
@@ -58,7 +59,7 @@ export default function LoginScreen({ navigation }: Props) {
         <TextInput
           style={styles.input}
           placeholder="이메일"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           autoCapitalize="none"
           keyboardType="email-address"
           value={email}
@@ -67,7 +68,7 @@ export default function LoginScreen({ navigation }: Props) {
         <TextInput
           style={styles.input}
           placeholder="비밀번호"
-          placeholderTextColor="#A6B39A"
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           value={password}
           onChangeText={setPassword}
@@ -79,34 +80,34 @@ export default function LoginScreen({ navigation }: Props) {
         onPress={() => void onSubmit()}
         disabled={!isValid || submitting}
       >
-        {submitting ? <ActivityIndicator color="#fff" /> : <Text style={styles.submitText}>로그인</Text>}
+        {submitting ? <ActivityIndicator color={colors.onPrimary} /> : <Text style={styles.submitText}>로그인</Text>}
       </Pressable>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  root: { flexGrow: 1, backgroundColor: '#F7F9F4', padding: 24, justifyContent: 'center', gap: 16 },
-  title: { fontSize: 22, fontWeight: '800', color: '#2E3A24' },
-  desc: { fontSize: 14, color: '#6B7A5E', lineHeight: 20, marginBottom: 4 },
+  root: { flexGrow: 1, backgroundColor: colors.background, padding: 24, justifyContent: 'center', gap: 16 },
+  title: { fontSize: 22, fontWeight: '800', color: colors.textPrimary },
+  desc: { fontSize: 14, color: colors.textSecondary, lineHeight: 20, marginBottom: 4 },
   form: { gap: 12 },
   input: {
-    backgroundColor: '#fff',
+    backgroundColor: colors.surface,
     borderRadius: 14,
     paddingHorizontal: 16,
     paddingVertical: 14,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: '#E4EFD8',
-    color: '#2E3A24',
+    borderColor: colors.primaryLight,
+    color: colors.textPrimary,
   },
   submitButton: {
     marginTop: 12,
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingVertical: 16,
     borderRadius: 24,
     alignItems: 'center',
   },
   disabled: { opacity: 0.5 },
-  submitText: { color: '#fff', fontSize: 16, fontWeight: '800' },
+  submitText: { color: colors.onPrimary, fontSize: 16, fontWeight: '800' },
 });

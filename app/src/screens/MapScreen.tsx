@@ -324,7 +324,7 @@ export default function MapScreen() {
 const INK = '#201E1D';
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#E4EBDA' },
+  root: { flex: 1, backgroundColor: colors.background },
 
   topWash: { position: 'absolute', top: 0, left: 0, right: 0 },
   topLeft: { position: 'absolute', left: 26, alignItems: 'flex-start', gap: 9 },
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
     paddingVertical: 9,
   },
   chipText: { fontSize: 15, fontWeight: '700', color: '#4B5248' },
-  chipAccent: { color: '#E7553D', fontWeight: '900' },
+  chipAccent: { color: colors.accent, fontWeight: '900' },
   emptyHint: {
     fontSize: 11,
     fontWeight: '700',

@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import type { NativeStackScreenProps } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '@/navigation/types';
 import { useAuthStore } from '@/store/authStore';
+import { colors } from '@/theme/colors';
 import { IntroBackground } from './IntroBackground';
 import { IntroProfessor, type IntroProfessorPhase } from './IntroProfessor';
 import { IntroCreatureMontage } from './IntroCreatureMontage';
@@ -106,7 +107,7 @@ const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: '#BFE6F7' },
   ctaWrap: { position: 'absolute', left: 0, right: 0, bottom: 48, alignItems: 'center' },
   ctaButton: {
-    backgroundColor: '#5B8C3E',
+    backgroundColor: colors.primary,
     paddingHorizontal: 40,
     paddingVertical: 18,
     borderRadius: 28,
@@ -116,5 +117,5 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     elevation: 4,
   },
-  ctaText: { color: '#fff', fontSize: 18, fontWeight: '900' },
+  ctaText: { color: colors.onPrimary, fontSize: 18, fontWeight: '900' },
 });

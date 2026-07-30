@@ -706,7 +706,7 @@ const styles = StyleSheet.create({
   stopHint: { color: colors.textSecondary, fontSize: 13, fontWeight: '700' },
   candidates: { gap: 10 },
   candidate: { flexDirection: 'row', alignItems: 'center', gap: 12, borderRadius: 18, padding: 14, borderWidth: 1.5, borderColor: colors.border, backgroundColor: colors.surface },
-  candidateActive: { borderColor: colors.primary, backgroundColor: '#FFF5F0' },
+  candidateActive: { borderColor: colors.primary, backgroundColor: colors.primaryLight },
   candidateEmoji: { fontSize: 30 },
   candidateText: { flex: 1, gap: 2 },
   candidateName: { color: colors.textPrimary, fontSize: 16, fontWeight: '900' },
