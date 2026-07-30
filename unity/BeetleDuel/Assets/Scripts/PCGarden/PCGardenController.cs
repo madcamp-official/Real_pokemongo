@@ -95,6 +95,13 @@ public sealed class PCGardenController : MonoBehaviour
     private string creatureSearchQuery = string.Empty;
     private string lastCreatureSearchQuery = string.Empty;
     private int creatureSearchIndex = -1;
+    // bootstrap(GET /garden/bootstrap)을 불러오는 중인지. 최초 기동 로드와 새로고침(F5)이
+    // 겹치면 두 응답이 서로를 덮어써 오래된 목록이 남을 수 있어, 한 번에 하나만 돌게 한다.
+    // (로그인 경로는 loginInProgress가 따로 막는다.)
+    private bool bootstrapLoadInProgress;
+    // PUT /garden/layout 이 아직 응답하지 않은 저장 요청 수. 저장이 서버에 반영되기 전에
+    // GET /garden/bootstrap 을 하면 방금 놓은 친구가 사라진 응답으로 덮어써진다.
+    private int pendingLayoutSaves;
 
     public int SpawnedCreatureCount => spawnedCreatures.Count;
     public string Status => status;
@@ -114,6 +121,8 @@ public sealed class PCGardenController : MonoBehaviour
 
         if (apiClient.IsConfigured)
         {
+            // 최초 로드가 끝나기 전에 F5를 눌러 두 번째 요청이 겹치지 않게 막는다.
+            bootstrapLoadInProgress = true;
             status = "서버에서 수집 생물을 불러오는 중입니다.";
             string serverJson = null;
             string serverError = null;
@@ -123,8 +132,10 @@ public sealed class PCGardenController : MonoBehaviour
             if (!string.IsNullOrWhiteSpace(serverJson))
             {
                 InitializeGarden(serverJson);
+                bootstrapLoadInProgress = false;
                 yield break;
             }
+            bootstrapLoadInProgress = false;
             Debug.LogWarning("PC 홈가든 서버 연결 실패, 로컬 데이터 사용: " + serverError);
         }
 
@@ -146,6 +157,9 @@ public sealed class PCGardenController : MonoBehaviour
 
         if (IsInventoryDragging)
             UpdateInventoryDrag();
+
+        if (Input.GetKeyDown(KeyCode.F5))
+            RequestRefresh();
 
         if (Input.GetKeyDown(KeyCode.F11))
             Screen.fullScreen = !Screen.fullScreen;
@@ -659,7 +673,10 @@ public sealed class PCGardenController : MonoBehaviour
     {
         newCreatureIds.Clear();
         if (data.creatures == null || data.creatures.Length == 0)
+        {
+            ResetNewFilterIfEmpty();
             return;
+        }
 
         string key = "pc-garden-last-capture-" + (data.userId ?? "local");
         string stored = PlayerPrefs.GetString(key, string.Empty);
@@ -698,11 +715,23 @@ public sealed class PCGardenController : MonoBehaviour
             }
         }
 
+        ResetNewFilterIfEmpty();
+
         if (newest > DateTime.MinValue)
         {
             PlayerPrefs.SetString(key, newest.ToString("O"));
             PlayerPrefs.Save();
         }
+    }
+
+    /// <summary>
+    /// 새 친구가 도착하면 인벤토리 필터가 "새로 온 친구"로 바뀐다. 그 뒤 다시 새로고침하면
+    /// 이번엔 새 친구가 없어 목록이 통째로 비어 보이므로, 그때는 전체 보기로 되돌린다.
+    /// </summary>
+    private void ResetNewFilterIfEmpty()
+    {
+        if (newCreatureIds.Count == 0 && inventoryCategoryFilter == "new")
+            inventoryCategoryFilter = "all";
     }
 
     private void RebuildCreatures()
@@ -2121,21 +2150,148 @@ public sealed class PCGardenController : MonoBehaviour
 
         if (apiClient != null && apiClient.IsConfigured)
         {
+            // SaveLayout은 onSuccess / onFailure 중 정확히 하나만 호출하므로
+            // 카운터는 어느 경로로 끝나든 한 번만 줄어든다.
+            pendingLayoutSaves++;
             StartCoroutine(apiClient.SaveLayout(
                 bootstrap,
-                () => status = message + " · 서버 저장 완료",
+                () =>
+                {
+                    pendingLayoutSaves--;
+                    status = message + " · 서버 저장 완료";
+                },
                 error =>
                 {
+                    pendingLayoutSaves--;
                     status = message + " · 서버 저장 재시도 필요";
                     Debug.LogWarning("PC 홈가든 서버 저장 실패: " + error);
                 }));
         }
     }
 
+    /// <summary>
+    /// 모바일 앱에서 방금 동정한 친구를 다시 로그인하지 않고 데려온다(F5 / 화면 버튼).
+    /// 실제 통신은 <see cref="RefreshFromServer"/>가 하고, 여기서는 지금 새로고침해도
+    /// 안전한 상태인지만 판단한다.
+    /// </summary>
+    public void RequestRefresh()
+    {
+        if (bootstrapLoadInProgress)
+            return;
+        if (loginInProgress)
+        {
+            status = "로그인이 끝난 뒤에 새로고침할 수 있습니다.";
+            return;
+        }
+        if (apiClient == null || !apiClient.IsConfigured)
+        {
+            // 로컬 미리보기(mock) 상태에서는 불러올 서버가 없다. 로그인 창을 대신 연다.
+            status = "서버에 로그인해야 새로 잡은 친구를 불러올 수 있습니다.";
+            loginMessage = "모바일 앱에서 사용하는 계정으로 로그인하세요.";
+            showLogin = true;
+            return;
+        }
+        StartCoroutine(RefreshFromServer());
+    }
+
+    private IEnumerator RefreshFromServer()
+    {
+        bootstrapLoadInProgress = true;
+
+        // 드래그 중이던 개체 데이터는 새 응답에서 교체되므로, 먼저 드래그를 정리한다.
+        if (IsInventoryDragging)
+            EndInventoryDrag(false);
+
+        // 방금 놓은 배치가 아직 서버에 저장되는 중이면 기다린다. 먼저 불러오면
+        // 저장 전 상태가 내려와 방금 놓은 친구가 사라진 것처럼 보인다.
+        float waitStartedAt = Time.unscaledTime;
+        bool waited = false;
+        while (pendingLayoutSaves > 0 && Time.unscaledTime - waitStartedAt < 8f)
+        {
+            if (!waited)
+            {
+                status = "배치를 저장하는 중입니다. 저장이 끝나면 새로고침합니다.";
+                waited = true;
+            }
+            yield return null;
+        }
+
+        status = "서버에서 새로 잡은 친구를 확인하는 중입니다.";
+        string json = null;
+        string error = null;
+        yield return apiClient.LoadBootstrap(
+            value => json = value,
+            value => error = value);
+
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            // 실패해도 화면에 있는 정원은 그대로 둔다 — 새로고침이 실패했다고
+            // 이미 배치해 둔 친구들이 사라지면 안 된다.
+            status = "새로고침하지 못했습니다: " + (error ?? "서버 응답이 비어 있습니다.");
+            Debug.LogWarning("PC 홈가든 새로고침 실패: " + error);
+            bootstrapLoadInProgress = false;
+            yield break;
+        }
+
+        // 카메라가 보고 있던 친구는 RebuildCreatures가 지웠다가 다시 만들기 때문에,
+        // 같은 개체가 그대로 있으면 보던 시점을 되돌려 준다.
+        string focusedCreatureId =
+            orbitCamera != null && orbitCamera.Selected != null
+                ? orbitCamera.Selected.creatureId
+                : null;
+        GardenBootstrapData previous = bootstrap;
+        int previousOwned = previous?.creatures?.Length ?? 0;
+
+        InitializeGarden(json);
+
+        // InitializeGarden은 파싱/버전 검증에 실패하면 bootstrap을 바꾸지 않고
+        // 실패 사유를 status에 남긴다. 그 메시지를 성공 문구로 덮지 않는다.
+        if (ReferenceEquals(bootstrap, previous))
+        {
+            bootstrapLoadInProgress = false;
+            yield break;
+        }
+
+        RestoreCameraFocus(focusedCreatureId);
+
+        int owned = bootstrap.creatures?.Length ?? 0;
+        int added = owned - previousOwned;
+        status = added > 0
+            ? "새로 잡은 친구 " + added + "마리가 도착했습니다 · 총 " + owned + "마리 보유"
+            : "최신 상태입니다 · " + owned + "마리 보유";
+        bootstrapLoadInProgress = false;
+    }
+
+    /// <summary>
+    /// 새로고침 전에 보고 있던 개체를 다시 비춘다. 그 개체가 사라졌으면 전체 보기로
+    /// 되돌린다(파괴된 뷰를 계속 참조하면 카메라가 빈 좌표를 바라본 채 멈춘다).
+    /// </summary>
+    private void RestoreCameraFocus(string creatureId)
+    {
+        if (orbitCamera == null)
+            return;
+        if (string.IsNullOrEmpty(creatureId))
+            return;
+
+        PCGardenCreatureView restored = spawnedCreatures.Find(
+            candidate => candidate != null
+                && candidate.creatureId == creatureId);
+        if (restored != null)
+            orbitCamera.Focus(restored);
+        else
+            orbitCamera.ShowOverview();
+    }
+
     private void BeginLogin()
     {
         if (loginInProgress)
             return;
+        if (bootstrapLoadInProgress)
+        {
+            // 새로고침이 끝나기 전에 로그인하면 두 bootstrap 응답이 서로를 덮어쓴다.
+            loginMessage = "정원을 불러오는 중입니다. 잠시 후 다시 시도해 주세요.";
+            return;
+        }
         if (string.IsNullOrWhiteSpace(loginServerUrl)
             || string.IsNullOrWhiteSpace(loginEmail)
             || string.IsNullOrWhiteSpace(loginPassword))
@@ -2409,7 +2565,7 @@ public sealed class PCGardenController : MonoBehaviour
         Rect progressBackground = new Rect(
             34f,
             78f,
-            Mathf.Max(240f, Screen.width - 545f),
+            Mathf.Max(240f, Screen.width - 663f),
             20f);
         Color previousBackground = GUI.color;
         GUI.color = new Color(0.06f, 0.07f, 0.06f, 0.92f);
@@ -2425,30 +2581,39 @@ public sealed class PCGardenController : MonoBehaviour
         GUI.color = previousBackground;
 
         GUI.Label(
-            new Rect(34f, 103f, Screen.width - 560f, 26f),
+            new Rect(34f, 103f, Screen.width - 678f, 26f),
             status + "  ·  빈 식물 슬롯 " + emptySlots,
             statusStyle);
 
-        float controlsX = Screen.width - 492f;
+        // 우측 컨트롤 블록: 폭 574(= 118+112+104+104+104 + 간격 8×4)로 세 줄을 오른쪽 정렬한다.
+        float controlsX = Screen.width - 610f;
+        GUI.enabled = !bootstrapLoadInProgress && !loginInProgress;
+        if (GUI.Button(
+                new Rect(controlsX, 28f, 118f, 38f),
+                bootstrapLoadInProgress ? "불러오는 중" : "새로고침 (F5)",
+                new GUIStyle(GUI.skin.button) { fontStyle = FontStyle.Bold }))
+            RequestRefresh();
+        GUI.enabled = true;
+
         string connectionLabel = apiClient != null && apiClient.IsConfigured
             ? "DB 다시 연결"
             : "실제 DB 연결";
-        if (GUI.Button(new Rect(controlsX, 28f, 112f, 38f), connectionLabel))
+        if (GUI.Button(new Rect(controlsX + 126f, 28f, 112f, 38f), connectionLabel))
         {
             loginMessage = "모바일 앱에서 사용하는 계정으로 로그인하세요.";
             showLogin = true;
         }
-        if (GUI.Button(new Rect(controlsX + 120f, 28f, 104f, 38f), "전체 보기")
+        if (GUI.Button(new Rect(controlsX + 246f, 28f, 104f, 38f), "전체 보기")
             && orbitCamera != null)
             orbitCamera.ShowOverview();
 
         string labelToggle = showCreatureLabels ? "이름 끄기" : "이름 켜기";
         if (GUI.Button(
-                new Rect(controlsX + 232f, 28f, 104f, 38f),
+                new Rect(controlsX + 358f, 28f, 104f, 38f),
                 labelToggle))
             showCreatureLabels = !showCreatureLabels;
 
-        if (GUI.Button(new Rect(controlsX + 344f, 28f, 104f, 38f), "종료"))
+        if (GUI.Button(new Rect(controlsX + 470f, 28f, 104f, 38f), "종료"))
         {
 #if UNITY_EDITOR
             UnityEditor.EditorApplication.isPlaying = false;
@@ -2458,7 +2623,7 @@ public sealed class PCGardenController : MonoBehaviour
         }
 
         const string searchControlName = "PCGardenCreatureNameSearch";
-        Rect searchFieldRect = new Rect(controlsX, 74f, 270f, 30f);
+        Rect searchFieldRect = new Rect(controlsX + 126f, 74f, 270f, 30f);
         GUI.SetNextControlName(searchControlName);
         creatureSearchQuery = GUI.TextField(
             searchFieldRect,
@@ -2485,7 +2650,7 @@ public sealed class PCGardenController : MonoBehaviour
                 });
         }
         bool searchClicked = GUI.Button(
-            new Rect(controlsX + 278f, 74f, 170f, 30f),
+            new Rect(controlsX + 404f, 74f, 170f, 30f),
             "검색 · 줌인 · 추적",
             new GUIStyle(GUI.skin.button)
             {
@@ -2507,7 +2672,7 @@ public sealed class PCGardenController : MonoBehaviour
                 + orbitCamera.Selected.bond + "/5"
             : "친구를 클릭하면 가까이 관찰합니다.";
         GUI.Label(
-            new Rect(controlsX, 103f, 448f, 24f),
+            new Rect(controlsX, 103f, 574f, 24f),
             selectedText + " · FPS " + smoothedFps.ToString("F0"),
             new GUIStyle(GUI.skin.label)
             {
