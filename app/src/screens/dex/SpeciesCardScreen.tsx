@@ -15,7 +15,7 @@ import { ProfessorEntryPoint } from '@/components/professor/ProfessorEntryPoint'
 import { QuizQuestion } from '@/components/species/QuizQuestion';
 import { colors } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
+import { GardenCreatureArt } from '@/components/species/GardenCreatureArt';
 import { PhotoGalleryBlock } from '@/components/species/PhotoGalleryBlock';
 import type { RootStackParamList } from '@/navigation/types';
 
@@ -52,11 +52,6 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
   const observePoints = card.observe_points ?? [];
   const quiz = card.quiz ?? [];
   const similarSpecies = card.similar_species ?? [];
-
-  const inviteToGarden = () => {
-    navigation.navigate('Main');
-    // Phase 5(홈 가든)에서 특정 개체를 배치하는 실제 초대 플로우로 확장.
-  };
 
   return (
     <View style={styles.root}>
@@ -135,10 +130,6 @@ export default function SpeciesCardScreen({ navigation, route }: Props) {
               navigation.navigate('Professor', { contextSpeciesId: card.species_id })
             }
           />
-
-          <Pressable style={styles.cta} onPress={inviteToGarden}>
-            <Text style={styles.ctaText}>우리집 정원에 초대하기</Text>
-          </Pressable>
 
           {similarSpecies.length > 0 && (
             <View style={styles.similarSection}>
@@ -227,14 +218,6 @@ const styles = StyleSheet.create({
   observeText: { flex: 1, fontSize: 14, color: colors.textPrimary, lineHeight: 20 },
 
   quizSection: { gap: 10 },
-
-  cta: {
-    backgroundColor: colors.primary,
-    borderRadius: 20,
-    paddingVertical: 18,
-    alignItems: 'center',
-  },
-  ctaText: { color: colors.onPrimary, fontSize: 17, fontWeight: '800' },
 
   similarSection: { gap: 10 },
   similarRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },

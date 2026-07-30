@@ -1,6 +1,6 @@
 import { Asset } from 'expo-asset';
 import { manipulateAsync, SaveFormat } from 'expo-image-manipulator';
-import { getGardenCreatureImageSource } from '@/components/garden/GardenCreatureArt';
+import { getGardenCreatureImageSource } from '@/components/species/GardenCreatureArt';
 
 const PIN_IMAGE_WIDTH = 72;
 const dataUriCache = new Map<string, Promise<string>>();

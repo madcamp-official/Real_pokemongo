@@ -17,7 +17,7 @@ import { queryClient } from '@/api/queryClient';
 import { useUploadQueue } from '@/store/uploadQueueStore';
 import { colors, discoveryGradient, alertGradient } from '@/theme/colors';
 import { getSpeciesVisual, getPastel } from '@/theme/species';
-import { GardenCreatureArt } from '@/components/garden/GardenCreatureArt';
+import { GardenCreatureArt } from '@/components/species/GardenCreatureArt';
 import type { RootStackParamList } from '@/navigation/types';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'IdentifyResult'>;
@@ -33,7 +33,8 @@ type Tone = 'discovery' | 'alert';
  * 신뢰도에 따라 "새로운 친구를 발견했어요!" 축하 연출 또는 "어떤 모습에 가까운가요?"
  * 후보 선택. 위험 생물이면 종 카드(안전 수칙 최상단)를 우선 노출한다.
  *
- * 작명은 이 화면에서 하지 않는다 — 홈 가든(F16)의 개체 상태 시트가 담당한다.
+ * 개체 작명(F16 `/creatures/:id/name`)은 이 모바일 앱에는 UI가 없다 — 3D 홈 가든
+ * 클라이언트가 같은 백엔드 엔드포인트를 통해 별도로 담당한다.
  */
 export default function IdentifyResultScreen({ navigation, route }: Props) {
   const insets = useSafeAreaInsets();

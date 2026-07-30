@@ -6,12 +6,6 @@ import type {
   PreviewScanResponse,
   SignupResponse,
   RestoreBundleResponse,
-  GardenLayout,
-  GardenTile,
-  TileCompatibility,
-  TileType,
-  CreatureStatus,
-  InteractResponse,
   XPProfile,
   Badge,
   Quest,
@@ -184,112 +178,6 @@ export function buildMockSignup(
 export const mockGuestConvert: GuestConvertResponse = {
   migrated_sightings: 1,
 };
-
-// ─── F16. 홈 가든 ────────────────────────────────────────
-// 6×6 기본 타일 맵. 왼쪽 상단에 물웅덩이, 곳곳에 꽃밭/흙/돌을 배치.
-const TILE_MAP: TileType[][] = [
-  ['물웅덩이', '물웅덩이', '잔디', '잔디', '꽃밭', '꽃밭'],
-  ['물웅덩이', '잔디', '잔디', '잔디', '꽃밭', '잔디'],
-  ['잔디', '잔디', '흙', '흙', '잔디', '잔디'],
-  ['잔디', '흙', '흙', '잔디', '잔디', '돌'],
-  ['꽃밭', '잔디', '잔디', '잔디', '돌', '돌'],
-  ['꽃밭', '꽃밭', '잔디', '흙', '흙', '잔디'],
-];
-
-function buildDefaultTiles(): GardenTile[] {
-  const tiles: GardenTile[] = [];
-  for (let row = 0; row < TILE_MAP.length; row++) {
-    for (let col = 0; col < TILE_MAP[row].length; col++) {
-      tiles.push({ row, col, type: TILE_MAP[row][col] });
-    }
-  }
-  return tiles;
-}
-
-export const mockGardenLayout: GardenLayout = {
-  tiles: buildDefaultTiles(),
-  placements: [],
-};
-
-export const mockTileCompatibility: TileCompatibility = {
-  곤충: ['잔디', '꽃밭', '흙', '돌'],
-  양서류: ['물웅덩이', '잔디', '흙'],
-  식물: ['흙', '꽃밭', '잔디'],
-  조류: ['잔디', '돌', '꽃밭', '흙'],
-  기타: ['흙', '잔디', '돌', '꽃밭', '물웅덩이'],
-};
-
-const STATUS_MESSAGES = [
-  '오늘은 기분이 좋아 보여요!',
-  '햇살을 쬐며 쉬고 있어요.',
-  '당신을 기다리고 있었어요.',
-  '주변을 탐험하는 중이에요.',
-];
-
-const BOND_MAX = 5;
-const REUNION_THRESHOLD_MS = 1000 * 60 * 60 * 24 * 3; // 3일
-
-function seedOf(id: string): number {
-  return id.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-}
-
-// creatureId → {bond, lastInteractionAt}. F9 상호작용으로 갱신되는 세션 내 상태.
-const bondState = new Map<string, { bond: number; lastInteractionAt: number }>();
-
-function getBondEntry(creatureId: string) {
-  if (!bondState.has(creatureId)) {
-    const seed = seedOf(creatureId);
-    bondState.set(creatureId, {
-      bond: (seed % BOND_MAX) + 1,
-      // 초기값은 "며칠 전"으로 세팅해, 처음 열었을 때 재회 연출이 자연스레 나오게 한다.
-      lastInteractionAt: Date.now() - REUNION_THRESHOLD_MS - 1000 * 60 * 60 * (seed % 24),
-    });
-  }
-  return bondState.get(creatureId)!;
-}
-
-export function buildMockCreatureStatus(
-  creatureId: string,
-  nickname: string | null
-): CreatureStatus {
-  const seed = seedOf(creatureId);
-  const entry = getBondEntry(creatureId);
-  return {
-    creature_id: creatureId,
-    nickname,
-    days_together: (seed % 30) + 1,
-    bond: entry.bond,
-    bond_max: BOND_MAX,
-    status_message: STATUS_MESSAGES[seed % STATUS_MESSAGES.length],
-    is_reunion: Date.now() - entry.lastInteractionAt > REUNION_THRESHOLD_MS,
-  };
-}
-
-const REACTION_MESSAGES = [
-  '기분이 좋아졌어요! 🐾',
-  '꼬리를 살랑살랑 흔들어요.',
-  '당신 쪽으로 다가와요.',
-  '반짝반짝 눈을 빛내요.',
-];
-
-/** F9 상호작용(쓰다듬기 등). Bond는 최대치까지 1씩 증가. */
-export function interactMockCreature(creatureId: string): InteractResponse {
-  const entry = getBondEntry(creatureId);
-  const now = Date.now();
-  const isReunion = now - entry.lastInteractionAt > REUNION_THRESHOLD_MS;
-  const before = entry.bond;
-
-  entry.bond = Math.min(entry.bond + 1, BOND_MAX);
-  entry.lastInteractionAt = now;
-
-  return {
-    bond: entry.bond,
-    bond_max: BOND_MAX,
-    bond_leveled_up: entry.bond > before,
-    reaction_message: REACTION_MESSAGES[Math.floor(Math.random() * REACTION_MESSAGES.length)],
-    is_reunion: isReunion,
-  };
-}
 
 // ─── F8. 배지 · 레벨 보상 ─────────────────────────────────
 // 실서버(seed-service/src/core/rewards/rewardTypes.ts의 DEFAULT_LEVEL_CURVE)와 반드시 같은

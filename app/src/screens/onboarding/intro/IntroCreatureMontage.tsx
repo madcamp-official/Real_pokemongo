@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Image, StyleSheet } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
-import { getGardenCreatureImageSource } from '@/components/garden/GardenCreatureArt';
+import { getGardenCreatureImageSource } from '@/components/species/GardenCreatureArt';
 
 interface Props {
   speciesIds: readonly string[];

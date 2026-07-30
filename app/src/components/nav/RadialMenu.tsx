@@ -31,7 +31,6 @@ const ITEMS: MenuItem[] = [
   { route: 'Dex', label: '도감', icon: '📖' },
   { route: 'Camera', label: '촬영', icon: '📷' },
   { route: 'Sound', label: '소리 찾기', icon: '🎙️' },
-  { route: 'Garden', label: '홈 가든', icon: '🌿' },
   { route: 'Rewards', label: '퀘스트', icon: '🏆' },
 ];
 
