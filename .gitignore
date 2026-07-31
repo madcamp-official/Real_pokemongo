@@ -4,6 +4,8 @@ node_modules/
 # env
 .env
 .env.local
+app/.env.production
+deploy/.env.production
 
 # OS
 .DS_Store

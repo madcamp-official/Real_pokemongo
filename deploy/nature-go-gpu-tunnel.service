@@ -1,0 +1,23 @@
+[Unit]
+Description=Nature Go private GPU model SSH tunnels
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/ssh -NT \
+  -i /root/.ssh/nature_go_gpu_ed25519 \
+  -o BatchMode=yes \
+  -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=30 \
+  -o ServerAliveCountMax=3 \
+  -o StrictHostKeyChecking=yes \
+  -L 127.0.0.1:8931:127.0.0.1:8931 \
+  -L 127.0.0.1:8932:127.0.0.1:8932 \
+  -L 127.0.0.1:8941:127.0.0.1:8941 \
+  root@172.10.5.71
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

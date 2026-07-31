@@ -1,0 +1,11 @@
+node_modules
+dist
+.env
+.env.*
+.runtime
+data/*
+!data/professor-knowledge.json
+!data/professor-knowledge-vectors.json
+research
+embedding-worker
+npm-debug.log*

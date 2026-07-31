@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -17,7 +18,8 @@ public sealed class PCGardenApiClient : MonoBehaviour
     {
         ApiBaseUrl = FirstNonEmpty(
             Environment.GetEnvironmentVariable("NATURE_GO_API_URL"),
-            PlayerPrefs.GetString("nature-go-api-url", string.Empty));
+            PlayerPrefs.GetString("nature-go-api-url", string.Empty),
+            LoadPackagedApiBaseUrl());
         AuthToken = FirstNonEmpty(
             Environment.GetEnvironmentVariable("NATURE_GO_AUTH_TOKEN"),
             PlayerPrefs.GetString("nature-go-auth-token", string.Empty));
@@ -206,6 +208,33 @@ public sealed class PCGardenApiClient : MonoBehaviour
                 return value.Trim();
         }
         return string.Empty;
+    }
+
+    private static string LoadPackagedApiBaseUrl()
+    {
+        try
+        {
+            string path = Path.Combine(
+                Application.streamingAssetsPath,
+                "nature-go-garden.json");
+            if (!File.Exists(path))
+                return string.Empty;
+            RuntimeConfig config = JsonUtility.FromJson<RuntimeConfig>(
+                File.ReadAllText(path, Encoding.UTF8));
+            return config != null ? config.api_base_url : string.Empty;
+        }
+        catch (Exception error)
+        {
+            Debug.LogWarning(
+                "[PC Garden] 패키지 API 설정을 읽지 못했습니다: " + error.Message);
+            return string.Empty;
+        }
+    }
+
+    [Serializable]
+    private sealed class RuntimeConfig
+    {
+        public string api_base_url;
     }
 
     [Serializable]

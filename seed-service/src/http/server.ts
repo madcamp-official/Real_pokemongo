@@ -56,6 +56,28 @@ function resolveJwtSecret(app: App): string {
 export async function buildHttpServer(app: App): Promise<FastifyInstance> {
   const server = Fastify({ logger: false });
 
+  // 로드밸런서/컨테이너가 프로세스 생존 여부와 DB 준비 여부를 구분해 판단할 수 있게 한다.
+  // /health는 인증·외부 모델과 무관한 liveness, /ready는 실제 요청 처리에 필수인 DB까지
+  // 확인하는 readiness다. 상세 DB 오류는 외부에 노출하지 않는다.
+  server.get("/health", async (_request, reply) =>
+    reply.code(200).send({ status: "ok", service: "nature-go-api" }),
+  );
+  server.get("/ready", async (_request, reply) => {
+    if (!app.dbPool) {
+      const ready = app.config.nodeEnv !== "production";
+      return reply.code(ready ? 200 : 503).send({
+        ready,
+        database: ready ? "in_memory" : "unavailable",
+      });
+    }
+    try {
+      await app.dbPool.query("SELECT 1");
+      return reply.code(200).send({ ready: true, database: "postgres" });
+    } catch {
+      return reply.code(503).send({ ready: false, database: "unavailable" });
+    }
+  });
+
   // 한 번만 계산해서 fastify-jwt 등록과 사진 단기 토큰(mediaToken.ts) 서명에 동일하게
   // 쓴다 — jwtSecret이 비어있어 여기서 임의 시크릿을 생성한 경우, app.config를 다시
   // 읽으면 이 값을 못 찾으므로 반드시 이 변수를 그대로 넘겨야 한다.

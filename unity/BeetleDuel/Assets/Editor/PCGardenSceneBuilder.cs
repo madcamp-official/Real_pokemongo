@@ -11,6 +11,8 @@ public static class PCGardenSceneBuilder
     public const string ScenePath = "Assets/Scenes/GreenhouseGarden.unity";
     public const string BuildFolder = "Builds/Windows/NatureGoGarden";
     public const string ExecutablePath = BuildFolder + "/NatureGoGarden.exe";
+    private const string RuntimeConfigPath =
+        "Assets/StreamingAssets/nature-go-garden.json";
 
     [MenuItem("Nature Go/PC Garden/Rebuild Greenhouse Garden Scene")]
     public static void RebuildScene()
@@ -105,6 +107,66 @@ public static class PCGardenSceneBuilder
             "[PC Garden] Windows 빌드 완료: " + ExecutablePath
             + " · " + (summary.totalSize / (1024f * 1024f)).ToString("F1") + " MB"
             + " · " + summary.totalTime);
+    }
+
+    [MenuItem("Nature Go/PC Garden/Build Windows Release")]
+    public static void BuildWindowsRelease()
+    {
+        string apiBaseUrl =
+            (System.Environment.GetEnvironmentVariable("NATURE_GO_API_URL")
+                ?? string.Empty).Trim().TrimEnd('/');
+        if (!System.Uri.TryCreate(apiBaseUrl, System.UriKind.Absolute, out System.Uri uri)
+            || uri.Scheme != System.Uri.UriSchemeHttps)
+        {
+            throw new BuildFailedException(
+                "NATURE_GO_API_URL에 배포용 HTTPS API 주소를 지정해야 합니다.");
+        }
+
+        if (!File.Exists(ScenePath))
+            RebuildScene();
+
+        string configDirectory = Path.GetDirectoryName(RuntimeConfigPath);
+        Directory.CreateDirectory(configDirectory);
+        File.WriteAllText(
+            RuntimeConfigPath,
+            JsonUtility.ToJson(new RuntimeConfig { api_base_url = apiBaseUrl }),
+            new System.Text.UTF8Encoding(false));
+        AssetDatabase.Refresh();
+
+        try
+        {
+            Directory.CreateDirectory(BuildFolder);
+            PlayerSettings.bundleVersion = "1.0.0";
+            BuildPlayerOptions options = new BuildPlayerOptions
+            {
+                scenes = new[] { ScenePath },
+                locationPathName = ExecutablePath,
+                target = BuildTarget.StandaloneWindows64,
+                options = BuildOptions.CompressWithLz4HC,
+            };
+
+            BuildReport report = BuildPipeline.BuildPlayer(options);
+            BuildSummary summary = report.summary;
+            if (summary.result != BuildResult.Succeeded)
+                throw new BuildFailedException(
+                    "PC 홈가든 Windows 릴리스 빌드 실패: " + summary.result);
+
+            Debug.Log(
+                "[PC Garden] Windows 릴리스 빌드 완료: " + ExecutablePath
+                + " · " + (summary.totalSize / (1024f * 1024f)).ToString("F1") + " MB"
+                + " · API " + apiBaseUrl);
+        }
+        finally
+        {
+            AssetDatabase.DeleteAsset(RuntimeConfigPath);
+            AssetDatabase.Refresh();
+        }
+    }
+
+    [System.Serializable]
+    private sealed class RuntimeConfig
+    {
+        public string api_base_url;
     }
 
     private static GameObject LoadRequiredPrefab(string path)

@@ -256,11 +256,19 @@ export function assertProductionConfig(cfg: AppConfig): void {
   if (cfg.nodeEnv !== "production") return;
   const missing: string[] = [];
   if (!cfg.database.url) missing.push("DATABASE_URL");
-  if (!cfg.mediaStorage.bucket) missing.push("MEDIA_STORAGE_BUCKET");
   if (!cfg.auth.jwtSecret) missing.push("AUTH_JWT_SECRET");
-  // 동정 API 키가 하나도 없으면 프로덕션에서 Mock으로 도는 것을 막는다.
-  if (!cfg.identification.plantId.apiKey && !cfg.identification.plantNet.apiKey) {
-    missing.push("PLANT_ID_API_KEY 또는 PLANTNET_API_KEY (최소 1개)");
+  // 현재 운영 저장소 구현은 LocalDiskMediaStore다. 컨테이너의 영구 볼륨에 localDir를
+  // 마운트하면 재시작 뒤에도 사진이 보존되므로, 아직 사용하지 않는 S3 버킷을 필수로
+  // 요구하지 않는다. 오브젝트 스토리지 어댑터를 실제로 도입할 때 별도 검증을 추가한다.
+  if (!cfg.mediaStorage.localDir) missing.push("MEDIA_STORAGE_LOCAL_DIR");
+  // 자체 GPU BioCLIP도 실제 동정 프로바이더다. 유료 식물 API 키가 없어도 BioCLIP
+  // endpoint가 있으면 Mock으로 폴백하지 않으므로 정상적인 프로덕션 구성이다.
+  if (
+    !cfg.identification.bioclip.endpoint &&
+    !cfg.identification.plantId.apiKey &&
+    !cfg.identification.plantNet.apiKey
+  ) {
+    missing.push("BIOCLIP_ENDPOINT 또는 외부 동정 API 키 (최소 1개)");
   }
   if (missing.length > 0) {
     throw new Error(
